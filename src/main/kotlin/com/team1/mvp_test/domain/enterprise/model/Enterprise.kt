@@ -25,10 +25,10 @@ class Enterprise(
     var phoneNumber: String,
 
     @Column(name = "is_confirmed")
-    var isConfirmed: Boolean,
+    var isConfirmed: Boolean? = false,
 
     @Column(name = "is_blocked")
-    var isBlocked: Boolean,
+    var isBlocked: Boolean? = false,
 ) {
 
 }
