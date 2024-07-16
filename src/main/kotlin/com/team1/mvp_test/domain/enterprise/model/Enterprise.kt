@@ -13,7 +13,7 @@ class Enterprise(
     val email: String,
 
     @Column(name = "name")
-    val name: String,
+    var name: String,
 
     @Column(name = "ceo_name")
     var ceoName: String,

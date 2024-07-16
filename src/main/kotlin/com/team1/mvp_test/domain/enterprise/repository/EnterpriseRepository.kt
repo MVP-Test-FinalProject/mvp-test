@@ -6,4 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 interface EnterpriseRepository : JpaRepository<Enterprise, Long> {
     fun existsByName(name: String): Boolean
     fun existsByEmail(email: String): Boolean
+    fun findByEmail(email: String): Enterprise?
 }
