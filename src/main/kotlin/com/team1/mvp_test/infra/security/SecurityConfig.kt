@@ -24,7 +24,9 @@ class SecurityConfig(
             .csrf { it.disable() }
             .authorizeHttpRequests {
                 it.requestMatchers(
+                    "/",
                     "/swagger-ui/**",
+                    "/v3/api-docs/**",
                     "/enterprise/login",
                     "/enterprise/sign-up"
                 )
