@@ -8,6 +8,7 @@ import com.team1.mvp_test.domain.member.dto.MemberUpdateResponse
 import com.team1.mvp_test.domain.member.dto.SignUpRequest
 import com.team1.mvp_test.domain.member.model.Member
 import com.team1.mvp_test.domain.member.repository.MemberRepository
+import com.team1.mvp_test.domain.oauth.client.OAuthLoginUserInfo
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -39,5 +40,13 @@ class MemberService(
     fun getMemberById(memberId: Long): MemberResponse {
         val member = memberRepository.findByIdOrNull(memberId) ?: throw ModelNotFoundException("Member", memberId)
         return MemberResponse.from(member)
+    }
+
+    fun registerIfAbsent(userInfo: OAuthLoginUserInfo): Member {
+        return memberRepository.findByProviderIdAndProviderName(userInfo.id, userInfo.provider) ?: run {
+            Member(
+                email = userInfo.email,
+            ).let { memberRepository.save(it) }
+        }
     }
 }
