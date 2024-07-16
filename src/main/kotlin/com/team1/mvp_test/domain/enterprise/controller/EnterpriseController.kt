@@ -3,8 +3,11 @@ package com.team1.mvp_test.domain.enterprise.controller
 import com.team1.mvp_test.domain.enterprise.dto.*
 import com.team1.mvp_test.domain.enterprise.service.EnterpriseAuthService
 import com.team1.mvp_test.domain.enterprise.service.EnterpriseService
+import com.team1.mvp_test.infra.security.UserPrincipal
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -34,20 +37,22 @@ class EnterpriseController(
     
     @GetMapping("/{enterpriseId}/profile")
     fun getProfile(
-        @PathVariable enterpriseId: Long,
+        @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<EnterpriseResponse> {
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(enterpriseService.getProfile(enterpriseId))
+            .body(enterpriseService.getProfile(userPrincipal.id))
     }
 
-    @PutMapping("/{enterpriseId}/profile")
+
+    @PutMapping("/profile")
+    @PreAuthorize("hasRole('ENTERPRISE')")
     fun updateProfile(
-        @PathVariable enterpriseId: Long,
+        @AuthenticationPrincipal userPrincipal: UserPrincipal,
         @RequestBody request: UpdateEnterpriseRequest
     ): ResponseEntity<EnterpriseResponse> {
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(enterpriseService.updateProfile(enterpriseId, request))
+            .body(enterpriseService.updateProfile(userPrincipal.id, request))
     }
 }
