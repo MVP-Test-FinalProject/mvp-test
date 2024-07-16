@@ -37,7 +37,7 @@ class EnterpriseAuthService(
     fun login(request: LoginRequest): EnterpriseLoginResponse {
         val enterprise = enterpriseRepository.findByEmail(request.email)
             ?: throw ModelNotFoundException("Enterprise", request.email)
-        if (passwordEncoder.matches(request.password, enterprise.password)) throw PasswordIncorrectException()
+        if (!passwordEncoder.matches(request.password, enterprise.password)) throw PasswordIncorrectException()
         return jwtHelper.generateAccessToken(
             subject = enterprise.id!!.toString(),
             email = enterprise.email,
