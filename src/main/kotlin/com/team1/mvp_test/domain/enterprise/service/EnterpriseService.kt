@@ -1,8 +1,8 @@
 package com.team1.mvp_test.domain.enterprise.service
 
-import com.team1.mvp_test.domain.common.error.EnterpriseErrorMessage
-import com.team1.mvp_test.domain.common.exception.ModelNotFoundException
-import com.team1.mvp_test.domain.common.exception.PasswordIncorrectException
+import com.team1.mvp_test.common.error.EnterpriseErrorMessage
+import com.team1.mvp_test.common.exception.ModelNotFoundException
+import com.team1.mvp_test.common.exception.PasswordIncorrectException
 import com.team1.mvp_test.domain.enterprise.dto.*
 import com.team1.mvp_test.domain.enterprise.model.Enterprise
 import com.team1.mvp_test.domain.enterprise.repository.EnterpriseRepository

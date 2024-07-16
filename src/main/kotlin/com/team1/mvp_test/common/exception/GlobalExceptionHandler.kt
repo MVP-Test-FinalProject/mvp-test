@@ -1,6 +1,6 @@
-package com.team1.mvp_test.domain.common.exception
+package com.team1.mvp_test.common.exception
 
-import com.team1.mvp_test.domain.common.exception.dto.ErrorResponse
+import com.team1.mvp_test.common.exception.dto.ErrorResponse
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler

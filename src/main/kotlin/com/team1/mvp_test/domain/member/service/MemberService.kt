@@ -1,7 +1,7 @@
 package com.team1.mvp_test.domain.member.service
 
-import com.team1.mvp_test.domain.common.error.MemberErrorMessage
-import com.team1.mvp_test.domain.common.exception.ModelNotFoundException
+import com.team1.mvp_test.common.error.MemberErrorMessage
+import com.team1.mvp_test.common.exception.ModelNotFoundException
 import com.team1.mvp_test.domain.member.dto.MemberResponse
 import com.team1.mvp_test.domain.member.dto.MemberUpdateRequest
 import com.team1.mvp_test.domain.member.dto.MemberUpdateResponse

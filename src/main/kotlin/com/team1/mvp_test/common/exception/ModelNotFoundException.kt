@@ -1,4 +1,4 @@
-package com.team1.mvp_test.domain.common.exception
+package com.team1.mvp_test.common.exception
 
 class ModelNotFoundException : RuntimeException {
     constructor(modelName: String) : super("Model with name $modelName not found")
