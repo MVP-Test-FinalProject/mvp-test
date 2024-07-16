@@ -1,5 +1,7 @@
 package com.team1.mvp_test.domain.enterprise.service
 
+import com.team1.mvp_test.domain.common.exception.ModelNotFoundException
+import com.team1.mvp_test.domain.common.exception.PasswordIncorrectException
 import com.team1.mvp_test.domain.enterprise.dto.*
 import com.team1.mvp_test.domain.enterprise.model.Enterprise
 import com.team1.mvp_test.domain.enterprise.repository.EnterpriseRepository
@@ -25,8 +27,9 @@ class EnterpriseService(
     }
 
     fun login(request: LoginRequest): EnterpriseLoginResponse {
-        val enterprise = enterpriseRepository.findByEmail(request.email) ?: throw RuntimeException("존재하지 않는 기업입니다.")
-        if (enterprise.password != request.password) throw RuntimeException("비밀번호가 맞지 않습니다.")
+        val enterprise = enterpriseRepository.findByEmail(request.email)
+            ?: throw ModelNotFoundException("Enterprise", request.email)
+        if (enterprise.password != request.password) throw PasswordIncorrectException()
         return EnterpriseLoginResponse(
             // TODO: Security 적용시 수정해야 할 부분
             accessToken = ""
@@ -34,13 +37,19 @@ class EnterpriseService(
     }
 
     fun getProfile(enterpriseId: Long): EnterpriseResponse {
-        val enterprise = enterpriseRepository.findByIdOrNull(enterpriseId) ?: throw RuntimeException("존재하지 않는 기업입니다.")
+        val enterprise = enterpriseRepository.findByIdOrNull(enterpriseId) ?: throw ModelNotFoundException(
+            "Enterprise",
+            enterpriseId
+        )
         return EnterpriseResponse.from(enterprise)
     }
 
     @Transactional
     fun updateProfile(enterpriseId: Long, request: UpdateEnterpriseRequest): EnterpriseResponse {
-        val enterprise = enterpriseRepository.findByIdOrNull(enterpriseId) ?: throw RuntimeException("존재하지 않는 기업입니다.")
+        val enterprise = enterpriseRepository.findByIdOrNull(enterpriseId) ?: throw ModelNotFoundException(
+            "Enterprise",
+            enterpriseId
+        )
         return enterprise.apply {
             this.name = request.name
             this.ceoName = request.ceoName
