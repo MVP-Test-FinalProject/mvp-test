@@ -1,5 +1,6 @@
 package com.team1.mvp_test.domain.member.service
 
+import com.team1.mvp_test.domain.common.error.MemberErrorMessage
 import com.team1.mvp_test.domain.common.exception.ModelNotFoundException
 import com.team1.mvp_test.domain.member.dto.MemberResponse
 import com.team1.mvp_test.domain.member.dto.MemberUpdateRequest
@@ -17,7 +18,7 @@ class MemberService(
 ) {
     @Transactional
     fun signUp(request: SignUpRequest): MemberResponse {
-        check(!memberRepository.existsByEmail(request.email)) { "이미 존재하는 email입니다." }
+        check(!memberRepository.existsByEmail(request.email)) { MemberErrorMessage.EMAIL_ALREADY_IN_USE.message }
         return Member(
             email = request.email,
             name = request.name,

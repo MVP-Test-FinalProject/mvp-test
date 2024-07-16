@@ -1,5 +1,6 @@
 package com.team1.mvp_test.domain.enterprise.service
 
+import com.team1.mvp_test.domain.common.error.EnterpriseErrorMessage
 import com.team1.mvp_test.domain.common.exception.ModelNotFoundException
 import com.team1.mvp_test.domain.common.exception.PasswordIncorrectException
 import com.team1.mvp_test.domain.enterprise.dto.*
@@ -14,8 +15,8 @@ class EnterpriseService(
     private val enterpriseRepository: EnterpriseRepository
 ) {
     fun signUp(request: EnterpriseSignUpRequest): EnterpriseResponse {
-        check(!enterpriseRepository.existsByName(request.name)) { "이미 존재하는 기업입니다." }
-        check(!enterpriseRepository.existsByEmail(request.email)) { "이미 존재하는 기업입니다." }
+        check(!enterpriseRepository.existsByName(request.name)) { EnterpriseErrorMessage.ALREADY_EXISTS.message }
+        check(!enterpriseRepository.existsByEmail(request.email)) { EnterpriseErrorMessage.ALREADY_EXISTS.message }
         return Enterprise(
             email = request.email,
             name = request.name,
