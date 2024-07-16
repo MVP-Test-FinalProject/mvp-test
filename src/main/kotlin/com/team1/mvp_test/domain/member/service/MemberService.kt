@@ -35,10 +35,6 @@ class MemberService(
         return MemberUpdateResponse.from(member)
     }
 
-    fun logOut(token: String) {
-// todo : 토큰 블랙리스트
-    }
-
     fun getMemberById(memberId: Long): MemberResponse {
         val member = memberRepository.findByIdOrNull(memberId) ?: throw ModelNotFoundException("Member", memberId)
         return MemberResponse.from(member)
