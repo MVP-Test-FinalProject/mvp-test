@@ -1,6 +1,7 @@
 package com.team1.mvp_test.domain.enterprise.controller
 
 import com.team1.mvp_test.domain.enterprise.dto.*
+import com.team1.mvp_test.domain.enterprise.service.EnterpriseAuthService
 import com.team1.mvp_test.domain.enterprise.service.EnterpriseService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -9,7 +10,8 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/enterprise")
 class EnterpriseController(
-    private val enterpriseService: EnterpriseService
+    private val enterpriseService: EnterpriseService,
+    private val enterpriseAuthService: EnterpriseAuthService
 ) {
 
     @PostMapping("/sign-up")
@@ -18,7 +20,7 @@ class EnterpriseController(
     ): ResponseEntity<EnterpriseResponse> {
         return ResponseEntity
             .status(HttpStatus.CREATED)
-            .body(enterpriseService.signUp(request))
+            .body(enterpriseAuthService.signUp(request))
     }
 
     @PostMapping("/login")
@@ -27,9 +29,9 @@ class EnterpriseController(
     ): ResponseEntity<EnterpriseLoginResponse> {
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(enterpriseService.login(request))
+            .body(enterpriseAuthService.login(request))
     }
-
+    
     @GetMapping("/{enterpriseId}/profile")
     fun getProfile(
         @PathVariable enterpriseId: Long,
