@@ -14,8 +14,8 @@ class EnterpriseService(
     private val enterpriseRepository: EnterpriseRepository
 ) {
     fun signUp(request: EnterpriseSignUpRequest): EnterpriseResponse {
-        check(enterpriseRepository.existsByName(request.name)) { "이미 존재하는 기업입니다." }
-        check(enterpriseRepository.existsByEmail(request.email)) { "이미 존재하는 기업입니다." }
+        check(!enterpriseRepository.existsByName(request.name)) { "이미 존재하는 기업입니다." }
+        check(!enterpriseRepository.existsByEmail(request.email)) { "이미 존재하는 기업입니다." }
         return Enterprise(
             email = request.email,
             name = request.name,
