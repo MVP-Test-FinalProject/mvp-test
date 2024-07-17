@@ -3,10 +3,13 @@ package com.team1.mvp_test.domain.member.controller
 import com.team1.mvp_test.domain.member.dto.MemberResponse
 import com.team1.mvp_test.domain.member.dto.MemberUpdateRequest
 import com.team1.mvp_test.domain.member.dto.MemberUpdateResponse
-import com.team1.mvp_test.domain.member.dto.SignUpRequest
+import com.team1.mvp_test.domain.member.dto.SignUpInfoRequest
 import com.team1.mvp_test.domain.member.service.MemberService
+import com.team1.mvp_test.infra.security.UserPrincipal
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 
 @RequestMapping("/members")
@@ -14,23 +17,26 @@ import org.springframework.web.bind.annotation.*
 class MemberController(
     val memberService: MemberService
 ) {
-    @PostMapping("/sign-up")
-    fun signUp(
-        @RequestBody request: SignUpRequest
+    @PutMapping("/info")
+    @PreAuthorize("hasRole('MEMBER')")
+    fun updateSignUpInfo(
+        @AuthenticationPrincipal userPrincipal: UserPrincipal,
+        @RequestBody request: SignUpInfoRequest
     ): ResponseEntity<MemberResponse> {
         return ResponseEntity
-            .status(HttpStatus.CREATED)
-            .body(memberService.signUp(request))
+            .status(HttpStatus.OK)
+            .body(memberService.updateSignUpInfo(userPrincipal.id, request))
     }
 
-    @PutMapping("/{memberId}/profile")
+    @PutMapping("/profile")
+    @PreAuthorize("hasRole('MEMBER')")
     fun updateMember(
-        @PathVariable memberId: Long,
+        @AuthenticationPrincipal userPrincipal: UserPrincipal,
         @RequestBody request: MemberUpdateRequest
     ): ResponseEntity<MemberUpdateResponse> {
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(memberService.updateMember(request, memberId))
+            .body(memberService.updateMember(userPrincipal.id, request))
     }
 
     @GetMapping("/{memberId}")

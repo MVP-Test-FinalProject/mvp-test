@@ -4,12 +4,12 @@ import com.team1.mvp_test.domain.member.model.Member
 
 data class MemberResponse(
     val id: Long,
-    val name: String,
-    val email: String,
-    val age: Long,
-    val sex: String,
-    val info: String,
-    val isBanned: Boolean,
+    val name: String?,
+    val email: String?,
+    val age: Int?,
+    val sex: String?,
+    val info: String?,
+    val signupState: Boolean,
 ) {
     companion object {
         fun from(member: Member): MemberResponse {
@@ -20,7 +20,7 @@ data class MemberResponse(
                 age = member.age,
                 sex = member.sex,
                 info = member.info,
-                isBanned = member.isBanned!!,
+                signupState = member.signUpState,
             )
         }
     }

@@ -1,9 +1,8 @@
 package com.team1.mvp_test.domain.member.dto
 
-data class SignUpRequest(
-    val email: String,
+data class SignUpInfoRequest(
     val name: String,
-    val age: Long,
+    val age: Int,
     val sex: String,
     val info: String,
 )
