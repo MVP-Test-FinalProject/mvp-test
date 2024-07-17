@@ -34,7 +34,7 @@ class Member(
     val providerId: String? = null,
 
     @Column(name = "signup_state")
-    val signUpState: Boolean? = false,
+    var signUpState: Boolean = false,
 ) {
     fun updateMember(request: MemberUpdateRequest) {
         this.name = request.name

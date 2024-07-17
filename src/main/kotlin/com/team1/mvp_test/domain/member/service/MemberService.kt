@@ -42,6 +42,7 @@ class MemberService(
         return MemberResponse.from(member)
     }
 
+    @Transactional
     fun registerIfAbsent(userInfo: OAuthLoginUserInfo): Member {
         return memberRepository.findByProviderIdAndProviderName(userInfo.id, userInfo.provider) ?: run {
             Member(
