@@ -3,18 +3,21 @@ package com.team1.mvp_test.domain.report.service
 import com.team1.mvp_test.common.exception.ModelNotFoundException
 import com.team1.mvp_test.domain.member.repository.MemberTestRepository
 import com.team1.mvp_test.domain.mvptest.dto.report.*
-import com.team1.mvp_test.domain.report.model.Report
-import com.team1.mvp_test.domain.report.model.ReportMedia
+import com.team1.mvp_test.domain.mvptest.model.MvpTest
 import com.team1.mvp_test.domain.mvptest.repository.MvpTestRepository
-import com.team1.mvp_test.domain.report.repository.ReportMediaRepository
-import com.team1.mvp_test.domain.report.repository.ReportRepository
 import com.team1.mvp_test.domain.report.dto.ApproveReportRequest
 import com.team1.mvp_test.domain.report.dto.ApproveReportResponse
 import com.team1.mvp_test.domain.report.dto.ReportResponse
 import com.team1.mvp_test.domain.report.dto.UpdateReportRequest
+import com.team1.mvp_test.domain.report.model.Report
+import com.team1.mvp_test.domain.report.model.ReportMedia
+import com.team1.mvp_test.domain.report.repository.ReportMediaRepository
+import com.team1.mvp_test.domain.report.repository.ReportRepository
 import jakarta.transaction.Transactional
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
+import javax.naming.NoPermissionException
 
 @Service
 class ReportService(
@@ -26,10 +29,11 @@ class ReportService(
 ) {
 
     @Transactional
-    fun createReport(testId: Long, stepId: Long, request: UpdateReportRequest, memberId: Long): ReportResponse {
-        val test = mvpTestRepository.findByIdOrNull(testId) ?: throw ModelNotFoundException("mvp test", testId)
+    fun createReport(stepId: Long, request: UpdateReportRequest, memberId: Long): ReportResponse {
         val step = stepRepository.findByIdOrNull(stepId) ?: throw ModelNotFoundException("step", stepId)
-        val memberTest = memberTestRepository.findByMemberIdAndTestId(memberId, testId) ?: throw RuntimeException("you are not tester for this test")
+        val test = step.test
+        checkDateCondition(test)
+        val memberTest = memberTestRepository.findByMemberIdAndTestId(memberId, test.id) ?: throw NoPermissionException("you are not tester for this test")
 
         val media = request.mediaUrl.map { reportMediaRepository.save(ReportMedia(mediaUrl = it))}.toMutableList()
         val report = Report(
@@ -37,7 +41,6 @@ class ReportService(
             body = request.body,
             feedback = request.feedback,
             memberTest = memberTest,
-            test = test,
             step = step,
             isConfirmed = false,
             reason = null,
@@ -49,48 +52,51 @@ class ReportService(
 
     @Transactional
     fun updateReport(
-        testId: Long,
-        stepId: Long,
         reportId: Long,
         request: UpdateReportRequest,
         memberId: Long
     ): ReportResponse {
-        val test = mvpTestRepository.findByIdOrNull(testId) ?: throw ModelNotFoundException("mvp test", testId)
-        val step = stepRepository.findByIdOrNull(stepId) ?: throw ModelNotFoundException("step", stepId)
-        val memberTest = memberTestRepository.findByMemberIdAndTestId(memberId, testId) ?: throw RuntimeException("you are not tester for this test")
+        val report = reportRepository.findByIdOrNull(reportId) ?: throw ModelNotFoundException("report", reportId)
+        val step = report.step
+        val test = step.test
+        checkDateCondition(test)
+        val memberTest = memberTestRepository.findByMemberIdAndTestId(memberId, test.id) ?: throw NoPermissionException("you are not tester for this test")
 
-        val report = reportRepository.findByIdOrNull(testId) ?: throw ModelNotFoundException("report", testId)
         report.title = request.title
         report.body = request.body
         report.feedback = request.feedback
-
         report.reportMedia.clear()
         val newMedia = request.mediaUrl.map{ reportMediaRepository.save(ReportMedia(mediaUrl = it)) }
 
         return ReportResponse.from(report)
     }
 
-    fun deleteReport(testId: Long, stepId: Long, reportId: Long, memberId: Long) {
-        val test = mvpTestRepository.findByIdOrNull(testId) ?: throw ModelNotFoundException("mvp test", testId)
-        val step = stepRepository.findByIdOrNull(stepId) ?: throw ModelNotFoundException("step", stepId)
-        val memberTest = memberTestRepository.findByMemberIdAndTestId(memberId, testId) ?: throw RuntimeException("you are not tester for this test")
-
-
+    fun deleteReport(reportId: Long, memberId: Long) {
         val report = reportRepository.findByIdOrNull(reportId) ?: throw ModelNotFoundException("report", reportId)
+        if(report.memberTest.member.id != memberId) { throw NoPermissionException("Not your report.") }
         reportRepository.delete(report)
     }
 
     fun approveReport(
-        testId: Long,
-        stepId: Long,
         reportId: Long,
         request: ApproveReportRequest,
         enterpriseId: Long
     ): ApproveReportResponse? {
         val report = reportRepository.findByIdOrNull(reportId) ?: throw ModelNotFoundException("report", reportId)
+        val test = report.step.test
+        if (test.enterpriseId != enterpriseId) { throw NoPermissionException("Not your test's report.") }
+
         report.isConfirmed = request.isConfirmed
         report.reason = request.reason
         reportRepository.save(report)
+
         return ApproveReportResponse.from(report)
+    }
+
+    private fun checkDateCondition(test: MvpTest) {
+        val currentDate = LocalDateTime.now()
+        if (currentDate.isAfter(test.testEndDate) || currentDate.isBefore(test.testStartDate)) {
+            throw IllegalArgumentException("Can't write the report right now.")
+        }
     }
 }
