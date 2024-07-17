@@ -1,6 +1,7 @@
 package com.team1.mvp_test.domain.member.model
 
 import com.team1.mvp_test.domain.member.dto.MemberUpdateRequest
+import com.team1.mvp_test.domain.oauth.provider.OAuthProvider
 import jakarta.persistence.*
 
 @Entity
@@ -11,28 +12,29 @@ class Member(
     val id: Long? = null,
 
     @Column(name = "name")
-    var name: String,
+    var name: String? = null,
 
     @Column(name = "email")
     val email: String,
 
     @Column(name = "age")
-    var age: Long,
+    var age: Int? = null,
 
     @Column(name = "sex")
-    var sex: String,
+    var sex: String? = null,
 
     @Column(name = "info")
-    var info: String,
+    var info: String? = null,
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "provider_name")
-    val providerName: String? = null,
+    val providerName: OAuthProvider? = null,
 
     @Column(name = "provider_id")
-    val providerId: Long? = null,
+    val providerId: String? = null,
 
-    @Column(name = "is_banned")
-    val isBanned: Boolean? = false,
+    @Column(name = "signup_state")
+    var signUpState: Boolean = false,
 ) {
     fun updateMember(request: MemberUpdateRequest) {
         this.name = request.name
