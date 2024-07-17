@@ -34,7 +34,6 @@ class NaverOAuthClient(
     }
 
     override fun getAccessToken(authorizationCode: String): String {
-        print(authorizationCode)
         val requestData = mutableMapOf(
             "grant_type" to "authorization_code",
             "client_id" to clientId,

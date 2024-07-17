@@ -22,14 +22,15 @@ class GoogleOAuthClient(
     @Value("\${oauth2.google.redirect-url}") private val redirectUrl: String,
     @Value("\${oauth2.google.auth_server_base_url}") private val authServerBaseUrl: String,
     @Value("\${oauth2.google.resource_server_base_url}") private val resourceServerBaseUrl: String,
+    @Value("\${oauth2.google.token_server_base_url}") private val tokenServerBaseUrl: String,
     private val restClient: RestClient
 ) : OAuthClient {
     override fun generateLoginPageUrl(): String {
         return StringBuilder(authServerBaseUrl)
-            .append("/oauth2.0/authorize")
             .append("?response_type=").append("code")
             .append("&client_id=").append(clientId)
             .append("&redirect_uri=").append(redirectUrl)
+            .append("&scope=").append("email")
             .toString()
     }
 
@@ -42,7 +43,7 @@ class GoogleOAuthClient(
             "redirect_uri" to redirectUrl
         )
         return restClient.post()
-            .uri("$authServerBaseUrl/oauth2.0/token")
+            .uri("$tokenServerBaseUrl")
             .contentType(MediaType.APPLICATION_FORM_URLENCODED)
             .body(LinkedMultiValueMap<String, String>().apply { this.setAll(requestData) })
             .retrieve()
