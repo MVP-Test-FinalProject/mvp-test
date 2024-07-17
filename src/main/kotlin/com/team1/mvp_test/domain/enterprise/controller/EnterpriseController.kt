@@ -34,8 +34,9 @@ class EnterpriseController(
             .status(HttpStatus.OK)
             .body(enterpriseAuthService.login(request))
     }
-    
-    @GetMapping("/{enterpriseId}/profile")
+
+    @GetMapping("/profile")
+    @PreAuthorize("hasRole('ENTERPRISE')")
     fun getProfile(
         @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<EnterpriseResponse> {
