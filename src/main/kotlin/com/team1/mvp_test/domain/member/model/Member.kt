@@ -18,7 +18,7 @@ class Member(
     val email: String,
 
     @Column(name = "age")
-    var age: Long? = null,
+    var age: Int? = null,
 
     @Column(name = "sex")
     var sex: String? = null,

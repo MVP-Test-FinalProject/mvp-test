@@ -6,7 +6,7 @@ data class MemberResponse(
     val id: Long,
     val name: String?,
     val email: String?,
-    val age: Long?,
+    val age: Int?,
     val sex: String?,
     val info: String?,
     val signupState: Boolean,
