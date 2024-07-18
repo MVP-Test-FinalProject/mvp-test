@@ -33,7 +33,8 @@ class Report(
     @JoinColumn(name = "member_test_id")
     val memberTest: MemberTest,
 
-    @OneToMany(mappedBy = "report", orphanRemoval = true)
+    @OneToMany(orphanRemoval = true)
+    @JoinColumn(name = "report_id")
     var reportMedia: MutableList<ReportMedia> = mutableListOf(),
 
     ) {
