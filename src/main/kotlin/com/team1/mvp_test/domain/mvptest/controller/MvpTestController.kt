@@ -85,6 +85,18 @@ class MvpTestController(
     ): ResponseEntity<TestingMemberCountResponse> {
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(mvpTestService.approveMemberToTest())
+            .body(mvpTestService.approveMemberToTest(testId, memberId, userPrincipal.id))
+    }
+
+    @PreAuthorize("hasRole('ENTERPRISE')")
+    @DeleteMapping("/{testId}/disapprove")
+    fun undoApproveMemberToMvpTest(
+        @RequestParam memberId: Long,
+        @PathVariable("testId") testId: Long,
+        @AuthenticationPrincipal userPrincipal: UserPrincipal
+    ): ResponseEntity<TestingMemberCountResponse> {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(mvpTestService.undoApproveMemberToTest(testId, memberId, userPrincipal.id))
     }
 }
