@@ -1,51 +1,68 @@
 package com.team1.mvp_test.domain.mvptest.controller
 
-import com.team1.mvp_test.domain.mvptest.dto.mvptest.CreateMpvTestRequest
+import com.team1.mvp_test.domain.mvptest.dto.mvptest.CreateCategoryRequest
+import com.team1.mvp_test.domain.mvptest.dto.mvptest.CreateMvpTestRequest
+import com.team1.mvp_test.domain.mvptest.dto.mvptest.MvpTestListResponse
 import com.team1.mvp_test.domain.mvptest.dto.mvptest.MvpTestResponse
+import com.team1.mvp_test.domain.mvptest.dto.mvptest.UpdateMvpTestRequest
 import com.team1.mvp_test.domain.mvptest.service.MvpTestService
+import com.team1.mvp_test.infra.security.UserPrincipal
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
+import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("")
+@RequestMapping("/mvp_tests")
 class MvpTestController(
     private val mvpTestService: MvpTestService
 ) {
 
-    @PostMapping("/mvp_tests")
+    @PostMapping("")
+    @PreAuthorize("hasRole('ENTERPRISE')")
     fun createMvpTest(
-        @RequestBody request: CreateMpvTestRequest
+        @RequestBody request: CreateMvpTestRequest,
+        @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<MvpTestResponse> {
         return ResponseEntity
             .status(HttpStatus.CREATED)
-            .body(mvpTestService.createMvpTest(request))
+            .body(mvpTestService.createMvpTest(userPrincipal.id, request))
     }
 
-
     @PutMapping("/{testId}")
+    @PreAuthorize("hasRole('ENTERPRISE')")
     fun updateMvpTest(
         @RequestBody request: UpdateMvpTestRequest,
-        @PathVariable("testId") testId: Long
-    ): ResponseEntity<MvpTestResponse>{
+        @PathVariable("testId") testId: Long,
+        @AuthenticationPrincipal userPrincipal: UserPrincipal
+    ): ResponseEntity<MvpTestResponse> {
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(mvpTestService.updateMvpTest())
+            .body(mvpTestService.updateMvpTest(userPrincipal.id, testId, request))
     }
 
     @DeleteMapping("/{testId}")
+    @PreAuthorize("hasRole('ENTERPRISE')")
     fun deleteMvpTest(
-        @PathVariable ("testId") testId: Long,
+        @PathVariable("testId") testId: Long,
+        @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<Unit> {
-        mvpTestService.deleteMvpTest(testId)
         return ResponseEntity
             .status(HttpStatus.NO_CONTENT)
-            .build()
+            .body(mvpTestService.deleteMvpTest(userPrincipal.id, testId))
     }
 
     @GetMapping("/{testId}")
     fun getMvpTest(
-        @PathVariable ("testId") testId: Long,
+        @PathVariable("testId") testId: Long,
     ): ResponseEntity<MvpTestResponse> {
         return ResponseEntity
             .status(HttpStatus.OK)
@@ -60,4 +77,13 @@ class MvpTestController(
             .body(mvpTestService.getMvpTestList())
     }
 
+    @PostMapping("/category")
+    //@PreAuthorize("hasRole('ADMIN')")
+    fun createCategory(
+        @RequestBody request: CreateCategoryRequest
+    ): ResponseEntity<String> {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(mvpTestService.createCategory(request))
+    }
 }

@@ -1,14 +1,27 @@
 package com.team1.mvp_test.domain.mvptest.model
 
-import jakarta.persistence.*
+import com.team1.mvp_test.domain.enterprise.model.Enterprise
+import com.team1.mvp_test.domain.mvptest.constant.RecruitType
+import com.team1.mvp_test.domain.mvptest.dto.mvptest.UpdateMvpTestRequest
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
+import jakarta.persistence.ManyToOne
+import jakarta.persistence.OneToMany
+import jakarta.persistence.Table
 import java.time.LocalDateTime
 
 @Table(name = "mvp_test")
 @Entity
 class MvpTest(
     @Id
-    @GeneratedValue()
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
+
+    @Column(name = "enterprise_id")
+    val enterpriseId : Long,
 
     @Column(name = "mvp_name")
     var mvpName: String,
@@ -43,21 +56,45 @@ class MvpTest(
     @Column(name = "requirement_max_age")
     var requirementMaxAge : Int?,
 
-    @Column(name = "requriement_sex")
-    var requirementSex : Boolean,
+    @Column(name = "requirement_sex")
+    var requirementSex : Boolean?,
 
     @Column(name = "recruit_type")
-    var recruitType : String,
+    var recruitType : RecruitType,
 
     @Column(name = "recruit_num")
     var recruitNum : Long,
 
-    @Column(name = "state")
-    var state : String,
-
-    @Column(name = "reject_reason")
-    var rejectReason : String
+    @OneToMany
+    var categories : List<CategoryMap>?
 
     ) {
 
+    @Column(name = "state")
+    lateinit var state : String
+
+    @Column(name = "reject_reason")
+    lateinit var rejectReason : String
+
+
+
+
+
+    fun update(request: UpdateMvpTestRequest, categoryMaps: List<CategoryMap>){
+        mvpName = request.mvpName
+        recruitStartDate = request.recruitStartDate
+        recruitEndDate = request.recruitEndDate
+        testStartDate = request.testStartDate
+        testEndDate = request.testEndDate
+        mainImageUrl = request.mainImageUrl
+        mvpInfo = request.mvpInfo
+        mvpUrl = request.mvpUrl
+        rewardBudget = request.rewardBudget
+        requirementMinAge = request.requirementMinAge
+        requirementMaxAge = request.requirementMaxAge
+        requirementSex = request.requirementSex
+        recruitType = RecruitType.fromString(request.recruitType)
+        recruitNum = request.recruitNum
+        categories = categoryMaps
+    }
 }
