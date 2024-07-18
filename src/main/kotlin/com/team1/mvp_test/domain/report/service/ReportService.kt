@@ -2,10 +2,11 @@ package com.team1.mvp_test.domain.report.service
 
 import com.team1.mvp_test.common.error.ReportErrorMessage
 import com.team1.mvp_test.common.exception.ModelNotFoundException
+import com.team1.mvp_test.common.exception.NoPermissionException
 import com.team1.mvp_test.domain.member.model.MemberTest
 import com.team1.mvp_test.domain.member.repository.MemberTestRepository
 import com.team1.mvp_test.domain.mvptest.model.MvpTest
-import com.team1.mvp_test.domain.mvptest.repository.MvpTestRepository
+
 import com.team1.mvp_test.domain.report.dto.ApproveReportRequest
 import com.team1.mvp_test.domain.report.dto.ApproveReportResponse
 import com.team1.mvp_test.domain.report.dto.ReportResponse
@@ -19,7 +20,6 @@ import jakarta.transaction.Transactional
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
-import javax.naming.NoPermissionException
 
 @Service
 class ReportService(
@@ -95,6 +95,7 @@ class ReportService(
 
         report.isConfirmed = request.isConfirmed
         report.reason = request.reason
+
         reportRepository.save(report)
 
         return ApproveReportResponse.from(report)
