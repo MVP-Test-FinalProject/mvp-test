@@ -18,7 +18,7 @@ class ReportController(
     private val reportService: ReportService
 ) {
 
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('MEMBER')")
     @PostMapping
     fun createReport(
         @PathVariable("test-id") testId: Long,
@@ -31,7 +31,7 @@ class ReportController(
             .body(reportService.createReport(stepId, request, userPrincipal.id))
     }
 
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('MEMBER')")
     @PutMapping("/{report-id}")
     fun updateReport(
         @PathVariable("test-id") testId: Long,
@@ -45,7 +45,7 @@ class ReportController(
             .body(reportService.updateReport(reportId, request, userPrincipal.id))
     }
 
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('MEMBER')")
     @DeleteMapping("/{report-id}")
     fun deleteReport(
         @PathVariable("test-id") testId: Long,
