@@ -1,5 +1,6 @@
 package com.team1.mvp_test.domain.report.service
 
+import com.team1.mvp_test.common.error.ReportErrorMessage
 import com.team1.mvp_test.common.exception.ModelNotFoundException
 import com.team1.mvp_test.domain.member.repository.MemberTestRepository
 import com.team1.mvp_test.domain.mvptest.dto.report.*
@@ -33,7 +34,7 @@ class ReportService(
         val step = stepRepository.findByIdOrNull(stepId) ?: throw ModelNotFoundException("step", stepId)
         val test = step.test
         checkDateCondition(test)
-        val memberTest = memberTestRepository.findByMemberIdAndTestId(memberId, test.id) ?: throw NoPermissionException("you are not tester for this test")
+        checkMemberTest(test, memberId)
 
         val media = request.mediaUrl.map { reportMediaRepository.save(ReportMedia(mediaUrl = it))}.toMutableList()
         val report = Report(
@@ -60,7 +61,8 @@ class ReportService(
         val step = report.step
         val test = step.test
         checkDateCondition(test)
-        val memberTest = memberTestRepository.findByMemberIdAndTestId(memberId, test.id) ?: throw NoPermissionException("you are not tester for this test")
+        checkMemberTest(test, memberId)
+        checkAuthor(report, memberId)
 
         report.title = request.title
         report.body = request.body
@@ -73,7 +75,7 @@ class ReportService(
 
     fun deleteReport(reportId: Long, memberId: Long) {
         val report = reportRepository.findByIdOrNull(reportId) ?: throw ModelNotFoundException("report", reportId)
-        if(report.memberTest.member.id != memberId) { throw NoPermissionException("Not your report.") }
+        checkAuthor(report, memberId)
         reportRepository.delete(report)
     }
 
@@ -84,7 +86,7 @@ class ReportService(
     ): ApproveReportResponse? {
         val report = reportRepository.findByIdOrNull(reportId) ?: throw ModelNotFoundException("report", reportId)
         val test = report.step.test
-        if (test.enterpriseId != enterpriseId) { throw NoPermissionException("Not your test's report.") }
+        checkEnterprise(test, enterpriseId)
 
         report.isConfirmed = request.isConfirmed
         report.reason = request.reason
@@ -96,7 +98,19 @@ class ReportService(
     private fun checkDateCondition(test: MvpTest) {
         val currentDate = LocalDateTime.now()
         if (currentDate.isAfter(test.testEndDate) || currentDate.isBefore(test.testStartDate)) {
-            throw IllegalArgumentException("Can't write the report right now.")
+            throw IllegalArgumentException(ReportErrorMessage.NOT_TEST_DURATION.message)
         }
+    }
+
+    private fun checkAuthor(report: Report, memberId: Long) {
+        check(report.memberTest.member.id == memberId) { throw IllegalArgumentException(ReportErrorMessage.NOT_AUTHORIZED.message) }
+    }
+
+    private fun checkEnterprise(test: MvpTest, enterpriseId: Long) {
+        check(test.enterprise.id == enterpriseId) { throw NoPermissionException(ReportErrorMessage.NOT_YOUR_TEST.message) }
+    }
+
+    private fun checkMemberTest(test: MvpTest, memberId: Long) {
+        memberTestRepository.findByMemberIdAndTestId(memberId, test.id) ?: throw NoPermissionException(ReportErrorMessage.NO_PERMISSION.message)
     }
 }
