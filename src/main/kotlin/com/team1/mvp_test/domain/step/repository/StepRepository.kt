@@ -14,6 +14,4 @@ interface StepRepository: JpaRepository<Step, Long>  {
 
     fun findAllByMvpTestId(testId: Long) :List<Step>
 
-    fun findByIdAndMvpTestId(stepId: Long, testId: Long) :Step?
-
 }
