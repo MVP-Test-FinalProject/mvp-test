@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 interface MemberTestRepository: JpaRepository<MemberTest, Long>  {
 
-    fun findByMemberIdAndTestId(memberId: Long, testId: Long): MemberTest
+    fun findByMemberIdAndTestId(memberId: Long?, testId: Long?): MemberTest?
 }
