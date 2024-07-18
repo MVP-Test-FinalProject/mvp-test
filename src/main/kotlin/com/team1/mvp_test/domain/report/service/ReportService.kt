@@ -14,6 +14,7 @@ import com.team1.mvp_test.domain.report.model.Report
 import com.team1.mvp_test.domain.report.model.ReportMedia
 import com.team1.mvp_test.domain.report.repository.ReportMediaRepository
 import com.team1.mvp_test.domain.report.repository.ReportRepository
+import com.team1.mvp_test.domain.step.repository.StepRepository
 import jakarta.transaction.Transactional
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service

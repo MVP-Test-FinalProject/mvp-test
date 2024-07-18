@@ -86,14 +86,14 @@ class MvpTestService(
     @Transactional
     fun approveMemberToTest(testId: Long, memberId: Long, enterpriseId: Long): TestingMemberCountResponse {
         val test = mvpTestRepository.findByIdOrNull(testId) ?: throw ModelNotFoundException("mvpTest", testId)
-        checkMvpTestAuthor(enterpriseId, mvpTest.enterpriseId)
+        checkMvpTestAuthor(enterpriseId, test.enterpriseId)
         val member = memberRepository.findByIdOrNull(memberId) ?: throw ModelNotFoundException("member", memberId)
         val currentTestingMembersCount = memberTestRepository.countAllTestingMembers(testId)
-        if (currentTestingMembersCount >= mvpTest.recruitNum) {
+        if (currentTestingMembersCount >= test.recruitNum) {
             throw IllegalArgumentException(MvpTestErrorMessage.TEST_ALREADY_FULL.message)
         }
-        memberTestRepository.save(MemberTest(member = member, test = mvpTest))
-        return TestingMemberCountResponse.from(mvpTest, currentTestingMembersCount+1)
+        memberTestRepository.save(MemberTest(member = member, test = test))
+        return TestingMemberCountResponse.from(test, currentTestingMembersCount+1)
     }
 
     @Transactional
@@ -105,8 +105,8 @@ class MvpTestService(
         return TestingMemberCountResponse.from(test, currentTestingMembersCount-1)
     }
 
-    private fun checkMvpTestAuthor(enterpriseId: Long, MvpTestAuthorId: Long) {
-        check(enterpriseId == MvpTestAuthorId) { EnterpriseErrorMessage.NOT_AUTHORIZED.message }
+    private fun checkMvpTestAuthor(enterpriseId: Long, mvpTestAuthorId: Long) {
+        check(enterpriseId == mvpTestAuthorId) { EnterpriseErrorMessage.NOT_AUTHORIZED.message }
     }
 
     fun createCategory(request: CreateCategoryRequest): String {

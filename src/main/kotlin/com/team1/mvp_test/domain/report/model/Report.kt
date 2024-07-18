@@ -1,6 +1,7 @@
 package com.team1.mvp_test.domain.report.model
 
 import com.team1.mvp_test.domain.member.model.MemberTest
+import com.team1.mvp_test.domain.step.model.Step
 import jakarta.persistence.*
 
 @Entity
