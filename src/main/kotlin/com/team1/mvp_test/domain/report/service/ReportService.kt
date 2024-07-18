@@ -2,6 +2,7 @@ package com.team1.mvp_test.domain.report.service
 
 import com.team1.mvp_test.common.error.ReportErrorMessage
 import com.team1.mvp_test.common.exception.ModelNotFoundException
+import com.team1.mvp_test.domain.member.model.MemberTest
 import com.team1.mvp_test.domain.member.repository.MemberTestRepository
 import com.team1.mvp_test.domain.mvptest.dto.report.*
 import com.team1.mvp_test.domain.mvptest.model.MvpTest
@@ -34,7 +35,7 @@ class ReportService(
         val step = stepRepository.findByIdOrNull(stepId) ?: throw ModelNotFoundException("step", stepId)
         val test = step.test
         checkDateCondition(test)
-        checkMemberTest(test, memberId)
+        val memberTest = checkMemberTest(test, memberId)
 
         val media = request.mediaUrl.map { reportMediaRepository.save(ReportMedia(mediaUrl = it))}.toMutableList()
         val report = Report(
@@ -58,8 +59,7 @@ class ReportService(
         memberId: Long
     ): ReportResponse {
         val report = reportRepository.findByIdOrNull(reportId) ?: throw ModelNotFoundException("report", reportId)
-        val step = report.step
-        val test = step.test
+        val test = report.step.test
         checkDateCondition(test)
         checkMemberTest(test, memberId)
         checkAuthor(report, memberId)
@@ -110,7 +110,9 @@ class ReportService(
         check(test.enterprise.id == enterpriseId) { throw NoPermissionException(ReportErrorMessage.NOT_YOUR_TEST.message) }
     }
 
-    private fun checkMemberTest(test: MvpTest, memberId: Long) {
-        memberTestRepository.findByMemberIdAndTestId(memberId, test.id) ?: throw NoPermissionException(ReportErrorMessage.NO_PERMISSION.message)
+    private fun checkMemberTest(test: MvpTest, memberId: Long): MemberTest {
+        val memberTest = memberTestRepository.findByMemberIdAndTestId(memberId, test.id) ?: throw NoPermissionException(ReportErrorMessage.NO_PERMISSION.message)
+        return memberTest
     }
+
 }
