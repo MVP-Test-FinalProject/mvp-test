@@ -3,7 +3,8 @@ package com.team1.mvp_test.domain.mvptest.service
 import com.team1.mvp_test.common.error.CategoryErrorMessage
 import com.team1.mvp_test.common.error.EnterpriseErrorMessage
 import com.team1.mvp_test.common.exception.ModelNotFoundException
-import com.team1.mvp_test.domain.mvptest.dto.mvptest.CreateMpvTestRequest
+import com.team1.mvp_test.domain.mvptest.dto.mvptest.CreateCategoryRequest
+import com.team1.mvp_test.domain.mvptest.dto.mvptest.CreateMvpTestRequest
 import com.team1.mvp_test.domain.mvptest.dto.mvptest.MvpTestListResponse
 import com.team1.mvp_test.domain.mvptest.dto.mvptest.MvpTestResponse
 import com.team1.mvp_test.domain.mvptest.dto.mvptest.UpdateMvpTestRequest
@@ -24,48 +25,33 @@ class MvpTestService(
     private val categoryMapRepository: CategoryMapRepository
 ) {
     @Transactional
-    fun createMvpTest(enterpriseId: Long, request: CreateMpvTestRequest): MvpTestResponse {
+    fun createMvpTest(enterpriseId: Long, request: CreateMvpTestRequest): MvpTestResponse {
         val mvpTest = request.toMvpTest(enterpriseId)
         mvpTest.state = ""
         mvpTest.rejectReason = ""
         val savedMvpTest = mvpTestRepository.save(mvpTest)
-        val categoryMaps = mutableListOf<CategoryMap>()
-        request.category.forEach {
-            //val savedCategory = categoryRepository.save(Category(name = it))
-            val category =
-                try {
-                    categoryRepository.findByName(it)
-                } catch (e: Exception) {
-                    categoryRepository.save(Category(name = it))
-                }
-            categoryMaps.add(
-                categoryMapRepository.save(
-                    CategoryMap(
-                        id = CategoryMapId(categoryId = category.id, mvpTestId = savedMvpTest.id),
-                        category = category
-                    )
-                )
-            )
+        val categoryMaps = request.category.map {
+            val category = categoryRepository.findByName(it)
+                ?: throw IllegalArgumentException(CategoryErrorMessage.NOT_EXIST.message)
+            categoryMapRepository.save(CategoryMap(id = CategoryMapId(category.id, mvpTest.id), category))
         }
+
         savedMvpTest.categories = categoryMaps
         mvpTestRepository.save(savedMvpTest)
         return MvpTestResponse.from(savedMvpTest)
     }
 
     @Transactional
-    fun updateMvpTest(id: Long, testId: Long, request: UpdateMvpTestRequest): MvpTestResponse? {
+    fun updateMvpTest(id: Long, testId: Long, request: UpdateMvpTestRequest): MvpTestResponse {
         val mvpTest = mvpTestRepository.findByIdOrNull(testId) ?: throw ModelNotFoundException(
             "MvpTest",
             testId
         )
         checkMvpTestAuthor(id, mvpTest.enterpriseId)
         val categoryMaps = request.category.map {
-            val category = try {
-                categoryRepository.findByName(it)
-            } catch (e: Exception) {
-                throw IllegalArgumentException(CategoryErrorMessage.DOSE_NOT_EXIST.message)
-            }
-            CategoryMap(id = CategoryMapId(category.id, testId), category)
+            val category = categoryRepository.findByName(it)
+                ?: throw IllegalArgumentException(CategoryErrorMessage.NOT_EXIST.message)
+            CategoryMap(id = CategoryMapId(category.id, mvpTest.id), category)
         }
         mvpTest.update(request, categoryMaps)
         return MvpTestResponse.from(mvpTestRepository.save(mvpTest))
@@ -96,7 +82,10 @@ class MvpTestService(
     }
 
     private fun checkMvpTestAuthor(enterpriseId: Long, MvpTestAuthorId: Long) {
-        println("enterpriseId : $enterpriseId , mvpAuthorId : $MvpTestAuthorId")
-        check(enterpriseId == MvpTestAuthorId) { EnterpriseErrorMessage.NOT_AUTHORISED.message }
+        check(enterpriseId == MvpTestAuthorId) { EnterpriseErrorMessage.NOT_AUTHORIZED.message }
+    }
+
+    fun createCategory(request: CreateCategoryRequest): String {
+        return categoryRepository.save(Category(name = request.category)).name
     }
 }

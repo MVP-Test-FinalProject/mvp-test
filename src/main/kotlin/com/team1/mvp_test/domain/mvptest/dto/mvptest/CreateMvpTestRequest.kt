@@ -4,7 +4,7 @@ import com.team1.mvp_test.domain.mvptest.constant.RecruitType
 import com.team1.mvp_test.domain.mvptest.model.MvpTest
 import java.time.LocalDateTime
 
-data class CreateMpvTestRequest(
+data class CreateMvpTestRequest(
     val mvpName: String,
     val recruitStartDate: LocalDateTime,
     val recruitEndDate: LocalDateTime,
@@ -37,7 +37,8 @@ data class CreateMpvTestRequest(
             requirementMaxAge = requirementMaxAge,
             requirementSex = requirementSex,
             recruitType = RecruitType.fromString(recruitType),
-            recruitNum = recruitNum
+            recruitNum = recruitNum,
+            categories = null
         )
     }
 }

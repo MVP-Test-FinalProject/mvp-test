@@ -1,6 +1,7 @@
 package com.team1.mvp_test.domain.mvptest.controller
 
-import com.team1.mvp_test.domain.mvptest.dto.mvptest.CreateMpvTestRequest
+import com.team1.mvp_test.domain.mvptest.dto.mvptest.CreateCategoryRequest
+import com.team1.mvp_test.domain.mvptest.dto.mvptest.CreateMvpTestRequest
 import com.team1.mvp_test.domain.mvptest.dto.mvptest.MvpTestListResponse
 import com.team1.mvp_test.domain.mvptest.dto.mvptest.MvpTestResponse
 import com.team1.mvp_test.domain.mvptest.dto.mvptest.UpdateMvpTestRequest
@@ -28,7 +29,7 @@ class MvpTestController(
     @PostMapping("")
     @PreAuthorize("hasRole('ENTERPRISE')")
     fun createMvpTest(
-        @RequestBody request: CreateMpvTestRequest,
+        @RequestBody request: CreateMvpTestRequest,
         @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<MvpTestResponse> {
         return ResponseEntity
@@ -74,5 +75,15 @@ class MvpTestController(
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(mvpTestService.getMvpTestList())
+    }
+
+    @PostMapping("/category")
+    //@PreAuthorize("hasRole('ADMIN')")
+    fun createCategory(
+        @RequestBody request: CreateCategoryRequest
+    ): ResponseEntity<String> {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(mvpTestService.createCategory(request))
     }
 }

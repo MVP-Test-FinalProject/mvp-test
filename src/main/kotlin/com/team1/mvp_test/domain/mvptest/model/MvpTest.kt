@@ -65,6 +65,9 @@ class MvpTest(
     @Column(name = "recruit_num")
     var recruitNum : Long,
 
+    @OneToMany
+    var categories : List<CategoryMap>?
+
     ) {
 
     @Column(name = "state")
@@ -73,8 +76,7 @@ class MvpTest(
     @Column(name = "reject_reason")
     lateinit var rejectReason : String
 
-    @OneToMany
-    lateinit var categories : List<CategoryMap>
+
 
 
 

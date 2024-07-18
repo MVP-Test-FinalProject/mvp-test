@@ -20,13 +20,13 @@ data class MvpTestResponse(
     val requirementSex: Boolean?,
     val recruitType: String,
     val recruitNum: Long,
-    val category: List<String>
+    val category: List<String>?
 ) {
     companion object {
         fun from(mvpTest: MvpTest): MvpTestResponse {
             return MvpTestResponse(
                 id = mvpTest.id,
-                enterpriseId = mvpTest.id,
+                enterpriseId = mvpTest.enterpriseId,
                 mvpName = mvpTest.mvpName,
                 recruitStartDate = mvpTest.recruitStartDate,
                 recruitEndDate = mvpTest.recruitEndDate,
@@ -41,7 +41,7 @@ data class MvpTestResponse(
                 requirementSex = mvpTest.requirementSex,
                 recruitType = mvpTest.recruitType.toString(),
                 recruitNum = mvpTest.recruitNum,
-                category = mvpTest.categories.map { it.category.name }
+                category = mvpTest.categories?.map { it.category.name }
             )
 
         }
