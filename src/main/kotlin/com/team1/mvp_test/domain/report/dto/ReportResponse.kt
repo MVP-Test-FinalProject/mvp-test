@@ -27,7 +27,7 @@ data class ReportResponse (
             return ReportResponse(
                 id = report.id!!,
                 stepId = report.step.id!!,
-                testId = report.test.id!!,
+                testId = report.step.mvpTest.id!!,
                 body = report.body,
                 reportMedia = report.reportMedia,
                 feedback = report.feedback,

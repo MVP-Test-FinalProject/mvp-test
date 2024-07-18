@@ -4,7 +4,6 @@ import com.team1.mvp_test.common.error.ReportErrorMessage
 import com.team1.mvp_test.common.exception.ModelNotFoundException
 import com.team1.mvp_test.domain.member.model.MemberTest
 import com.team1.mvp_test.domain.member.repository.MemberTestRepository
-import com.team1.mvp_test.domain.mvptest.dto.report.*
 import com.team1.mvp_test.domain.mvptest.model.MvpTest
 import com.team1.mvp_test.domain.mvptest.repository.MvpTestRepository
 import com.team1.mvp_test.domain.report.dto.ApproveReportRequest
@@ -33,11 +32,11 @@ class ReportService(
     @Transactional
     fun createReport(stepId: Long, request: UpdateReportRequest, memberId: Long): ReportResponse {
         val step = stepRepository.findByIdOrNull(stepId) ?: throw ModelNotFoundException("step", stepId)
-        val test = step.test
+        val test = step.mvpTest
         checkDateCondition(test)
         val memberTest = checkMemberTest(test, memberId)
 
-        val media = request.mediaUrl.map { reportMediaRepository.save(ReportMedia(mediaUrl = it))}.toMutableList()
+        val media = request.mediaUrl.map { reportMediaRepository.save(ReportMedia(mediaUrl = it)) }.toMutableList()
         val report = Report(
             title = request.title,
             body = request.body,
@@ -59,7 +58,7 @@ class ReportService(
         memberId: Long
     ): ReportResponse {
         val report = reportRepository.findByIdOrNull(reportId) ?: throw ModelNotFoundException("report", reportId)
-        val test = report.step.test
+        val test = report.step.mvpTest
         checkDateCondition(test)
         checkMemberTest(test, memberId)
         checkAuthor(report, memberId)
@@ -67,25 +66,31 @@ class ReportService(
         report.title = request.title
         report.body = request.body
         report.feedback = request.feedback
+
         report.reportMedia.clear()
-        val newMedia = request.mediaUrl.map{ reportMediaRepository.save(ReportMedia(mediaUrl = it)) }
+        val newMedia = request.mediaUrl.map { reportMediaRepository.save(ReportMedia(mediaUrl = it)) }.toMutableList()
+        report.reportMedia = newMedia
 
         return ReportResponse.from(report)
     }
 
+    @Transactional
     fun deleteReport(reportId: Long, memberId: Long) {
         val report = reportRepository.findByIdOrNull(reportId) ?: throw ModelNotFoundException("report", reportId)
         checkAuthor(report, memberId)
+
         reportRepository.delete(report)
+        report.reportMedia.clear()
     }
 
+    @Transactional
     fun approveReport(
         reportId: Long,
         request: ApproveReportRequest,
         enterpriseId: Long
-    ): ApproveReportResponse? {
+    ): ApproveReportResponse {
         val report = reportRepository.findByIdOrNull(reportId) ?: throw ModelNotFoundException("report", reportId)
-        val test = report.step.test
+        val test = report.step.mvpTest
         checkEnterprise(test, enterpriseId)
 
         report.isConfirmed = request.isConfirmed
@@ -103,15 +108,17 @@ class ReportService(
     }
 
     private fun checkAuthor(report: Report, memberId: Long) {
-        check(report.memberTest.member.id == memberId) { throw IllegalArgumentException(ReportErrorMessage.NOT_AUTHORIZED.message) }
+        check(report.memberTest.member.id == memberId) { ReportErrorMessage.NOT_AUTHORIZED.message }
     }
 
     private fun checkEnterprise(test: MvpTest, enterpriseId: Long) {
-        check(test.enterprise.id == enterpriseId) { throw NoPermissionException(ReportErrorMessage.NOT_YOUR_TEST.message) }
+        check(test.enterpriseId == enterpriseId) { ReportErrorMessage.NOT_YOUR_TEST.message }
     }
 
     private fun checkMemberTest(test: MvpTest, memberId: Long): MemberTest {
-        val memberTest = memberTestRepository.findByMemberIdAndTestId(memberId, test.id) ?: throw NoPermissionException(ReportErrorMessage.NO_PERMISSION.message)
+        val memberTest = memberTestRepository.findByMemberIdAndTestId(memberId, test.id) ?: throw NoPermissionException(
+            ReportErrorMessage.NO_PERMISSION.message
+        )
         return memberTest
     }
 

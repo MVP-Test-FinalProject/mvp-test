@@ -33,7 +33,7 @@ class Report(
     val memberTest: MemberTest,
 
     @OneToMany(mappedBy = "report", orphanRemoval = true)
-    val reportMedia: MutableList<ReportMedia> = mutableListOf(),
+    var reportMedia: MutableList<ReportMedia> = mutableListOf(),
 
     ) {
 }
