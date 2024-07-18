@@ -25,7 +25,6 @@ import javax.naming.NoPermissionException
 class ReportService(
     private val reportRepository: ReportRepository,
     private val reportMediaRepository: ReportMediaRepository,
-    private val mvpTestRepository: MvpTestRepository,
     private val stepRepository: StepRepository,
     private val memberTestRepository: MemberTestRepository,
 ) {

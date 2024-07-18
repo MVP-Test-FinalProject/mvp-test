@@ -1,16 +1,8 @@
 package com.team1.mvp_test.domain.mvptest.model
 
-import com.team1.mvp_test.domain.enterprise.model.Enterprise
 import com.team1.mvp_test.domain.mvptest.constant.RecruitType
 import com.team1.mvp_test.domain.mvptest.dto.mvptest.UpdateMvpTestRequest
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
-import jakarta.persistence.ManyToOne
-import jakarta.persistence.OneToMany
-import jakarta.persistence.Table
+import jakarta.persistence.*
 import java.time.LocalDateTime
 
 @Table(name = "mvp_test")
