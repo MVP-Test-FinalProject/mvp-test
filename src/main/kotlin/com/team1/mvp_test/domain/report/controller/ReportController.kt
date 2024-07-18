@@ -8,6 +8,7 @@ import com.team1.mvp_test.domain.report.service.ReportService
 import com.team1.mvp_test.infra.security.UserPrincipal
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 
@@ -17,6 +18,7 @@ class ReportController(
     private val reportService: ReportService
 ) {
 
+    @PreAuthorize("hasRole('USER')")
     @PostMapping
     fun createReport(
         @PathVariable("test-id") testId: Long,
@@ -29,6 +31,7 @@ class ReportController(
             .body(reportService.createReport(stepId, request, userPrincipal.id))
     }
 
+    @PreAuthorize("hasRole('USER')")
     @PutMapping("/{report-id}")
     fun updateReport(
         @PathVariable("test-id") testId: Long,
@@ -42,6 +45,7 @@ class ReportController(
             .body(reportService.updateReport(reportId, request, userPrincipal.id))
     }
 
+    @PreAuthorize("hasRole('USER')")
     @DeleteMapping("/{report-id}")
     fun deleteReport(
         @PathVariable("test-id") testId: Long,
@@ -55,7 +59,7 @@ class ReportController(
             .build()
     }
 
-
+    @PreAuthorize("hasRole('ENTERPRISE')")
     @PutMapping("/{report-id}/approve")
     fun approveReport(
         @PathVariable("test-id") testId: Long,
