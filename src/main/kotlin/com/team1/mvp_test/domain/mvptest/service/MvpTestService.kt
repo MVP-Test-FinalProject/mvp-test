@@ -2,12 +2,12 @@ package com.team1.mvp_test.domain.mvptest.service
 
 import com.team1.mvp_test.common.error.CategoryErrorMessage
 import com.team1.mvp_test.common.error.EnterpriseErrorMessage
+import com.team1.mvp_test.common.error.MvpTestErrorMessage
 import com.team1.mvp_test.common.exception.ModelNotFoundException
-import com.team1.mvp_test.domain.mvptest.dto.mvptest.CreateCategoryRequest
-import com.team1.mvp_test.domain.mvptest.dto.mvptest.CreateMvpTestRequest
-import com.team1.mvp_test.domain.mvptest.dto.mvptest.MvpTestListResponse
-import com.team1.mvp_test.domain.mvptest.dto.mvptest.MvpTestResponse
-import com.team1.mvp_test.domain.mvptest.dto.mvptest.UpdateMvpTestRequest
+import com.team1.mvp_test.domain.member.model.MemberTest
+import com.team1.mvp_test.domain.member.repository.MemberRepository
+import com.team1.mvp_test.domain.member.repository.MemberTestRepository
+import com.team1.mvp_test.domain.mvptest.dto.mvptest.*
 import com.team1.mvp_test.domain.mvptest.model.Category
 import com.team1.mvp_test.domain.mvptest.model.CategoryMap
 import com.team1.mvp_test.domain.mvptest.model.CategoryMapId
@@ -22,7 +22,9 @@ import org.springframework.transaction.annotation.Transactional
 class MvpTestService(
     private val mvpTestRepository: MvpTestRepository,
     private val categoryRepository: CategoryRepository,
-    private val categoryMapRepository: CategoryMapRepository
+    private val categoryMapRepository: CategoryMapRepository,
+    private val memberRepository: MemberRepository,
+    private val memberTestRepository: MemberTestRepository
 ) {
     @Transactional
     fun createMvpTest(enterpriseId: Long, request: CreateMvpTestRequest): MvpTestResponse {
@@ -81,8 +83,30 @@ class MvpTestService(
         )
     }
 
-    private fun checkMvpTestAuthor(enterpriseId: Long, MvpTestAuthorId: Long) {
-        check(enterpriseId == MvpTestAuthorId) { EnterpriseErrorMessage.NOT_AUTHORIZED.message }
+    @Transactional
+    fun approveMemberToTest(testId: Long, memberId: Long, enterpriseId: Long): TestingMemberCountResponse {
+        val test = mvpTestRepository.findByIdOrNull(testId) ?: throw ModelNotFoundException("mvpTest", testId)
+        checkMvpTestAuthor(enterpriseId, test.enterpriseId)
+        val member = memberRepository.findByIdOrNull(memberId) ?: throw ModelNotFoundException("member", memberId)
+        val currentTestingMembersCount = memberTestRepository.countAllTestingMembers(testId)
+        if (currentTestingMembersCount >= test.recruitNum) {
+            throw IllegalArgumentException(MvpTestErrorMessage.TEST_ALREADY_FULL.message)
+        }
+        memberTestRepository.save(MemberTest(member = member, test = test))
+        return TestingMemberCountResponse.from(test, currentTestingMembersCount+1)
+    }
+
+    @Transactional
+    fun undoApproveMemberToTest(testId: Long, memberId: Long, enterpriseId: Long): TestingMemberCountResponse {
+        val test = mvpTestRepository.findByIdOrNull(testId) ?: throw ModelNotFoundException("mvpTest", testId)
+        checkMvpTestAuthor(enterpriseId, test.enterpriseId)
+        val memberTest = memberTestRepository.findByMemberIdAndTestId(memberId,testId) ?: throw ModelNotFoundException(MvpTestErrorMessage.NOT_TEST_MEMBER.message)
+        val currentTestingMembersCount = memberTestRepository.countAllTestingMembers(testId)
+        return TestingMemberCountResponse.from(test, currentTestingMembersCount-1)
+    }
+
+    private fun checkMvpTestAuthor(enterpriseId: Long, mvpTestAuthorId: Long) {
+        check(enterpriseId == mvpTestAuthorId) { EnterpriseErrorMessage.NOT_AUTHORIZED.message }
     }
 
     fun createCategory(request: CreateCategoryRequest): String {
