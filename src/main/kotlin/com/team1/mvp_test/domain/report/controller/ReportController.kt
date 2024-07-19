@@ -13,7 +13,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("mvp-test/{test-id}/steps/{step-id}/reports")
+@RequestMapping("api/v1/mvp-test/{test-id}/steps/{step-id}/reports")
 class ReportController(
     private val reportService: ReportService
 ) {

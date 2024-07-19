@@ -11,7 +11,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/enterprise")
+@RequestMapping("api/v1/enterprise")
 class EnterpriseController(
     private val enterpriseService: EnterpriseService,
     private val enterpriseAuthService: EnterpriseAuthService

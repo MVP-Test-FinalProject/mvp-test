@@ -12,7 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 
-@RequestMapping("/members")
+@RequestMapping("api/v1/members")
 @RestController
 class MemberController(
     val memberService: MemberService
