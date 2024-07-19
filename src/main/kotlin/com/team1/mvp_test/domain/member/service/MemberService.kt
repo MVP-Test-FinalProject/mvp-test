@@ -45,6 +45,8 @@ class MemberService(
         return memberRepository.findByProviderIdAndProviderName(userInfo.id, userInfo.provider) ?: run {
             Member(
                 email = userInfo.email,
+                providerId = userInfo.id,
+                providerName = userInfo.provider
             ).let { memberRepository.save(it) }
         }
     }
