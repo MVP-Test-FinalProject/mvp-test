@@ -18,7 +18,7 @@ data class StepResponse(
                testId = step.mvpTest.id!!,
                title = step.title,
                requirement = step.requirement,
-               guidelineUrl = step.guidelineUrl,
+               guidelineUrl = step.guidelineUrl!!,
                 stepOrder = step.stepOrder,
                reward = step.reward,
             )
