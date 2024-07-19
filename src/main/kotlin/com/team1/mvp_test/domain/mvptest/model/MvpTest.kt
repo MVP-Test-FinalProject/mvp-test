@@ -1,9 +1,8 @@
 package com.team1.mvp_test.domain.mvptest.model
 
-import com.team1.mvp_test.domain.mvptest.constant.RecruitType
-import com.team1.mvp_test.domain.mvptest.dto.mvptest.UpdateMvpTestRequest
+import com.team1.mvp_test.domain.mvptest.dto.UpdateMvpTestRequest
 import jakarta.persistence.*
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 @Table(name = "mvp_test")
 @Entity
@@ -13,66 +12,62 @@ class MvpTest(
     val id: Long? = null,
 
     @Column(name = "enterprise_id")
-    val enterpriseId : Long,
+    val enterpriseId: Long,
 
     @Column(name = "mvp_name")
     var mvpName: String,
 
     @Column(name = "recruit_start_date")
-    var recruitStartDate: LocalDateTime,
+    var recruitStartDate: LocalDate,
 
     @Column(name = "recruit_ent_date")
-    var recruitEndDate: LocalDateTime,
+    var recruitEndDate: LocalDate,
 
     @Column(name = "test_start_date")
-    var testStartDate: LocalDateTime,
+    var testStartDate: LocalDate,
 
     @Column(name = "test_end_date")
-    var testEndDate : LocalDateTime,
+    var testEndDate: LocalDate,
 
-    @Column(name= "main_image_url")
-    var mainImageUrl : String,
+    @Column(name = "main_image_url")
+    var mainImageUrl: String,
 
-    @Column(name = "mvp_info" )
-    var mvpInfo :String,
+    @Column(name = "mvp_info")
+    var mvpInfo: String,
 
     @Column(name = "mvp_url")
-    var mvpUrl : String,
+    var mvpUrl: String,
 
     @Column(name = "reword_budget")
-    var rewardBudget : Int,
+    var rewardBudget: Int,
 
     @Column(name = "requirement_min_age")
-    var requirementMinAge : Int?,
+    var requirementMinAge: Int?,
 
     @Column(name = "requirement_max_age")
-    var requirementMaxAge : Int?,
+    var requirementMaxAge: Int?,
 
     @Column(name = "requirement_sex")
-    var requirementSex : Boolean?,
+    var requirementSex: Boolean?,
 
     @Column(name = "recruit_type")
-    var recruitType : RecruitType,
+    @Enumerated(EnumType.STRING)
+    var recruitType: RecruitType,
 
     @Column(name = "recruit_num")
-    var recruitNum : Long,
+    var recruitNum: Long,
 
-    @OneToMany
-    var categories : List<CategoryMap>?
+    @Column(name = "state")
+    @Enumerated(EnumType.STRING)
+    var state: MvpTestState,
+
+    @Column(name = "reject_reason")
+    var rejectReason: String? = null,
+
 
     ) {
 
-    @Column(name = "state")
-    lateinit var state : String
-
-    @Column(name = "reject_reason")
-    lateinit var rejectReason : String
-
-
-
-
-
-    fun update(request: UpdateMvpTestRequest, categoryMaps: List<CategoryMap>){
+    fun update(request: UpdateMvpTestRequest) {
         mvpName = request.mvpName
         recruitStartDate = request.recruitStartDate
         recruitEndDate = request.recruitEndDate
@@ -85,8 +80,7 @@ class MvpTest(
         requirementMinAge = request.requirementMinAge
         requirementMaxAge = request.requirementMaxAge
         requirementSex = request.requirementSex
-        recruitType = RecruitType.fromString(request.recruitType)
+        recruitType = request.recruitType
         recruitNum = request.recruitNum
-        categories = categoryMaps
     }
 }

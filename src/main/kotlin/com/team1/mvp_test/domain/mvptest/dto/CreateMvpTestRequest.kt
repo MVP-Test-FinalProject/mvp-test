@@ -1,15 +1,16 @@
-package com.team1.mvp_test.domain.mvptest.dto.mvptest
+package com.team1.mvp_test.domain.mvptest.dto
 
-import com.team1.mvp_test.domain.mvptest.constant.RecruitType
 import com.team1.mvp_test.domain.mvptest.model.MvpTest
-import java.time.LocalDateTime
+import com.team1.mvp_test.domain.mvptest.model.MvpTestState
+import com.team1.mvp_test.domain.mvptest.model.RecruitType
+import java.time.LocalDate
 
 data class CreateMvpTestRequest(
     val mvpName: String,
-    val recruitStartDate: LocalDateTime,
-    val recruitEndDate: LocalDateTime,
-    val testStartDate: LocalDateTime,
-    val testEndDate: LocalDateTime,
+    val recruitStartDate: LocalDate,
+    val recruitEndDate: LocalDate,
+    val testStartDate: LocalDate,
+    val testEndDate: LocalDate,
     val mainImageUrl: String,
     val mvpInfo: String,
     val mvpUrl: String,
@@ -17,9 +18,9 @@ data class CreateMvpTestRequest(
     val requirementMinAge: Int?,
     val requirementMaxAge: Int?,
     val requirementSex: Boolean?,
-    val recruitType: String,
+    val recruitType: RecruitType,
     val recruitNum: Long,
-    val category: List<String>
+    val categories: List<String>
 ) {
     fun toMvpTest(enterpriseId: Long): MvpTest {
         return MvpTest(
@@ -36,9 +37,9 @@ data class CreateMvpTestRequest(
             requirementMinAge = requirementMinAge,
             requirementMaxAge = requirementMaxAge,
             requirementSex = requirementSex,
-            recruitType = RecruitType.fromString(recruitType),
+            recruitType = recruitType,
             recruitNum = recruitNum,
-            categories = null
+            state = MvpTestState.PENDING
         )
     }
 }

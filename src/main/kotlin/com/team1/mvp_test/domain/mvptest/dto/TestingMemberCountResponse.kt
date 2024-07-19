@@ -1,4 +1,4 @@
-package com.team1.mvp_test.domain.mvptest.dto.mvptest
+package com.team1.mvp_test.domain.mvptest.dto
 
 import com.team1.mvp_test.domain.mvptest.model.MvpTest
 

@@ -1,16 +1,17 @@
-package com.team1.mvp_test.domain.mvptest.dto.mvptest
+package com.team1.mvp_test.domain.mvptest.dto
 
 import com.team1.mvp_test.domain.mvptest.model.MvpTest
-import java.time.LocalDateTime
+import com.team1.mvp_test.domain.mvptest.model.RecruitType
+import java.time.LocalDate
 
 data class MvpTestResponse(
     val id: Long?,
     val enterpriseId: Long?,
     val mvpName: String,
-    val recruitStartDate: LocalDateTime,
-    val recruitEndDate: LocalDateTime,
-    val testStartDate: LocalDateTime,
-    val testEndDate: LocalDateTime,
+    val recruitStartDate: LocalDate,
+    val recruitEndDate: LocalDate,
+    val testStartDate: LocalDate,
+    val testEndDate: LocalDate,
     val mainImageUrl: String,
     val mvpInfo: String,
     val mvpUrl: String,
@@ -18,12 +19,12 @@ data class MvpTestResponse(
     val requirementMinAge: Int?,
     val requirementMaxAge: Int?,
     val requirementSex: Boolean?,
-    val recruitType: String,
+    val recruitType: RecruitType,
     val recruitNum: Long,
-    val category: List<String>?
+    val categories: List<String>
 ) {
     companion object {
-        fun from(mvpTest: MvpTest): MvpTestResponse {
+        fun from(mvpTest: MvpTest, categories: List<String>): MvpTestResponse {
             return MvpTestResponse(
                 id = mvpTest.id,
                 enterpriseId = mvpTest.enterpriseId,
@@ -39,11 +40,10 @@ data class MvpTestResponse(
                 requirementMinAge = mvpTest.requirementMinAge,
                 requirementMaxAge = mvpTest.requirementMaxAge,
                 requirementSex = mvpTest.requirementSex,
-                recruitType = mvpTest.recruitType.toString(),
+                recruitType = mvpTest.recruitType,
                 recruitNum = mvpTest.recruitNum,
-                category = mvpTest.categories?.map { it.category.name }
+                categories = categories
             )
-
         }
     }
 }
