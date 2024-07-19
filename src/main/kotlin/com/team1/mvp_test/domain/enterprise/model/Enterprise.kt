@@ -29,10 +29,7 @@ class Enterprise(
     var password: String,
 
     @Column(name = "phone_number")
-    @field:Size(
-        min = 11,
-        max = 11,
-    )
+    @field:Size(min = 11, max = 11)
     var phoneNumber: String,
 
     @Column(name = "is_confirmed")
