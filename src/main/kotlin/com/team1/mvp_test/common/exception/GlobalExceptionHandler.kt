@@ -1,6 +1,7 @@
 package com.team1.mvp_test.common.exception
 
 import com.team1.mvp_test.common.exception.dto.ErrorResponse
+import jakarta.validation.ConstraintViolationException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -33,6 +34,11 @@ class GlobalExceptionHandler {
     @ExceptionHandler(NoPermissionException::class)
     fun handlerNoPermissionException(e: NoPermissionException): ResponseEntity<ErrorResponse> {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ErrorResponse(e.message))
+    }
+
+    @ExceptionHandler(ConstraintViolationException::class)
+    fun handleConstraintViolation(e: ConstraintViolationException): ResponseEntity<ErrorResponse> {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ErrorResponse(message = e.constraintViolations.map { it.message }.joinToString()))
     }
 
 }
