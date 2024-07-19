@@ -37,7 +37,6 @@ class ReportService(
         val memberTest = checkMemberTest(test, memberId)
 
         val media = request.mediaUrl.map { reportMediaRepository.save(ReportMedia(mediaUrl = it)) }.toMutableList()
-        validateMediaCount(media)
         val report = Report(
             title = request.title,
             body = request.body,
@@ -48,6 +47,7 @@ class ReportService(
             reason = null,
             reportMedia = media
         )
+        report.validateMediaCount()
         return report.let { reportRepository.save(it) }
             .let { ReportResponse.from(it) }
     }
@@ -59,7 +59,7 @@ class ReportService(
         memberId: Long
     ): ReportResponse {
         val report = reportRepository.findByIdOrNull(reportId) ?: throw ModelNotFoundException("report", reportId)
-        validateAlreadyConfirmed(report)
+        report.validAlreadyConfirmed()
         val test = report.step.mvpTest
         checkDateCondition(test)
         checkMemberTest(test, memberId)
@@ -72,7 +72,8 @@ class ReportService(
         report.reportMedia.clear()
         val newMedia = request.mediaUrl.map { reportMediaRepository.save(ReportMedia(mediaUrl = it)) }.toMutableList()
         report.reportMedia = newMedia
-        validateMediaCount(newMedia)
+
+        report.validateMediaCount()
 
         return ReportResponse.from(report)
     }
@@ -82,7 +83,7 @@ class ReportService(
         val report = reportRepository.findByIdOrNull(reportId) ?: throw ModelNotFoundException("report", reportId)
 
         checkAuthor(report, memberId)
-        validateAlreadyConfirmed(report)
+        report.validAlreadyConfirmed()
 
         reportRepository.delete(report)
         report.reportMedia.clear()
@@ -95,7 +96,7 @@ class ReportService(
         enterpriseId: Long
     ): ApproveReportResponse {
         val report = reportRepository.findByIdOrNull(reportId) ?: throw ModelNotFoundException("report", reportId)
-        validateAlreadyConfirmed(report)
+        report.validAlreadyConfirmed()
         val test = report.step.mvpTest
         checkEnterprise(test, enterpriseId)
 
@@ -129,14 +130,5 @@ class ReportService(
         return memberTest
     }
 
-    private fun validateMediaCount(reportMedia: List<ReportMedia>) {
-        check(reportMedia.size <= 10) { throw IllegalArgumentException(ReportErrorMessage.MEDIA_COUNT_OVER.message) }
-    }
-
-    private fun validateAlreadyConfirmed(report: Report) {
-        if (report.isConfirmed) {
-            throw IllegalArgumentException(ReportErrorMessage.ALREADY_CONFIRMED_REPORT.message)
-        }
-    }
 
 }

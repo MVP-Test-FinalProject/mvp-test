@@ -1,5 +1,6 @@
 package com.team1.mvp_test.domain.report.model
 
+import com.team1.mvp_test.common.error.ReportErrorMessage
 import com.team1.mvp_test.domain.member.model.MemberTest
 import com.team1.mvp_test.domain.step.model.Step
 import jakarta.persistence.*
@@ -43,5 +44,15 @@ class Report(
     var reportMedia: MutableList<ReportMedia> = mutableListOf(),
 
     ) {
+
+    fun validAlreadyConfirmed() {
+        if (this.isConfirmed) {
+            throw IllegalArgumentException(ReportErrorMessage.ALREADY_CONFIRMED_REPORT.message)
+        }
+    }
+
+    fun validateMediaCount() {
+        check(reportMedia.size <= 10) { throw IllegalArgumentException(ReportErrorMessage.MEDIA_COUNT_OVER.message) }
+    }
 
 }
