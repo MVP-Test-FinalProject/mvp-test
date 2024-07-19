@@ -47,7 +47,7 @@ class ReportService(
             reason = null,
             reportMedia = media
         )
-        report.validateMediaCount()
+        validateMediaCount(report)
         return report.let { reportRepository.save(it) }
             .let { ReportResponse.from(it) }
     }
@@ -59,7 +59,7 @@ class ReportService(
         memberId: Long
     ): ReportResponse {
         val report = reportRepository.findByIdOrNull(reportId) ?: throw ModelNotFoundException("report", reportId)
-        report.validAlreadyConfirmed()
+        validateAlreadyConfirmed(report)
         val test = report.step.mvpTest
         checkDateCondition(test)
         checkMemberTest(test, memberId)
@@ -73,7 +73,7 @@ class ReportService(
         val newMedia = request.mediaUrl.map { reportMediaRepository.save(ReportMedia(mediaUrl = it)) }.toMutableList()
         report.reportMedia = newMedia
 
-        report.validateMediaCount()
+        validateMediaCount(report)
 
         return ReportResponse.from(report)
     }
@@ -83,7 +83,7 @@ class ReportService(
         val report = reportRepository.findByIdOrNull(reportId) ?: throw ModelNotFoundException("report", reportId)
 
         checkAuthor(report, memberId)
-        report.validAlreadyConfirmed()
+        validateAlreadyConfirmed(report)
 
         reportRepository.delete(report)
         report.reportMedia.clear()
@@ -96,7 +96,7 @@ class ReportService(
         enterpriseId: Long
     ): ApproveReportResponse {
         val report = reportRepository.findByIdOrNull(reportId) ?: throw ModelNotFoundException("report", reportId)
-        report.validAlreadyConfirmed()
+        validateAlreadyConfirmed(report)
         val test = report.step.mvpTest
         checkEnterprise(test, enterpriseId)
 
@@ -130,5 +130,14 @@ class ReportService(
         return memberTest
     }
 
+    private fun validateAlreadyConfirmed(report: Report) {
+        if (report.isConfirmed) {
+            throw IllegalArgumentException(ReportErrorMessage.ALREADY_CONFIRMED_REPORT.message)
+        }
+    }
+
+    private fun validateMediaCount(report: Report) {
+        check(report.reportMedia.size <= 10) { throw IllegalArgumentException(ReportErrorMessage.MEDIA_COUNT_OVER.message) }
+    }
 
 }
