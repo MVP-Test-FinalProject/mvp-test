@@ -4,13 +4,13 @@ import com.team1.mvp_test.common.error.CategoryErrorMessage
 import com.team1.mvp_test.common.error.MvpTestErrorMessage
 import com.team1.mvp_test.common.exception.ModelNotFoundException
 import com.team1.mvp_test.common.exception.NoPermissionException
+import com.team1.mvp_test.domain.category.repository.CategoryRepository
 import com.team1.mvp_test.domain.member.repository.MemberRepository
 import com.team1.mvp_test.domain.member.repository.MemberTestRepository
 import com.team1.mvp_test.domain.mvptest.dto.CreateMvpTestRequest
 import com.team1.mvp_test.domain.mvptest.dto.MvpTestResponse
 import com.team1.mvp_test.domain.mvptest.dto.UpdateMvpTestRequest
 import com.team1.mvp_test.domain.mvptest.model.MvpTestCategoryMap
-import com.team1.mvp_test.domain.mvptest.repository.CategoryRepository
 import com.team1.mvp_test.domain.mvptest.repository.MvpTestCategoryMapRepository
 import com.team1.mvp_test.domain.mvptest.repository.MvpTestRepository
 import org.springframework.data.repository.findByIdOrNull

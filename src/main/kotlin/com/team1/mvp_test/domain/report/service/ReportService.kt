@@ -6,7 +6,6 @@ import com.team1.mvp_test.common.exception.NoPermissionException
 import com.team1.mvp_test.domain.member.model.MemberTest
 import com.team1.mvp_test.domain.member.repository.MemberTestRepository
 import com.team1.mvp_test.domain.mvptest.model.MvpTest
-
 import com.team1.mvp_test.domain.report.dto.ApproveReportRequest
 import com.team1.mvp_test.domain.report.dto.ApproveReportResponse
 import com.team1.mvp_test.domain.report.dto.ReportResponse
@@ -19,7 +18,7 @@ import com.team1.mvp_test.domain.step.repository.StepRepository
 import jakarta.transaction.Transactional
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 @Service
 class ReportService(
@@ -102,7 +101,7 @@ class ReportService(
     }
 
     private fun checkDateCondition(test: MvpTest) {
-        val currentDate = LocalDateTime.now()
+        val currentDate = LocalDate.now()
         if (currentDate.isAfter(test.testEndDate) || currentDate.isBefore(test.testStartDate)) {
             throw IllegalArgumentException(ReportErrorMessage.NOT_TEST_DURATION.message)
         }

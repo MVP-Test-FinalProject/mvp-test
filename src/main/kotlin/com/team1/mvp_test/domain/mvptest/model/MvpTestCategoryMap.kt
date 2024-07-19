@@ -1,5 +1,6 @@
 package com.team1.mvp_test.domain.mvptest.model
 
+import com.team1.mvp_test.domain.category.model.Category
 import jakarta.persistence.*
 
 @Table(name = "test_category_map")
