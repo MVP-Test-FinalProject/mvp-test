@@ -38,6 +38,7 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(ConstraintViolationException::class)
     fun handleConstraintViolation(e: ConstraintViolationException): ResponseEntity<ErrorResponse> {
+        val errorDetails = e.constraintViolations.map { it.message }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ErrorResponse(message = e.constraintViolations.map { it.message }.joinToString()))
     }
 
