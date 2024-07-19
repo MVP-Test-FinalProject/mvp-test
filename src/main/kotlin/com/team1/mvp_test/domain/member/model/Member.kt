@@ -3,6 +3,8 @@ package com.team1.mvp_test.domain.member.model
 import com.team1.mvp_test.domain.member.dto.MemberUpdateRequest
 import com.team1.mvp_test.domain.oauth.provider.OAuthProvider
 import jakarta.persistence.*
+import jakarta.validation.constraints.Min
+import jakarta.validation.constraints.Size
 
 @Entity
 @Table(name = "members")
@@ -12,18 +14,21 @@ class Member(
     val id: Long? = null,
 
     @Column(name = "name")
+    @field:Size(min = 1)
     var name: String? = null,
 
     @Column(name = "email")
     val email: String,
 
     @Column(name = "age")
+    @field:Min(value = 15)
     var age: Int? = null,
 
     @Column(name = "sex")
     var sex: String? = null,
 
     @Column(name = "info")
+    @field:Size(max = 200)
     var info: String? = null,
 
     @Enumerated(EnumType.STRING)
