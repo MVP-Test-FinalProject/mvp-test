@@ -15,6 +15,7 @@ import com.team1.mvp_test.domain.report.model.Report
 import com.team1.mvp_test.domain.report.model.ReportMedia
 import com.team1.mvp_test.domain.report.repository.ReportMediaRepository
 import com.team1.mvp_test.domain.report.repository.ReportRepository
+import com.team1.mvp_test.domain.step.model.Step
 import com.team1.mvp_test.domain.step.repository.StepRepository
 import jakarta.transaction.Transactional
 import org.springframework.data.repository.findByIdOrNull
@@ -35,6 +36,7 @@ class ReportService(
         val test = step.mvpTest
         checkDateCondition(test)
         val memberTest = checkMemberTest(test, memberId)
+        checkAlreadyReporting(step, memberTest)
 
         val media = request.mediaUrl.map { reportMediaRepository.save(ReportMedia(mediaUrl = it)) }.toMutableList()
         val report = Report(
@@ -138,6 +140,12 @@ class ReportService(
 
     private fun validateMediaCount(report: Report) {
         check(report.reportMedia.size <= 10) { throw IllegalArgumentException(ReportErrorMessage.MEDIA_COUNT_OVER.message) }
+    }
+
+    private fun checkAlreadyReporting(step: Step, memberTest: MemberTest) {
+        if(reportRepository.findByStepAndMemberTest(step, memberTest) != null) {
+            throw IllegalArgumentException(ReportErrorMessage.ALREADY_REPORTING.message)
+        }
     }
 
 }
