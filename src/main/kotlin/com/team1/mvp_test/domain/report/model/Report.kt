@@ -1,13 +1,15 @@
 package com.team1.mvp_test.domain.report.model
 
 import com.team1.mvp_test.domain.member.model.MemberTest
+import com.team1.mvp_test.domain.report.dto.UpdateReportRequest
 import com.team1.mvp_test.domain.step.model.Step
 import jakarta.persistence.*
 
 @Entity
 @Table(name = "report")
 class Report(
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
     @Column(name = "title")
@@ -19,11 +21,12 @@ class Report(
     @Column(name = "feedback")
     var feedback: String,
 
-    @Column(name = "is_confirmed")
-    var isConfirmed: Boolean,
+    @Enumerated(EnumType.STRING)
+    @Column(name = "state")
+    var state: ReportState = ReportState.PENDING,
 
     @Column(name = "reason")
-    var reason: String?,
+    var reason: String? = null,
 
     @ManyToOne
     @JoinColumn(name = "step_id")
@@ -38,4 +41,17 @@ class Report(
     var reportMedia: MutableList<ReportMedia> = mutableListOf(),
 
     ) {
+    fun setReportMedia(mediaList: List<ReportMedia>) {
+        reportMedia = mediaList.toMutableList()
+    }
+
+    fun updateReport(request: UpdateReportRequest) {
+        title = request.title
+        body = request.body
+        feedback = request.feedback
+    }
+
+    fun approve() {
+        state = ReportState.APPROVED
+    }
 }

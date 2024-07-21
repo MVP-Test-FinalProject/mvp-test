@@ -1,7 +1,5 @@
 package com.team1.mvp_test.domain.report.controller
 
-import com.team1.mvp_test.domain.report.dto.ApproveReportRequest
-import com.team1.mvp_test.domain.report.dto.ApproveReportResponse
 import com.team1.mvp_test.domain.report.dto.ReportResponse
 import com.team1.mvp_test.domain.report.dto.UpdateReportRequest
 import com.team1.mvp_test.domain.report.service.ReportService
@@ -13,64 +11,54 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("api/v1/mvp-test/{test-id}/steps/{step-id}/reports")
+@RequestMapping("api/v1")
 class ReportController(
     private val reportService: ReportService
 ) {
-
     @PreAuthorize("hasRole('MEMBER')")
-    @PostMapping
+    @PostMapping("/steps/{step-id}/reports")
     fun createReport(
-        @PathVariable("test-id") testId: Long,
         @PathVariable("step-id") stepId: Long,
         @RequestBody request: UpdateReportRequest,
         @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<ReportResponse> {
         return ResponseEntity
             .status(HttpStatus.CREATED)
-            .body(reportService.createReport(stepId, request, userPrincipal.id))
+            .body(reportService.createReport(userPrincipal.id, stepId, request))
     }
 
     @PreAuthorize("hasRole('MEMBER')")
-    @PutMapping("/{report-id}")
+    @PutMapping("reports/{report-id}")
     fun updateReport(
-        @PathVariable("test-id") testId: Long,
-        @PathVariable("step-id") stepId: Long,
         @PathVariable("report-id") reportId: Long,
+        @RequestBody request: UpdateReportRequest,
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
-        @RequestBody request: UpdateReportRequest
     ): ResponseEntity<ReportResponse> {
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(reportService.updateReport(reportId, request, userPrincipal.id))
+            .body(reportService.updateReport(userPrincipal.id, reportId, request))
     }
 
     @PreAuthorize("hasRole('MEMBER')")
-    @DeleteMapping("/{report-id}")
+    @DeleteMapping("/reports/{report-id}")
     fun deleteReport(
-        @PathVariable("test-id") testId: Long,
-        @PathVariable("step-id") stepId: Long,
         @PathVariable("report-id") reportId: Long,
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
     ): ResponseEntity<Unit> {
-        reportService.deleteReport(reportId, userPrincipal.id)
         return ResponseEntity
             .status(HttpStatus.NO_CONTENT)
-            .build()
+            .body(reportService.deleteReport(userPrincipal.id, reportId))
     }
 
     @PreAuthorize("hasRole('ENTERPRISE')")
-    @PutMapping("/{report-id}/approve")
+    @PutMapping("/reports/{report-id}/approve")
     fun approveReport(
-        @PathVariable("test-id") testId: Long,
-        @PathVariable("step-id") stepId: Long,
         @PathVariable("report-id") reportId: Long,
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
-        @RequestBody request: ApproveReportRequest
-    ): ResponseEntity<ApproveReportResponse> {
+    ): ResponseEntity<ReportResponse> {
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(reportService.approveReport(reportId, request, userPrincipal.id))
+            .body(reportService.approveReport(userPrincipal.id, reportId))
     }
 
 }
