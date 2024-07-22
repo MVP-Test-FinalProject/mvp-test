@@ -9,6 +9,7 @@ import com.team1.mvp_test.domain.mvptest.model.MvpTest
 import com.team1.mvp_test.domain.report.dto.ApproveReportRequest
 import com.team1.mvp_test.domain.report.dto.UpdateReportRequest
 import com.team1.mvp_test.domain.report.model.Report
+import com.team1.mvp_test.domain.report.model.ReportMedia
 import com.team1.mvp_test.domain.report.repository.ReportMediaRepository
 import com.team1.mvp_test.domain.report.repository.ReportRepository
 import com.team1.mvp_test.domain.report.service.ReportService
@@ -40,8 +41,88 @@ class ReportTest : BehaviorSpec({
         clearAllMocks()
     }
 
+    Given("Report 작성 요건을 갖췄다면") {
+        val stepId = 1L
+        val memberId = 1L
+        val request = UpdateReportRequest(
+            title = "Test title",
+            body = "Test body",
+            feedback = "Test feedback",
+            mediaUrl = listOf("test url1", "test url2")
+        )
+        val mvpTest = MvpTest(
+            id = 1L,
+            enterpriseId = 1L,
+            mvpName = "test mvp name",
+            recruitStartDate = LocalDateTime.now().minusMonths(2),
+            recruitEndDate = LocalDateTime.now().minusMonths(1),
+            testStartDate = LocalDateTime.now().minusDays(10),
+            testEndDate = LocalDateTime.now().plusDays(10),
+            mainImageUrl = "test mvp main url",
+            mvpInfo = "test mvp info",
+            mvpUrl = "test mvp url",
+            rewardBudget = 1000,
+            requirementMinAge = 0,
+            requirementMaxAge = 200,
+            requirementSex = null,
+            recruitType = RecruitType.FIRST_COME,
+            recruitNum = 100L,
+            categories = emptyList()
+        )
+        val step = Step(
+            id = 1L,
+            title = "Test step title",
+            requirement = "Test requirement",
+            guidelineUrl = "test guideline",
+            stepOrder = 1,
+            reward = 100,
+            mvpTest = mvpTest
+        )
+        val member = Member(
+            id = 1L,
+            name = "test member name",
+            email = "test@test.com",
+            age = 20,
+            sex = "test sex",
+            info = "test info",
+            signUpState = true
+        )
+        val memberTest = MemberTest(member = member, test = mvpTest)
 
-    Given("report 작성시 승인이") {
+        every { stepRepository.findByIdOrNull(stepId) } returns step
+        every { memberTestRepository.findByMemberIdAndTestId(memberId, mvpTest.id) } returns memberTest
+        every { reportRepository.findByStepAndMemberTest(step, memberTest) } returns null
+
+        When("작성 시도하면") {
+            Then("작성된다") {
+                every { reportRepository.save(any()) } returns Report(
+                    id = 1L,
+                    title = "Test title",
+                    body = "Test body",
+                    feedback = "Test feedback",
+                    isConfirmed = false,
+                    reason = "Test report reason",
+                    step = step,
+                    memberTest = memberTest,
+                    reportMedia = mutableListOf(ReportMedia(1L, "test url1"), ReportMedia(2L, "test url2") )
+                )
+
+                every { reportMediaRepository.save(any()) } returns ReportMedia(1L, "test url1")
+
+                val response = reportService.createReport(stepId, request, memberId)
+
+                response.title shouldBe "Test title"
+                response.body shouldBe "Test body"
+                response.feedback shouldBe "Test feedback"
+                response.reportMedia.size shouldBe 2
+
+                verify { reportRepository.save(any()) }
+            }
+        }
+    }
+
+
+    Given("Report 작성시 승인이") {
         val stepId = 1L
         val memberId = 1L
         val request = UpdateReportRequest(
@@ -102,7 +183,7 @@ class ReportTest : BehaviorSpec({
         }
     }
 
-    Given("report 작성시 report 의 ") {
+    Given("Report 작성시 report 의 ") {
         When("테스트 기간이 지났다면") {
             val stepId = 1L
             val memberId = 1L
@@ -435,7 +516,7 @@ class ReportTest : BehaviorSpec({
         }
     }
 
-    Given("Report가 이미 승인된 상태라면") {
+    Given("Report 가 이미 승인된 상태라면") {
         val stepId = 1L
         val memberId = 1L
         val request = UpdateReportRequest(
@@ -610,7 +691,7 @@ class ReportTest : BehaviorSpec({
         }
     }
 
-    Given("Report 승인시 자신의 ID 가") {
+    Given("Report 승인시 자신의 ID 가 MvpTest 작성자의 ID와") {
         val stepId = 1L
         val request = ApproveReportRequest(
             reason = "Test reason",
@@ -680,7 +761,7 @@ class ReportTest : BehaviorSpec({
         }
     }
 
-    Given("Report 승인시 자신의 ID") {
+    Given("Report 승인시 자신의 ID와") {
         val stepId = 1L
         val request = ApproveReportRequest(
             reason = "Test reason",
