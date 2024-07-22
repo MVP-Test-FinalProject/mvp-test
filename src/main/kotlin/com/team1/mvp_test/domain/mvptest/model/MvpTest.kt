@@ -6,7 +6,6 @@ import jakarta.persistence.*
 import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
 import java.time.LocalDateTime
 
@@ -61,7 +60,6 @@ class MvpTest(
     @Column(name = "requirement_sex")
     var requirementSex : Boolean?,
 
-    @field:Pattern(regexp = "FIRST_COME|DIRECT_SELECTION")
     @Column(name = "recruit_type")
     var recruitType : RecruitType,
 
@@ -111,7 +109,7 @@ class MvpTest(
 
     private fun validateRecruitDate(){
         require(recruitEndDate.isAfter(recruitStartDate)&&recruitEndDate.isAfter(LocalDateTime.now())){
-            "Recruit end date is invalid"
+            "모집 일자가 유효하지 않습니다."
         }
     }
 
@@ -119,21 +117,20 @@ class MvpTest(
         require(testStartDate.isAfter(recruitStartDate)&&
             testEndDate.isAfter(testStartDate)&&
             testEndDate.isAfter(recruitEndDate)){
-            "Test date is invalid"
+            "테스트 일자가 유효하지 않습니다."
         }
     }
 
     private fun validateAgeRule(){
         require(requirementMaxAge == null || requirementMinAge == null || requirementMaxAge!! > requirementMinAge!!) {
-            "Maximum age must be greater than the minimum age."
+            "최대 나이는 최소 나이보다 큰 값이어야 합니다."
         }
     }
 
     private fun validateCategoriesRule() {
         require(categories == null || categories!!.size <= 3) {
-            "The number of categories can be specified up to 3."
+            "카테고리는 3개까지 지정할 수 있습니다."
         }
     }
-
 
 }

@@ -33,6 +33,11 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+    // Validation
+    implementation ("org.hibernate.validator:hibernate-validator:8.0.0.Final")
+    implementation ("jakarta.validation:jakarta.validation-api:3.0.0")
+    implementation ("org.glassfish:jakarta.el:4.0.2") // Required for EL expression support
 }
 
 tasks.withType<KotlinCompile> {
