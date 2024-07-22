@@ -19,9 +19,6 @@ repositories {
     mavenCentral()
 }
 
-val kotestVersion = "5.5.5"
-val mockkVersion = "1.13.8"
-
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -35,13 +32,10 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    runtimeOnly("org.postgresql:postgresql")
-    implementation ("org.springframework.boot:spring-boot-starter-validation")
-
-    testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
-    testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
-    testImplementation("io.kotest.extensions:kotest-extensions-spring:1.1.3")
-    testImplementation("io.mockk:mockk:$mockkVersion")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
+    testImplementation("io.mockk:mockk:1.13.9")
+    testImplementation("io.kotest:kotest-runner-junit5:5.7.2")
+    testImplementation("com.ninja-squad:springmockk:3.0.1")
 }
 
 tasks.withType<KotlinCompile> {
@@ -51,6 +45,6 @@ tasks.withType<KotlinCompile> {
     }
 }
 
-tasks.withType<Test>().configureEach() {
+tasks.withType<Test> {
     useJUnitPlatform()
 }
