@@ -11,6 +11,8 @@ data class ReportResponse (
 
     val testId: Long,
 
+    val title: String,
+
     val body: String,
 
     val reportMedia: List<ReportMedia>,
@@ -28,6 +30,7 @@ data class ReportResponse (
                 id = report.id!!,
                 stepId = report.step.id!!,
                 testId = report.step.mvpTest.id!!,
+                title = report.title,
                 body = report.body,
                 reportMedia = report.reportMedia,
                 feedback = report.feedback,
