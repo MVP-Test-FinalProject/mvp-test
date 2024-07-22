@@ -78,27 +78,4 @@ class MvpTestController(
             .status(HttpStatus.OK)
             .body(mvpTestService.applyToMvpTest(userPrincipal.id, testId))
     }
-//    @PreAuthorize("hasRole('ENTERPRISE')")
-//    @PostMapping("/{testId}/approve")
-//    fun approveMemberToMvpTest(
-//        @RequestParam memberId: Long,
-//        @PathVariable("testId") testId: Long,
-//        @AuthenticationPrincipal userPrincipal: UserPrincipal
-//    ): ResponseEntity<TestingMemberCountResponse> {
-//        return ResponseEntity
-//            .status(HttpStatus.OK)
-//            .body(mvpTestService.approveMemberToTest(testId, memberId, userPrincipal.id))
-//    }
-//
-//    @PreAuthorize("hasRole('ENTERPRISE')")
-//    @DeleteMapping("/{testId}/disapprove")
-//    fun undoApproveMemberToMvpTest(
-//        @RequestParam memberId: Long,
-//        @PathVariable("testId") testId: Long,
-//        @AuthenticationPrincipal userPrincipal: UserPrincipal
-//    ): ResponseEntity<TestingMemberCountResponse> {
-//        return ResponseEntity
-//            .status(HttpStatus.OK)
-//            .body(mvpTestService.undoApproveMemberToTest(testId, memberId, userPrincipal.id))
-//    }
 }

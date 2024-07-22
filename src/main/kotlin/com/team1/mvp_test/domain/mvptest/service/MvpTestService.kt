@@ -101,29 +101,5 @@ class MvpTestService(
             state = if (test.recruitType == RecruitType.FIRST_COME) MemberTestState.APPROVED else MemberTestState.PENDING
         ).let { memberTestRepository.save(it) }
     }
-//
-//    @Transactional
-//    fun approveMemberToTest(testId: Long, memberId: Long, enterpriseId: Long): TestingMemberCountResponse {
-//        val test = mvpTestRepository.findByIdOrNull(testId) ?: throw ModelNotFoundException("mvpTest", testId)
-//        checkMvpTestAuthor(enterpriseId, test.enterpriseId)
-//        val member = memberRepository.findByIdOrNull(memberId) ?: throw ModelNotFoundException("member", memberId)
-//        val currentTestingMembersCount = memberTestRepository.countAllTestingMembers(testId)
-//        if (currentTestingMembersCount >= test.recruitNum) {
-//            throw IllegalArgumentException(MvpTestErrorMessage.TEST_ALREADY_FULL.message)
-//        }
-//        memberTestRepository.save(MemberTest(member = member, test = test))
-//        return TestingMemberCountResponse.from(test, currentTestingMembersCount + 1)
-//    }
-//
-//    @Transactional
-//    fun undoApproveMemberToTest(testId: Long, memberId: Long, enterpriseId: Long): TestingMemberCountResponse {
-//        val test = mvpTestRepository.findByIdOrNull(testId) ?: throw ModelNotFoundException("mvpTest", testId)
-//        checkMvpTestAuthor(enterpriseId, test.enterpriseId)
-//        val memberTest = memberTestRepository.findByMemberIdAndTestId(memberId, testId) ?: throw ModelNotFoundException(
-//            MvpTestErrorMessage.NOT_TEST_MEMBER.message
-//        )
-//        val currentTestingMembersCount = memberTestRepository.countAllTestingMembers(testId)
-//        return TestingMemberCountResponse.from(test, currentTestingMembersCount - 1)
-//    }
-//
+
 }

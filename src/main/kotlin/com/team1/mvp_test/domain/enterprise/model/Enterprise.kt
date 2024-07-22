@@ -25,11 +25,8 @@ class Enterprise(
     @Column(name = "phone_number")
     var phoneNumber: String,
 
-    @Column(name = "is_confirmed")
-    var isConfirmed: Boolean? = false,
-
-    @Column(name = "is_blocked")
-    var isBlocked: Boolean? = false,
+    @Column(name = "state")
+    var state: EnterpriseState = EnterpriseState.PENDING,
 ) {
     fun update(request: UpdateEnterpriseRequest) {
         this.name = request.name
