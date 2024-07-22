@@ -13,23 +13,16 @@ class EnterpriseService(
     private val enterpriseRepository: EnterpriseRepository
 ) {
     fun getProfile(enterpriseId: Long): EnterpriseResponse {
-        val enterprise = enterpriseRepository.findByIdOrNull(enterpriseId) ?: throw ModelNotFoundException(
-            "Enterprise",
-            enterpriseId
-        )
+        val enterprise = enterpriseRepository.findByIdOrNull(enterpriseId)
+            ?: throw ModelNotFoundException("Enterprise", enterpriseId)
         return EnterpriseResponse.from(enterprise)
     }
 
     @Transactional
     fun updateProfile(enterpriseId: Long, request: UpdateEnterpriseRequest): EnterpriseResponse {
-        val enterprise = enterpriseRepository.findByIdOrNull(enterpriseId) ?: throw ModelNotFoundException(
-            "Enterprise",
-            enterpriseId
-        )
-        return enterprise.apply {
-            this.name = request.name
-            this.ceoName = request.ceoName
-            this.phoneNumber = request.phoneNumber
-        }.let { EnterpriseResponse.from(it) }
+        val enterprise = enterpriseRepository.findByIdOrNull(enterpriseId)
+            ?: throw ModelNotFoundException("Enterprise", enterpriseId)
+        enterprise.update(request)
+        return EnterpriseResponse.from(enterprise)
     }
 }
