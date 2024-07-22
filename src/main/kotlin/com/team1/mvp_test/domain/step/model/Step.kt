@@ -6,6 +6,7 @@ import jakarta.persistence.*
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.Size
 
+@Table(name = "step")
 @Entity
 class Step(
     @Id
