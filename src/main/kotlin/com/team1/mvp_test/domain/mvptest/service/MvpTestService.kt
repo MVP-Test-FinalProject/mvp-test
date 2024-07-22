@@ -5,12 +5,15 @@ import com.team1.mvp_test.common.error.MvpTestErrorMessage
 import com.team1.mvp_test.common.exception.ModelNotFoundException
 import com.team1.mvp_test.common.exception.NoPermissionException
 import com.team1.mvp_test.domain.category.repository.CategoryRepository
+import com.team1.mvp_test.domain.member.model.MemberTest
+import com.team1.mvp_test.domain.member.model.MemberTestState
 import com.team1.mvp_test.domain.member.repository.MemberRepository
 import com.team1.mvp_test.domain.member.repository.MemberTestRepository
 import com.team1.mvp_test.domain.mvptest.dto.CreateMvpTestRequest
 import com.team1.mvp_test.domain.mvptest.dto.MvpTestResponse
 import com.team1.mvp_test.domain.mvptest.dto.UpdateMvpTestRequest
 import com.team1.mvp_test.domain.mvptest.model.MvpTestCategoryMap
+import com.team1.mvp_test.domain.mvptest.model.RecruitType
 import com.team1.mvp_test.domain.mvptest.repository.MvpTestCategoryMapRepository
 import com.team1.mvp_test.domain.mvptest.repository.MvpTestRepository
 import org.springframework.data.repository.findByIdOrNull
@@ -84,6 +87,19 @@ class MvpTestService(
                     .map { maps -> maps.category.name }
                     .let { categories -> MvpTestResponse.from(mvpTest, categories) }
             }
+    }
+
+    @Transactional
+    fun applyToMvpTest(memberId: Long, testId: Long) {
+        val test = mvpTestRepository.findByIdOrNull(testId) ?: throw ModelNotFoundException("mvpTest", testId)
+        val member = memberRepository.findByIdOrNull(memberId) ?: throw ModelNotFoundException("member", memberId)
+        val recruitCount = memberTestRepository.countByTestIdAndState(testId, MemberTestState.APPROVED)
+        check(recruitCount >= test.recruitNum) { MvpTestErrorMessage.TEST_ALREADY_FULL.message }
+        MemberTest(
+            member = member,
+            test = test,
+            state = if (test.recruitType == RecruitType.FIRST_COME) MemberTestState.APPROVED else MemberTestState.PENDING
+        ).let { memberTestRepository.save(it) }
     }
 //
 //    @Transactional

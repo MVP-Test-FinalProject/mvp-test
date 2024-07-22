@@ -15,6 +15,9 @@ class MemberTest(
 
     @ManyToOne
     @JoinColumn(name = "test_id")
-    val test: MvpTest
+    val test: MvpTest,
+
+    @Column(name = "state")
+    val state: MemberTestState = MemberTestState.PENDING
 ) {
 }

@@ -12,7 +12,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("api/v1/mvp_tests")
+@RequestMapping("api/v1/mvp-tests")
 class MvpTestController(
     private val mvpTestService: MvpTestService
 ) {
@@ -68,6 +68,16 @@ class MvpTestController(
             .body(mvpTestService.getMvpTestList())
     }
 
+    @PreAuthorize("hasRole('MEMBER')")
+    @PostMapping("/{testId}/apply")
+    fun applyToMvpTest(
+        @PathVariable("testId") testId: Long,
+        @AuthenticationPrincipal userPrincipal: UserPrincipal
+    ): ResponseEntity<Unit> {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(mvpTestService.applyToMvpTest(userPrincipal.id, testId))
+    }
 //    @PreAuthorize("hasRole('ENTERPRISE')")
 //    @PostMapping("/{testId}/approve")
 //    fun approveMemberToMvpTest(
