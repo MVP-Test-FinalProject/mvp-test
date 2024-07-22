@@ -6,7 +6,7 @@ data class StepResponse(
     val stepId: Long,
     val title: String,
     val requirement: String,
-    val guidelineUrl: String,
+    val guidelineUrl: String?,
     val stepOrder: Int,
     val reward: Int,
 ) {
