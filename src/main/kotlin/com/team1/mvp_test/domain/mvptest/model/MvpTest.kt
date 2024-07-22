@@ -3,6 +3,10 @@ package com.team1.mvp_test.domain.mvptest.model
 import com.team1.mvp_test.domain.mvptest.constant.RecruitType
 import com.team1.mvp_test.domain.mvptest.dto.mvptest.UpdateMvpTestRequest
 import jakarta.persistence.*
+import jakarta.validation.constraints.Max
+import jakarta.validation.constraints.Min
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.Size
 import java.time.LocalDateTime
 
 @Table(name = "mvp_test")
@@ -15,6 +19,8 @@ class MvpTest(
     @Column(name = "enterprise_id")
     val enterpriseId : Long,
 
+    @field:NotBlank
+    @field:Size(min=1, max = 50)
     @Column(name = "mvp_name")
     var mvpName: String,
 
@@ -39,9 +45,12 @@ class MvpTest(
     @Column(name = "mvp_url")
     var mvpUrl : String,
 
+    @field:Min(10000)
     @Column(name = "reword_budget")
     var rewardBudget : Int,
 
+    @field:Min(1)
+    @field:Max(80)
     @Column(name = "requirement_min_age")
     var requirementMinAge : Int?,
 
@@ -54,12 +63,12 @@ class MvpTest(
     @Column(name = "recruit_type")
     var recruitType : RecruitType,
 
+    @field:Min(1)
     @Column(name = "recruit_num")
     var recruitNum : Long,
 
     @OneToMany
     var categories : List<CategoryMap>?
-
     ) {
 
     @Column(name = "state")
@@ -68,9 +77,12 @@ class MvpTest(
     @Column(name = "reject_reason")
     lateinit var rejectReason : String
 
-
-
-
+    init {
+        validateRecruitDate()
+        validateTestDate()
+        validateAgeRule()
+        validateCategoriesRule()
+    }
 
     fun update(request: UpdateMvpTestRequest, categoryMaps: List<CategoryMap>){
         mvpName = request.mvpName
@@ -88,5 +100,37 @@ class MvpTest(
         recruitType = RecruitType.fromString(request.recruitType)
         recruitNum = request.recruitNum
         categories = categoryMaps
+
+        validateRecruitDate()
+        validateTestDate()
+        validateAgeRule()
+        validateCategoriesRule()
     }
+
+    private fun validateRecruitDate(){
+        require(recruitEndDate.isAfter(recruitStartDate)&&recruitEndDate.isAfter(LocalDateTime.now())){
+            "모집 일자가 유효하지 않습니다."
+        }
+    }
+
+    private fun validateTestDate(){
+        require(testStartDate.isAfter(recruitStartDate)&&
+            testEndDate.isAfter(testStartDate)&&
+            testEndDate.isAfter(recruitEndDate)){
+            "테스트 일자가 유효하지 않습니다."
+        }
+    }
+
+    private fun validateAgeRule(){
+        require(requirementMaxAge == null || requirementMinAge == null || requirementMaxAge!! > requirementMinAge!!) {
+            "최대 나이는 최소 나이보다 큰 값이어야 합니다."
+        }
+    }
+
+    private fun validateCategoriesRule() {
+        require(categories == null || categories!!.size <= 3) {
+            "카테고리는 3개까지 지정할 수 있습니다."
+        }
+    }
+
 }
