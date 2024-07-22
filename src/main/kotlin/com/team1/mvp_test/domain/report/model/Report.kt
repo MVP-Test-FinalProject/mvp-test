@@ -41,8 +41,12 @@ class Report(
     var reportMedia: MutableList<ReportMedia> = mutableListOf(),
 
     ) {
-    fun setReportMedia(mediaList: List<ReportMedia>) {
-        reportMedia = mediaList.toMutableList()
+    fun addReportMedia(media: ReportMedia) {
+        reportMedia.add(media)
+    }
+
+    fun clearReportMedia() {
+        reportMedia.clear()
     }
 
     fun updateReport(request: UpdateReportRequest) {

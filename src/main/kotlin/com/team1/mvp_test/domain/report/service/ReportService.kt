@@ -9,6 +9,7 @@ import com.team1.mvp_test.domain.report.dto.ReportResponse
 import com.team1.mvp_test.domain.report.dto.UpdateReportRequest
 import com.team1.mvp_test.domain.report.model.Report
 import com.team1.mvp_test.domain.report.model.ReportMedia
+import com.team1.mvp_test.domain.report.repository.ReportMediaRepository
 import com.team1.mvp_test.domain.report.repository.ReportRepository
 import com.team1.mvp_test.domain.step.repository.StepRepository
 import jakarta.transaction.Transactional
@@ -21,6 +22,7 @@ class ReportService(
     private val reportRepository: ReportRepository,
     private val stepRepository: StepRepository,
     private val memberTestRepository: MemberTestRepository,
+    private val reportMediaRepository: ReportMediaRepository,
 ) {
 
     @Transactional
@@ -35,8 +37,8 @@ class ReportService(
             memberTest = memberTest,
             step = step
         ).let { reportRepository.save(it) }
-        request.mediaUrl.map { ReportMedia(mediaUrl = it) }
-            .let { report.setReportMedia(it) }
+        request.mediaUrl.map { reportMediaRepository.save(ReportMedia(mediaUrl = it)) }
+            .forEach { report.addReportMedia(it) }
         return reportRepository.save(report)
             .let { ReportResponse.from(it) }
     }
@@ -47,8 +49,9 @@ class ReportService(
         if (report.memberTest.member.id != memberId) throw NoPermissionException(ReportErrorMessage.NOT_AUTHORIZED.message)
         checkDateCondition(report.step.mvpTest)
         report.updateReport(request)
-        request.mediaUrl.map { ReportMedia(mediaUrl = it) }
-            .let { report.setReportMedia(it) }
+        report.clearReportMedia()
+        request.mediaUrl.map { reportMediaRepository.save(ReportMedia(mediaUrl = it)) }
+            .forEach { report.addReportMedia(it) }
         return reportRepository.save(report)
             .let { ReportResponse.from(it) }
     }
