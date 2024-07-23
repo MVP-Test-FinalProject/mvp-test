@@ -13,69 +13,64 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/mvp_tests/{testId}/steps")
+@RequestMapping("api/v1")
 class StepController(
     private val stepService: StepService
 ) {
 
-    @GetMapping
+    @GetMapping("/mvp-tests/{testId}/steps")
     @PreAuthorize("hasRole('ENTERPRISE')")
     fun getStepList(
         @PathVariable testId: Long,
-        @AuthenticationPrincipal  userPrincipal: UserPrincipal
-    ):ResponseEntity<List<StepListResponse>> {
+        @AuthenticationPrincipal userPrincipal: UserPrincipal
+    ): ResponseEntity<List<StepListResponse>> {
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(stepService.getStepList(userPrincipal.id,testId))
+            .body(stepService.getStepList(userPrincipal.id, testId))
     }
 
-    @PostMapping
+    @PostMapping("/mvp-tests/{testId}/steps")
     @PreAuthorize("hasRole('ENTERPRISE')")
     fun createStep(
         @PathVariable testId: Long,
         @RequestBody request: CreateStepRequest,
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
     ): ResponseEntity<StepResponse> {
-       return ResponseEntity
-           .status(HttpStatus.CREATED)
-           .body(stepService.createStep(userPrincipal.id,testId,request))
+        return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(stepService.createStep(userPrincipal.id, testId, request))
     }
 
-    @GetMapping("/{stepId}")
-    @PreAuthorize("hasRole('ENTERPRISE')")
+    @GetMapping("steps/{stepId}")
     fun getStepById(
-        @PathVariable testId: Long,
-        @PathVariable stepId:Long,
-        @AuthenticationPrincipal userPrincipal: UserPrincipal,
-    ):ResponseEntity<StepResponse> {
+        @PathVariable stepId: Long,
+    ): ResponseEntity<StepResponse> {
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(stepService.getStepById(userPrincipal.id,testId,stepId))
+            .body(stepService.getStepById(stepId))
     }
 
-    @PutMapping("/{stepId}")
+    @PutMapping("steps/{stepId}")
     @PreAuthorize("hasRole('ENTERPRISE')")
     fun updateStepById(
-        @PathVariable testId: Long,
         @PathVariable stepId: Long,
         @RequestBody request: UpdateStepRequest,
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
-    ):ResponseEntity<StepResponse> {
-       return ResponseEntity
+    ): ResponseEntity<StepResponse> {
+        return ResponseEntity
             .status(HttpStatus.OK)
-            .body(stepService.updateStepById(userPrincipal.id,testId,stepId,request))
+            .body(stepService.updateStep(userPrincipal.id, stepId, request))
     }
 
-    @DeleteMapping("/{stepId}")
+    @DeleteMapping("steps/{stepId}")
     @PreAuthorize("hasRole('ENTERPRISE')")
     fun deleteStepById(
-        @PathVariable testId: Long,
         @PathVariable stepId: Long,
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
-    ):ResponseEntity<Unit> {
+    ): ResponseEntity<Unit> {
         return ResponseEntity
             .status(HttpStatus.NO_CONTENT)
-            .body(stepService.deleteStepById(userPrincipal.id,testId,stepId))
+            .body(stepService.deleteStep(userPrincipal.id, stepId))
     }
 
 }

@@ -1,4 +1,4 @@
-package com.team1.mvp_test.domain.mvptest.model
+package com.team1.mvp_test.domain.category.model
 
 import jakarta.persistence.*
 

@@ -19,13 +19,8 @@ class MemberService(
     @Transactional
     fun updateSignUpInfo(memberId: Long, request: SignUpInfoRequest): MemberResponse {
         val member = memberRepository.findByIdOrNull(memberId) ?: throw ModelNotFoundException("Member", memberId)
-        return member.apply {
-            name = request.name
-            age = request.age
-            sex = request.sex
-            info = request.info
-            signUpState = true
-        }.let { MemberResponse.from(it) }
+        member.updateSignUpInfo(request)
+        return MemberResponse.from(member)
     }
 
     @Transactional
@@ -45,6 +40,8 @@ class MemberService(
         return memberRepository.findByProviderIdAndProviderName(userInfo.id, userInfo.provider) ?: run {
             Member(
                 email = userInfo.email,
+                providerId = userInfo.id,
+                providerName = userInfo.provider
             ).let { memberRepository.save(it) }
         }
     }

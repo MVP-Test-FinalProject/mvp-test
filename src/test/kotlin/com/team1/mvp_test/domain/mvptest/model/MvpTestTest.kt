@@ -1,6 +1,5 @@
 package com.team1.mvp_test.domain.mvptest.model
 
-import com.team1.mvp_test.domain.mvptest.constant.RecruitType
 import jakarta.validation.Validation
 import jakarta.validation.Validator
 import jakarta.validation.ValidatorFactory
@@ -13,7 +12,6 @@ import java.time.LocalDateTime
 
 @DataJpaTest
 class MvpTestTest {
-
     companion object {
         private lateinit var validator: Validator
 
@@ -26,21 +24,20 @@ class MvpTestTest {
     }
 
     @Test
-    fun validateNameTest(){
+    fun validateNameTest() {
         // Arrange
         val enterpriseId = 1L
         val mvpName = "testName"
-        val recruitStartDate: LocalDateTime =  LocalDateTime.of(2024, 1, 18, 11, 22)
-        val recruitEndDate: LocalDateTime =  LocalDateTime.of(2025, 1, 18, 11, 22)
-        val testStartDate: LocalDateTime =  LocalDateTime.of(2024, 3, 18, 11, 22)
-        val testEndDate: LocalDateTime =  LocalDateTime.of(2025, 3, 18, 11, 22)
+        val recruitStartDate: LocalDateTime = LocalDateTime.of(2024, 1, 18, 11, 22)
+        val recruitEndDate: LocalDateTime = LocalDateTime.of(2025, 1, 18, 11, 22)
+        val testStartDate: LocalDateTime = LocalDateTime.of(2024, 3, 18, 11, 22)
+        val testEndDate: LocalDateTime = LocalDateTime.of(2025, 3, 18, 11, 22)
         val mainImageUrl = "imageUrl"
         val mvpInfo = "this is mvpTest for test"
         val mvpUrl = "this is test Url"
         val rewardBudget = 10000
         val requirementMinAge = 20
         val requirementMaxAge = 40
-        val recruitType = "FIRST_COME"
         val recruitNum = 50L
 
         // Act
@@ -58,9 +55,9 @@ class MvpTestTest {
             requirementMinAge = requirementMinAge,
             requirementMaxAge = requirementMaxAge,
             requirementSex = null,
-            recruitType = RecruitType.fromString(recruitType),
+            recruitType = RecruitType.FIRST_COME,
             recruitNum = recruitNum,
-            categories = null
+            state = MvpTestState.APPROVED
         )
 
         // Assert
@@ -69,21 +66,20 @@ class MvpTestTest {
     }
 
     @Test
-    fun validateWrongNameTest(){
+    fun validateWrongNameTest() {
         // Arrange
         val enterpriseId = 1L
         val mvpName = "testName".repeat(10)
-        val recruitStartDate: LocalDateTime =  LocalDateTime.of(2024, 1, 18, 11, 22)
-        val recruitEndDate: LocalDateTime =  LocalDateTime.of(2025, 1, 18, 11, 22)
-        val testStartDate: LocalDateTime =  LocalDateTime.of(2024, 3, 18, 11, 22)
-        val testEndDate: LocalDateTime =  LocalDateTime.of(2025, 3, 18, 11, 22)
+        val recruitStartDate: LocalDateTime = LocalDateTime.of(2024, 1, 18, 11, 22)
+        val recruitEndDate: LocalDateTime = LocalDateTime.of(2025, 1, 18, 11, 22)
+        val testStartDate: LocalDateTime = LocalDateTime.of(2024, 3, 18, 11, 22)
+        val testEndDate: LocalDateTime = LocalDateTime.of(2025, 3, 18, 11, 22)
         val mainImageUrl = "imageUrl"
         val mvpInfo = "this is mvpTest for test"
         val mvpUrl = "this is test Url"
         val rewardBudget = 10000
         val requirementMinAge = 20
         val requirementMaxAge = 40
-        val recruitType = "FIRST_COME"
         val recruitNum = 50L
 
         // Act
@@ -101,9 +97,9 @@ class MvpTestTest {
             requirementMinAge = requirementMinAge,
             requirementMaxAge = requirementMaxAge,
             requirementSex = null,
-            recruitType = RecruitType.fromString(recruitType),
+            recruitType = RecruitType.FIRST_COME,
             recruitNum = recruitNum,
-            categories = null
+            state = MvpTestState.APPROVED
         )
 
         // Assert
@@ -114,21 +110,20 @@ class MvpTestTest {
     }
 
     @Test
-    fun validateWrongRecruitEndDateTest(){
+    fun validateWrongRecruitEndDateTest() {
         // Arrange
         val enterpriseId = 1L
         val mvpName = "testName"
-        val recruitStartDate: LocalDateTime =  LocalDateTime.of(2024, 1, 18, 11, 22)
-        val recruitEndDate: LocalDateTime =  LocalDateTime.of(2024, 1, 11, 11, 22)
-        val testStartDate: LocalDateTime =  LocalDateTime.of(2024, 3, 18, 11, 22)
-        val testEndDate: LocalDateTime =  LocalDateTime.of(2025, 3, 18, 11, 22)
+        val recruitStartDate: LocalDateTime = LocalDateTime.of(2024, 1, 18, 11, 22)
+        val recruitEndDate: LocalDateTime = LocalDateTime.of(2024, 1, 11, 11, 22)
+        val testStartDate: LocalDateTime = LocalDateTime.of(2024, 3, 18, 11, 22)
+        val testEndDate: LocalDateTime = LocalDateTime.of(2025, 3, 18, 11, 22)
         val mainImageUrl = "imageUrl"
         val mvpInfo = "this is mvpTest for test"
         val mvpUrl = "this is test Url"
         val rewardBudget = 10000
         val requirementMinAge = 20
         val requirementMaxAge = 40
-        val recruitType = "FIRST_COME"
         val recruitNum = 50L
 
         // Act
@@ -147,9 +142,9 @@ class MvpTestTest {
                 requirementMinAge = requirementMinAge,
                 requirementMaxAge = requirementMaxAge,
                 requirementSex = null,
-                recruitType = RecruitType.fromString(recruitType),
+                recruitType = RecruitType.FIRST_COME,
                 recruitNum = recruitNum,
-                categories = null
+                state = MvpTestState.APPROVED
             )
         }
 
@@ -158,21 +153,20 @@ class MvpTestTest {
     }
 
     @Test
-    fun validateWrongTestStartDateTest(){
+    fun validateWrongTestStartDateTest() {
         // Arrange
         val enterpriseId = 1L
         val mvpName = "testName"
-        val recruitStartDate: LocalDateTime =  LocalDateTime.of(2024, 1, 18, 11, 22)
-        val recruitEndDate: LocalDateTime =  LocalDateTime.of(2025, 1, 11, 11, 22)
-        val testStartDate: LocalDateTime =  LocalDateTime.of(2024, 1, 11, 11, 22)
-        val testEndDate: LocalDateTime =  LocalDateTime.of(2025, 3, 18, 11, 22)
+        val recruitStartDate: LocalDateTime = LocalDateTime.of(2024, 1, 18, 11, 22)
+        val recruitEndDate: LocalDateTime = LocalDateTime.of(2025, 1, 11, 11, 22)
+        val testStartDate: LocalDateTime = LocalDateTime.of(2024, 1, 11, 11, 22)
+        val testEndDate: LocalDateTime = LocalDateTime.of(2025, 3, 18, 11, 22)
         val mainImageUrl = "imageUrl"
         val mvpInfo = "this is mvpTest for test"
         val mvpUrl = "this is test Url"
         val rewardBudget = 10000
         val requirementMinAge = 20
         val requirementMaxAge = 40
-        val recruitType = "FIRST_COME"
         val recruitNum = 50L
 
         // Act
@@ -191,9 +185,9 @@ class MvpTestTest {
                 requirementMinAge = requirementMinAge,
                 requirementMaxAge = requirementMaxAge,
                 requirementSex = null,
-                recruitType = RecruitType.fromString(recruitType),
+                recruitType = RecruitType.FIRST_COME,
                 recruitNum = recruitNum,
-                categories = null
+                state = MvpTestState.APPROVED
             )
         }
 
@@ -202,21 +196,20 @@ class MvpTestTest {
     }
 
     @Test
-    fun validateWrongTestEndDateTest(){
+    fun validateWrongTestEndDateTest() {
         // Arrange
         val enterpriseId = 1L
         val mvpName = "testName"
-        val recruitStartDate: LocalDateTime =  LocalDateTime.of(2024, 1, 18, 11, 22)
-        val recruitEndDate: LocalDateTime =  LocalDateTime.of(2025, 1, 11, 11, 22)
-        val testStartDate: LocalDateTime =  LocalDateTime.of(2024, 3, 18, 11, 22)
-        val testEndDate: LocalDateTime =  LocalDateTime.of(2024, 2, 18, 11, 22)
+        val recruitStartDate: LocalDateTime = LocalDateTime.of(2024, 1, 18, 11, 22)
+        val recruitEndDate: LocalDateTime = LocalDateTime.of(2025, 1, 11, 11, 22)
+        val testStartDate: LocalDateTime = LocalDateTime.of(2024, 3, 18, 11, 22)
+        val testEndDate: LocalDateTime = LocalDateTime.of(2024, 2, 18, 11, 22)
         val mainImageUrl = "imageUrl"
         val mvpInfo = "this is mvpTest for test"
         val mvpUrl = "this is test Url"
         val rewardBudget = 10000
         val requirementMinAge = 20
         val requirementMaxAge = 40
-        val recruitType = "FIRST_COME"
         val recruitNum = 50L
 
         // Act
@@ -235,9 +228,9 @@ class MvpTestTest {
                 requirementMinAge = requirementMinAge,
                 requirementMaxAge = requirementMaxAge,
                 requirementSex = null,
-                recruitType = RecruitType.fromString(recruitType),
+                recruitType = RecruitType.FIRST_COME,
                 recruitNum = recruitNum,
-                categories = null
+                state = MvpTestState.APPROVED
             )
         }
 
@@ -246,21 +239,20 @@ class MvpTestTest {
     }
 
     @Test
-    fun validateWrongRewardBudgetTest(){
+    fun validateWrongRewardBudgetTest() {
         // Arrange
         val enterpriseId = 1L
         val mvpName = "testName"
-        val recruitStartDate: LocalDateTime =  LocalDateTime.of(2024, 1, 18, 11, 22)
-        val recruitEndDate: LocalDateTime =  LocalDateTime.of(2025, 1, 18, 11, 22)
-        val testStartDate: LocalDateTime =  LocalDateTime.of(2024, 3, 18, 11, 22)
-        val testEndDate: LocalDateTime =  LocalDateTime.of(2025, 3, 18, 11, 22)
+        val recruitStartDate: LocalDateTime = LocalDateTime.of(2024, 1, 18, 11, 22)
+        val recruitEndDate: LocalDateTime = LocalDateTime.of(2025, 1, 18, 11, 22)
+        val testStartDate: LocalDateTime = LocalDateTime.of(2024, 3, 18, 11, 22)
+        val testEndDate: LocalDateTime = LocalDateTime.of(2025, 3, 18, 11, 22)
         val mainImageUrl = "imageUrl"
         val mvpInfo = "this is mvpTest for test"
         val mvpUrl = "this is test Url"
         val rewardBudget = 1000
         val requirementMinAge = 20
         val requirementMaxAge = 40
-        val recruitType = "FIRST_COME"
         val recruitNum = 50L
 
         // Act
@@ -278,9 +270,9 @@ class MvpTestTest {
             requirementMinAge = requirementMinAge,
             requirementMaxAge = requirementMaxAge,
             requirementSex = null,
-            recruitType = RecruitType.fromString(recruitType),
+            recruitType = RecruitType.FIRST_COME,
             recruitNum = recruitNum,
-            categories = null
+            state = MvpTestState.APPROVED
         )
 
         // Assert
@@ -291,21 +283,20 @@ class MvpTestTest {
     }
 
     @Test
-    fun validateWrongMinimumAgeTest(){
+    fun validateWrongMinimumAgeTest() {
         // Arrange
         val enterpriseId = 1L
         val mvpName = "testName"
-        val recruitStartDate: LocalDateTime =  LocalDateTime.of(2024, 1, 18, 11, 22)
-        val recruitEndDate: LocalDateTime =  LocalDateTime.of(2025, 1, 18, 11, 22)
-        val testStartDate: LocalDateTime =  LocalDateTime.of(2024, 3, 18, 11, 22)
-        val testEndDate: LocalDateTime =  LocalDateTime.of(2025, 3, 18, 11, 22)
+        val recruitStartDate: LocalDateTime = LocalDateTime.of(2024, 1, 18, 11, 22)
+        val recruitEndDate: LocalDateTime = LocalDateTime.of(2025, 1, 18, 11, 22)
+        val testStartDate: LocalDateTime = LocalDateTime.of(2024, 3, 18, 11, 22)
+        val testEndDate: LocalDateTime = LocalDateTime.of(2025, 3, 18, 11, 22)
         val mainImageUrl = "imageUrl"
         val mvpInfo = "this is mvpTest for test"
         val mvpUrl = "this is test Url"
         val rewardBudget = 10000
         val requirementMinAge = -1
         val requirementMaxAge = 40
-        val recruitType = "FIRST_COME"
         val recruitNum = 50L
 
         // Act
@@ -323,9 +314,9 @@ class MvpTestTest {
             requirementMinAge = requirementMinAge,
             requirementMaxAge = requirementMaxAge,
             requirementSex = null,
-            recruitType = RecruitType.fromString(recruitType),
+            recruitType = RecruitType.FIRST_COME,
             recruitNum = recruitNum,
-            categories = null
+            state = MvpTestState.APPROVED
         )
 
         // Assert
@@ -336,21 +327,20 @@ class MvpTestTest {
     }
 
     @Test
-    fun validateWrongMaximumAgeTest(){
+    fun validateWrongMaximumAgeTest() {
         // Arrange
         val enterpriseId = 1L
         val mvpName = "testName"
-        val recruitStartDate: LocalDateTime =  LocalDateTime.of(2024, 1, 18, 11, 22)
-        val recruitEndDate: LocalDateTime =  LocalDateTime.of(2025, 1, 18, 11, 22)
-        val testStartDate: LocalDateTime =  LocalDateTime.of(2024, 3, 18, 11, 22)
-        val testEndDate: LocalDateTime =  LocalDateTime.of(2025, 3, 18, 11, 22)
+        val recruitStartDate: LocalDateTime = LocalDateTime.of(2024, 1, 18, 11, 22)
+        val recruitEndDate: LocalDateTime = LocalDateTime.of(2025, 1, 18, 11, 22)
+        val testStartDate: LocalDateTime = LocalDateTime.of(2024, 3, 18, 11, 22)
+        val testEndDate: LocalDateTime = LocalDateTime.of(2025, 3, 18, 11, 22)
         val mainImageUrl = "imageUrl"
         val mvpInfo = "this is mvpTest for test"
         val mvpUrl = "this is test Url"
         val rewardBudget = 10000
         val requirementMinAge = 60
         val requirementMaxAge = 40
-        val recruitType = "FIRST_COME"
         val recruitNum = 50L
 
         // Act
@@ -369,9 +359,9 @@ class MvpTestTest {
                 requirementMinAge = requirementMinAge,
                 requirementMaxAge = requirementMaxAge,
                 requirementSex = null,
-                recruitType = RecruitType.fromString(recruitType),
+                recruitType = RecruitType.FIRST_COME,
                 recruitNum = recruitNum,
-                categories = null
+                state = MvpTestState.APPROVED
             )
         }
 
@@ -380,21 +370,20 @@ class MvpTestTest {
     }
 
     @Test
-    fun validateWrongRecruitNumberTest(){
+    fun validateWrongRecruitNumberTest() {
         // Arrange
         val enterpriseId = 1L
         val mvpName = "testName"
-        val recruitStartDate: LocalDateTime =  LocalDateTime.of(2024, 1, 18, 11, 22)
-        val recruitEndDate: LocalDateTime =  LocalDateTime.of(2025, 1, 18, 11, 22)
-        val testStartDate: LocalDateTime =  LocalDateTime.of(2024, 3, 18, 11, 22)
-        val testEndDate: LocalDateTime =  LocalDateTime.of(2025, 3, 18, 11, 22)
+        val recruitStartDate: LocalDateTime = LocalDateTime.of(2024, 1, 18, 11, 22)
+        val recruitEndDate: LocalDateTime = LocalDateTime.of(2025, 1, 18, 11, 22)
+        val testStartDate: LocalDateTime = LocalDateTime.of(2024, 3, 18, 11, 22)
+        val testEndDate: LocalDateTime = LocalDateTime.of(2025, 3, 18, 11, 22)
         val mainImageUrl = "imageUrl"
         val mvpInfo = "this is mvpTest for test"
         val mvpUrl = "this is test Url"
         val rewardBudget = 10000
         val requirementMinAge = 10
         val requirementMaxAge = 40
-        val recruitType = "FIRST_COME"
         val recruitNum = -1L
 
         // Act
@@ -412,9 +401,9 @@ class MvpTestTest {
             requirementMinAge = requirementMinAge,
             requirementMaxAge = requirementMaxAge,
             requirementSex = null,
-            recruitType = RecruitType.fromString(recruitType),
+            recruitType = RecruitType.FIRST_COME,
             recruitNum = recruitNum,
-            categories = null
+            state = MvpTestState.APPROVED
         )
 
         // Assert

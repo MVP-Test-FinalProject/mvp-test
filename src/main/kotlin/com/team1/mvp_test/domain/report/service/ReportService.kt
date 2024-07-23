@@ -3,19 +3,15 @@ package com.team1.mvp_test.domain.report.service
 import com.team1.mvp_test.common.error.ReportErrorMessage
 import com.team1.mvp_test.common.exception.ModelNotFoundException
 import com.team1.mvp_test.common.exception.NoPermissionException
-import com.team1.mvp_test.domain.member.model.MemberTest
 import com.team1.mvp_test.domain.member.repository.MemberTestRepository
 import com.team1.mvp_test.domain.mvptest.model.MvpTest
-
-import com.team1.mvp_test.domain.report.dto.ApproveReportRequest
-import com.team1.mvp_test.domain.report.dto.ApproveReportResponse
 import com.team1.mvp_test.domain.report.dto.ReportResponse
 import com.team1.mvp_test.domain.report.dto.UpdateReportRequest
 import com.team1.mvp_test.domain.report.model.Report
 import com.team1.mvp_test.domain.report.model.ReportMedia
+import com.team1.mvp_test.domain.report.model.ReportState
 import com.team1.mvp_test.domain.report.repository.ReportMediaRepository
 import com.team1.mvp_test.domain.report.repository.ReportRepository
-import com.team1.mvp_test.domain.step.model.Step
 import com.team1.mvp_test.domain.step.repository.StepRepository
 import jakarta.transaction.Transactional
 import org.springframework.data.repository.findByIdOrNull
@@ -25,126 +21,69 @@ import java.time.LocalDateTime
 @Service
 class ReportService(
     private val reportRepository: ReportRepository,
-    private val reportMediaRepository: ReportMediaRepository,
     private val stepRepository: StepRepository,
     private val memberTestRepository: MemberTestRepository,
+    private val reportMediaRepository: ReportMediaRepository,
 ) {
 
     @Transactional
-    fun createReport(stepId: Long, request: UpdateReportRequest, memberId: Long): ReportResponse {
+    fun createReport(memberId: Long, stepId: Long, request: UpdateReportRequest): ReportResponse {
         val step = stepRepository.findByIdOrNull(stepId) ?: throw ModelNotFoundException("step", stepId)
-        val test = step.mvpTest
-        checkDateCondition(test)
-        val memberTest = checkMemberTest(test, memberId)
-        checkAlreadyReporting(step, memberTest)
-
-        val media = request.mediaUrl.map { reportMediaRepository.save(ReportMedia(mediaUrl = it)) }.toMutableList()
+        val memberTest = memberTestRepository.findByMemberIdAndTestId(memberId, step.mvpTest.id!!)
+            ?: throw NoPermissionException(ReportErrorMessage.NO_PERMISSION.message)
+        check(
+            !reportRepository.existsByStepAndMemberTest(
+                step,
+                memberTest
+            )
+        ) { ReportErrorMessage.ALREADY_REPORTED.message }
         val report = Report(
             title = request.title,
             body = request.body,
             feedback = request.feedback,
             memberTest = memberTest,
-            step = step,
-            isConfirmed = false,
-            reason = null,
-            reportMedia = media
-        )
-        validateMediaCount(report)
-        return report.let { reportRepository.save(it) }
+            step = step
+        ).let { reportRepository.save(it) }
+        request.mediaUrl.map { reportMediaRepository.save(ReportMedia(mediaUrl = it)) }
+            .forEach { report.addReportMedia(it) }
+        return reportRepository.save(report)
             .let { ReportResponse.from(it) }
     }
 
     @Transactional
-    fun updateReport(
-        reportId: Long,
-        request: UpdateReportRequest,
-        memberId: Long
-    ): ReportResponse {
+    fun updateReport(memberId: Long, reportId: Long, request: UpdateReportRequest): ReportResponse {
         val report = reportRepository.findByIdOrNull(reportId) ?: throw ModelNotFoundException("report", reportId)
-        validateAlreadyConfirmed(report)
-        val test = report.step.mvpTest
-        checkDateCondition(test)
-        checkMemberTest(test, memberId)
-        checkAuthor(report, memberId)
-
-        report.title = request.title
-        report.body = request.body
-        report.feedback = request.feedback
-
-        report.reportMedia.clear()
-        val newMedia = request.mediaUrl.map { reportMediaRepository.save(ReportMedia(mediaUrl = it)) }.toMutableList()
-        report.reportMedia = newMedia
-
-        validateMediaCount(report)
-
-        return ReportResponse.from(report)
+        if (report.memberTest.member.id != memberId) throw NoPermissionException(ReportErrorMessage.NOT_AUTHORIZED.message)
+        check(report.state != ReportState.APPROVED) { ReportErrorMessage.ALREADY_APPROVED.message }
+        checkDateCondition(report.step.mvpTest)
+        report.updateReport(request)
+        report.clearReportMedia()
+        request.mediaUrl.map { reportMediaRepository.save(ReportMedia(mediaUrl = it)) }
+            .forEach { report.addReportMedia(it) }
+        return reportRepository.save(report)
+            .let { ReportResponse.from(it) }
     }
 
     @Transactional
-    fun deleteReport(reportId: Long, memberId: Long) {
+    fun deleteReport(memberId: Long, reportId: Long) {
         val report = reportRepository.findByIdOrNull(reportId) ?: throw ModelNotFoundException("report", reportId)
-
-        checkAuthor(report, memberId)
-        validateAlreadyConfirmed(report)
-
+        if (report.memberTest.member.id != memberId) throw NoPermissionException(ReportErrorMessage.NOT_AUTHORIZED.message)
+        check(report.state != ReportState.APPROVED) { ReportErrorMessage.ALREADY_APPROVED.message }
         reportRepository.delete(report)
-        report.reportMedia.clear()
     }
 
     @Transactional
-    fun approveReport(
-        reportId: Long,
-        request: ApproveReportRequest,
-        enterpriseId: Long
-    ): ApproveReportResponse {
+    fun approveReport(enterpriseId: Long, reportId: Long): ReportResponse {
         val report = reportRepository.findByIdOrNull(reportId) ?: throw ModelNotFoundException("report", reportId)
-        validateAlreadyConfirmed(report)
-        val test = report.step.mvpTest
-        checkEnterprise(test, enterpriseId)
-
-        report.isConfirmed = request.isConfirmed
-        report.reason = request.reason
-
-        reportRepository.save(report)
-
-        return ApproveReportResponse.from(report)
+        if (report.step.mvpTest.enterpriseId != enterpriseId) throw NoPermissionException(ReportErrorMessage.NO_PERMISSION.message)
+        report.approve()
+        return ReportResponse.from(report)
     }
 
     private fun checkDateCondition(test: MvpTest) {
         val currentDate = LocalDateTime.now()
         if (currentDate.isAfter(test.testEndDate) || currentDate.isBefore(test.testStartDate)) {
             throw IllegalArgumentException(ReportErrorMessage.NOT_TEST_DURATION.message)
-        }
-    }
-
-    private fun checkAuthor(report: Report, memberId: Long) {
-        check(report.memberTest.member.id == memberId) { ReportErrorMessage.NOT_AUTHORIZED.message }
-    }
-
-    private fun checkEnterprise(test: MvpTest, enterpriseId: Long) {
-        check(test.enterpriseId == enterpriseId) { ReportErrorMessage.NOT_YOUR_TEST.message }
-    }
-
-    private fun checkMemberTest(test: MvpTest, memberId: Long): MemberTest {
-        val memberTest = memberTestRepository.findByMemberIdAndTestId(memberId, test.id) ?: throw NoPermissionException(
-            ReportErrorMessage.NO_PERMISSION.message
-        )
-        return memberTest
-    }
-
-    private fun validateAlreadyConfirmed(report: Report) {
-        if (report.isConfirmed) {
-            throw IllegalArgumentException(ReportErrorMessage.ALREADY_CONFIRMED_REPORT.message)
-        }
-    }
-
-    private fun validateMediaCount(report: Report) {
-        check(report.reportMedia.size <= 10) { throw IllegalArgumentException(ReportErrorMessage.MEDIA_COUNT_OVER.message) }
-    }
-
-    private fun checkAlreadyReporting(step: Step, memberTest: MemberTest) {
-        if(reportRepository.findByStepAndMemberTest(step, memberTest) != null) {
-            throw IllegalArgumentException(ReportErrorMessage.ALREADY_REPORTING.message)
         }
     }
 

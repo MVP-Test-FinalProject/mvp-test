@@ -1,5 +1,6 @@
 package com.team1.mvp_test.domain.enterprise.model
 
+import com.team1.mvp_test.domain.enterprise.dto.UpdateEnterpriseRequest
 import jakarta.persistence.*
 import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
@@ -32,11 +33,12 @@ class Enterprise(
     @field:Size(min = 11, max = 11)
     var phoneNumber: String,
 
-    @Column(name = "is_confirmed")
-    var isConfirmed: Boolean? = false,
-
-    @Column(name = "is_blocked")
-    var isBlocked: Boolean? = false,
+    @Column(name = "state")
+    var state: EnterpriseState = EnterpriseState.PENDING,
 ) {
-
+    fun update(request: UpdateEnterpriseRequest) {
+        this.name = request.name
+        this.ceoName = request.ceoName
+        this.phoneNumber = request.phoneNumber
+    }
 }

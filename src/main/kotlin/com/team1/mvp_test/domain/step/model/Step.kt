@@ -34,12 +34,10 @@ class Step(
     @ManyToOne
     @JoinColumn(name = "mvp_test_id")
     var mvpTest: MvpTest,
-
-    ) {
+) {
     fun updateStep(request: UpdateStepRequest) {
         this.title = request.title
         this.requirement = request.requirement
         this.guidelineUrl = request.guidelineUrl
-
     }
 }

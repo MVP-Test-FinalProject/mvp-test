@@ -1,6 +1,8 @@
 package com.team1.mvp_test.domain.mvptest.controller
 
-import com.team1.mvp_test.domain.mvptest.dto.mvptest.*
+import com.team1.mvp_test.domain.mvptest.dto.CreateMvpTestRequest
+import com.team1.mvp_test.domain.mvptest.dto.MvpTestResponse
+import com.team1.mvp_test.domain.mvptest.dto.UpdateMvpTestRequest
 import com.team1.mvp_test.domain.mvptest.service.MvpTestService
 import com.team1.mvp_test.infra.security.UserPrincipal
 import org.springframework.http.HttpStatus
@@ -10,12 +12,12 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/mvp_tests")
+@RequestMapping("api/v1/mvp-tests")
 class MvpTestController(
     private val mvpTestService: MvpTestService
 ) {
 
-    @PostMapping("")
+    @PostMapping
     @PreAuthorize("hasRole('ENTERPRISE')")
     fun createMvpTest(
         @RequestBody request: CreateMvpTestRequest,
@@ -58,45 +60,22 @@ class MvpTestController(
             .body(mvpTestService.getMvpTest(testId))
     }
 
-    @GetMapping("")
+    @GetMapping
     fun getMvpTestList(
-    ): ResponseEntity<MvpTestListResponse> {
+    ): ResponseEntity<List<MvpTestResponse>> {
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(mvpTestService.getMvpTestList())
     }
 
-    @PostMapping("/category")
-    //@PreAuthorize("hasRole('ADMIN')")
-    fun createCategory(
-        @RequestBody request: CreateCategoryRequest
-    ): ResponseEntity<String> {
-        return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(mvpTestService.createCategory(request))
-    }
-
-    @PreAuthorize("hasRole('ENTERPRISE')")
-    @PostMapping("/{testId}/approve")
-    fun approveMemberToMvpTest(
-        @RequestParam memberId: Long,
+    @PreAuthorize("hasRole('MEMBER')")
+    @PostMapping("/{testId}/apply")
+    fun applyToMvpTest(
         @PathVariable("testId") testId: Long,
         @AuthenticationPrincipal userPrincipal: UserPrincipal
-    ): ResponseEntity<TestingMemberCountResponse> {
+    ): ResponseEntity<Unit> {
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(mvpTestService.approveMemberToTest(testId, memberId, userPrincipal.id))
-    }
-
-    @PreAuthorize("hasRole('ENTERPRISE')")
-    @DeleteMapping("/{testId}/disapprove")
-    fun undoApproveMemberToMvpTest(
-        @RequestParam memberId: Long,
-        @PathVariable("testId") testId: Long,
-        @AuthenticationPrincipal userPrincipal: UserPrincipal
-    ): ResponseEntity<TestingMemberCountResponse> {
-        return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(mvpTestService.undoApproveMemberToTest(testId, memberId, userPrincipal.id))
+            .body(mvpTestService.applyToMvpTest(userPrincipal.id, testId))
     }
 }

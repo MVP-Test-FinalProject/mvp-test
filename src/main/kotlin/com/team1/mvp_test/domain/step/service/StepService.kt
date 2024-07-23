@@ -1,7 +1,8 @@
 package com.team1.mvp_test.domain.step.service
 
-import com.team1.mvp_test.common.error.StepErrorMessage
+import com.team1.mvp_test.common.error.MvpTestErrorMessage
 import com.team1.mvp_test.common.exception.ModelNotFoundException
+import com.team1.mvp_test.common.exception.NoPermissionException
 import com.team1.mvp_test.domain.mvptest.repository.MvpTestRepository
 import com.team1.mvp_test.domain.step.dto.CreateStepRequest
 import com.team1.mvp_test.domain.step.dto.StepListResponse
@@ -18,31 +19,19 @@ class StepService(
     private val stepRepository: StepRepository,
     private val mvpTestRepository: MvpTestRepository,
 ) {
-
-    fun getStepList(enterpriseId: Long,testId: Long): List<StepListResponse> {
+    fun getStepList(enterpriseId: Long, testId: Long): List<StepListResponse> {
         val mvpTest = mvpTestRepository.findByIdOrNull(testId)
             ?: throw ModelNotFoundException("MvpTest", testId)
-
-        check(mvpTest.enterpriseId == enterpriseId) {
-            StepErrorMessage.ACCESS_ERROR.message
-        }
-
-        return stepRepository.findAllByMvpTestId(testId).map { StepListResponse.from(it) }
+        if (mvpTest.enterpriseId != enterpriseId) throw NoPermissionException(MvpTestErrorMessage.NOT_AUTHORIZED.message)
+        return stepRepository.findAllByMvpTestIdOrderByStepOrder(testId).map { StepListResponse.from(it) }
     }
 
-
     @Transactional
-    fun createStep(enterpriseId: Long,testId: Long, request: CreateStepRequest): StepResponse {
-
+    fun createStep(enterpriseId: Long, testId: Long, request: CreateStepRequest): StepResponse {
         val mvpTest = mvpTestRepository.findByIdOrNull(testId)
             ?: throw ModelNotFoundException("MvpTest", testId)
-
-        check(mvpTest.enterpriseId == enterpriseId) {
-            StepErrorMessage.ACCESS_ERROR.message
-        }
-
+        if (mvpTest.enterpriseId != enterpriseId) throw NoPermissionException(MvpTestErrorMessage.NOT_AUTHORIZED.message)
         val maxOrder = stepRepository.findMaxOrderByTestId(testId)
-
         return Step(
             title = request.title,
             requirement = request.requirement,
@@ -54,63 +43,26 @@ class StepService(
             .let { StepResponse.from(it) }
     }
 
-    fun getStepById(enterpriseId: Long,testId: Long, stepId: Long): StepResponse {
-
-        val mvpTest = mvpTestRepository.findByIdOrNull(testId)
-             ?: throw ModelNotFoundException("MvpTest", testId)
-
-        check(mvpTest.enterpriseId == enterpriseId) {
-            StepErrorMessage.ACCESS_ERROR.message
-        }
-
-       val step = stepRepository.findByIdOrNull(stepId)
-           ?: throw ModelNotFoundException("Step", stepId)
-
-        check (step.mvpTest.id == testId) {
-            StepErrorMessage.ACCESS_ERROR.message
-        }
-
-
+    fun getStepById(stepId: Long): StepResponse {
+        val step = stepRepository.findByIdOrNull(stepId)
+            ?: throw ModelNotFoundException("Step", stepId)
         return StepResponse.from(step)
     }
 
     @Transactional
-    fun updateStepById(enterpriseId: Long,testId: Long, stepId: Long, request: UpdateStepRequest): StepResponse {
-
-        val mvpTest = mvpTestRepository.findByIdOrNull(testId)
-            ?: throw ModelNotFoundException("MvpTest", testId)
-
-        check(mvpTest.enterpriseId == enterpriseId) {
-            StepErrorMessage.ACCESS_ERROR.message
-        }
-
+    fun updateStep(enterpriseId: Long, stepId: Long, request: UpdateStepRequest): StepResponse {
         val step = stepRepository.findByIdOrNull(stepId)
             ?: throw ModelNotFoundException("Step", stepId)
-
-        check (step.mvpTest.id == testId) {
-            StepErrorMessage.ACCESS_ERROR.message
-        }
-
+        if (step.mvpTest.enterpriseId != enterpriseId) throw NoPermissionException(MvpTestErrorMessage.NOT_AUTHORIZED.message)
         step.updateStep(request)
         return StepResponse.from(step)
     }
 
     @Transactional
-    fun deleteStepById(testId: Long, stepId: Long, enterpriseId: Long) {
-
-        val mvpTest = mvpTestRepository.findByIdOrNull(testId)
-            ?: throw ModelNotFoundException("MvpTest", testId)
-
-        check(mvpTest.enterpriseId == enterpriseId) {
-            StepErrorMessage.ACCESS_ERROR.message
-        }
-
+    fun deleteStep(enterpriseId: Long, stepId: Long) {
         val step = stepRepository.findByIdOrNull(stepId)
             ?: throw ModelNotFoundException("Step", stepId)
-
-        check (step.mvpTest.id == testId) {
-            StepErrorMessage.ACCESS_ERROR.message
-        }
+        if (step.mvpTest.enterpriseId != enterpriseId) throw NoPermissionException(MvpTestErrorMessage.NOT_AUTHORIZED.message)
         stepRepository.delete(step)
     }
 }

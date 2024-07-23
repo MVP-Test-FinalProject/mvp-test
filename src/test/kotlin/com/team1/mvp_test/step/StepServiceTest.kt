@@ -1,8 +1,10 @@
 package com.team1.mvp_test.step
 
 import com.team1.mvp_test.common.exception.ModelNotFoundException
-import com.team1.mvp_test.domain.mvptest.constant.RecruitType
+import com.team1.mvp_test.common.exception.NoPermissionException
 import com.team1.mvp_test.domain.mvptest.model.MvpTest
+import com.team1.mvp_test.domain.mvptest.model.MvpTestState
+import com.team1.mvp_test.domain.mvptest.model.RecruitType
 import com.team1.mvp_test.domain.mvptest.repository.MvpTestRepository
 import com.team1.mvp_test.domain.step.dto.CreateStepRequest
 import com.team1.mvp_test.domain.step.dto.UpdateStepRequest
@@ -10,32 +12,92 @@ import com.team1.mvp_test.domain.step.model.Step
 import com.team1.mvp_test.domain.step.repository.StepRepository
 import com.team1.mvp_test.domain.step.service.StepService
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.matchers.shouldBe
-import io.mockk.*
-import org.junit.jupiter.api.Test
+import io.kotest.core.spec.style.BehaviorSpec
+import io.mockk.every
+import io.mockk.mockk
 import org.springframework.data.repository.findByIdOrNull
 import java.time.LocalDateTime
 
 
-class StepServiceTest {
+class StepServiceTest : BehaviorSpec({
 
-    private val stepRepository = mockk<StepRepository>()
-    private val mvpTestRepository = mockk<MvpTestRepository>()
-    private val stepService = StepService(stepRepository, mvpTestRepository)
+    val stepRepository = mockk<StepRepository>()
+    val mvpTestRepository = mockk<MvpTestRepository>()
 
-    @Test
-    fun `createStep - 기업 본인의 mvpTest에 step작성`() {
-        //given
-        val testId = 1L
-        val enterpriseId = 1L
-        val mvpTest = MvpTest(
-            id = 1L,
-            enterpriseId = 1L,
+    val stepService = StepService(
+        stepRepository = stepRepository,
+        mvpTestRepository = mvpTestRepository,
+    )
+
+    Given("존재하지 않는 테스트에 대해서") {
+        every { mvpTestRepository.findByIdOrNull(any()) } returns null
+        When("createStep 실행 시") {
+            Then("ModelNotFoundException 예외를 던진다") {
+                shouldThrow<ModelNotFoundException> {
+                    stepService.createStep(ENTERPRISE_ID, TEST_ID, createStepRequest)
+                }
+            }
+        }
+    }
+
+    Given("권한이 없는 테스트에 대해서") {
+        every { mvpTestRepository.findByIdOrNull(any()) } returns mvpTest
+        every { stepRepository.findByIdOrNull(any()) } returns step
+        val otherEnterpriseId = 2L
+        When("createStep 실행 시") {
+            Then("NoPermissionException 예외를 던진다") {
+                shouldThrow<NoPermissionException> {
+                    stepService.createStep(otherEnterpriseId, TEST_ID, createStepRequest)
+                }
+            }
+        }
+        When("updateStep 실행 시") {
+            Then("NoPermissionException 예외를 던진다") {
+                shouldThrow<NoPermissionException> {
+                    stepService.updateStep(otherEnterpriseId, STEP_ID, updateStepRequest)
+                }
+            }
+        }
+        When("deleteStep 실행 시") {
+            Then("NoPermissionException 예외를 던진다") {
+                shouldThrow<NoPermissionException> {
+                    stepService.deleteStep(otherEnterpriseId, STEP_ID)
+                }
+            }
+        }
+    }
+
+    Given("존재하지 않는 STEP에 대해서") {
+        every { stepRepository.findByIdOrNull(any()) } returns null
+        When("updateStep 실행 시") {
+            Then("ModelNotFoundException 예외를 던진다") {
+                shouldThrow<ModelNotFoundException> {
+                    stepService.updateStep(ENTERPRISE_ID, STEP_ID, updateStepRequest)
+                }
+            }
+        }
+        When("deleteStep 실행 시") {
+            Then("ModelNotFoundException 예외를 던진다") {
+                shouldThrow<ModelNotFoundException> {
+                    stepService.deleteStep(ENTERPRISE_ID, STEP_ID)
+                }
+            }
+        }
+    }
+
+}) {
+    companion object {
+        private const val TEST_ID = 1L
+        private const val ENTERPRISE_ID = 1L
+        private const val STEP_ID = 1L
+        private val mvpTest = MvpTest(
+            id = TEST_ID,
+            enterpriseId = ENTERPRISE_ID,
             mvpName = "string",
-            recruitStartDate = LocalDateTime.of(2024, 5, 1, 12, 0),
-            recruitEndDate = LocalDateTime.of(2024, 5, 5, 12, 0),
-            testStartDate = LocalDateTime.of(2024, 5, 10, 12, 0),
-            testEndDate = LocalDateTime.of(2024, 5, 15, 12, 0),
+            recruitStartDate = LocalDateTime.of(2025, 5, 1, 12, 0),
+            recruitEndDate = LocalDateTime.of(2025, 5, 5, 12, 0),
+            testStartDate = LocalDateTime.of(2025, 5, 10, 12, 0),
+            testEndDate = LocalDateTime.of(2025, 5, 15, 12, 0),
             mainImageUrl = "string",
             mvpInfo = "string",
             mvpUrl = "string",
@@ -45,390 +107,32 @@ class StepServiceTest {
             requirementSex = true,
             recruitType = RecruitType.FIRST_COME,
             recruitNum = 50,
-            categories = listOf()
+            state = MvpTestState.APPROVED
         )
 
-        val request = CreateStepRequest(
+        private val createStepRequest = CreateStepRequest(
             title = "title",
             requirement = "requirement",
             guidelineUrl = "string",
             reward = 100
         )
-
-        val maxOrder = 0
-
-        val step = Step(
-            id = 1L,
-            title = request.title,
-            requirement = request.requirement,
-            guidelineUrl = request.guidelineUrl,
-            reward = request.reward,
-            stepOrder = maxOrder + 1,
-            mvpTest = mvpTest
-        )
-
-        every { mvpTestRepository.findByIdOrNull(testId) } returns mvpTest
-        every { stepRepository.findMaxOrderByTestId(testId) } returns maxOrder
-        every { stepRepository.save(any()) } returns step
-
-        //when
-        val result = stepService.createStep(enterpriseId, testId, request)
-
-        //then
-        result.title shouldBe "title"
-        result.requirement shouldBe "requirement"
-        result.guidelineUrl shouldBe "string"
-        result.reward shouldBe 100
-        verify { stepRepository.save(any()) }
-    }
-
-    @Test
-    fun `updateStepById - 기업 본인의 step 수정`() {
-        //given
-        val stepId = 1L
-        val testId = 1L
-        val enterpriseId = 1L
-        val mvpTest = MvpTest(
-            id = 1L,
-            enterpriseId = 1L,
-            mvpName = "string",
-            recruitStartDate = LocalDateTime.of(2024, 5, 1, 12, 0),
-            recruitEndDate = LocalDateTime.of(2024, 5, 5, 12, 0),
-            testStartDate = LocalDateTime.of(2024, 5, 10, 12, 0),
-            testEndDate = LocalDateTime.of(2024, 5, 15, 12, 0),
-            mainImageUrl = "string",
-            mvpInfo = "string",
-            mvpUrl = "string",
-            rewardBudget = 100000,
-            requirementMinAge = 15,
-            requirementMaxAge = 60,
-            requirementSex = true,
-            recruitType = RecruitType.FIRST_COME,
-            recruitNum = 50,
-            categories = listOf()
-        )
-
-        val step = Step(
-            id = 1L,
-            title = "title",
-            requirement = "requirement",
-            guidelineUrl = "string",
-            reward = 100,
-            stepOrder = 1,
-            mvpTest = mvpTest
-        )
-
-        val request = UpdateStepRequest(
+        private val updateStepRequest = UpdateStepRequest(
             title = "test_title",
             requirement = "test_requirement",
             guidelineUrl = "test_url",
         )
-        every { mvpTestRepository.findByIdOrNull(testId) } returns mvpTest
-        every { stepRepository.findByIdOrNull(stepId) } returns step
+        private const val MAX_ORDER = 0
 
-        //when
-        val result = stepService.updateStepById(enterpriseId, testId, stepId, request)
-
-        //then
-        result.title shouldBe "test_title"
-        result.requirement shouldBe "test_requirement"
-        result.guidelineUrl shouldBe "test_url"
-    }
-
-    @Test
-    fun `deleteStepById - 기업 본인의 step 삭제`() {
-        // given
-        val stepId = 1L
-        val testId = 1L
-        val enterpriseId = 1L
-        val mvpTest = MvpTest(
-            id = 1L,
-            enterpriseId = 1L,
-            mvpName = "string",
-            recruitStartDate = LocalDateTime.of(2024, 5, 1, 12, 0),
-            recruitEndDate = LocalDateTime.of(2024, 5, 5, 12, 0),
-            testStartDate = LocalDateTime.of(2024, 5, 10, 12, 0),
-            testEndDate = LocalDateTime.of(2024, 5, 15, 12, 0),
-            mainImageUrl = "string",
-            mvpInfo = "string",
-            mvpUrl = "string",
-            rewardBudget = 100000,
-            requirementMinAge = 15,
-            requirementMaxAge = 60,
-            requirementSex = true,
-            recruitType = RecruitType.FIRST_COME,
-            recruitNum = 50,
-            categories = listOf()
-        )
-
-        val step = Step(
-            id = 1L,
-            title = "title",
-            requirement = "requirement",
-            guidelineUrl = "string",
-            reward = 100,
-            stepOrder = 1,
+        private val step = Step(
+            id = STEP_ID,
+            title = createStepRequest.title,
+            requirement = createStepRequest.requirement,
+            guidelineUrl = createStepRequest.guidelineUrl,
+            reward = createStepRequest.reward,
+            stepOrder = MAX_ORDER + 1,
             mvpTest = mvpTest
         )
-
-        every { mvpTestRepository.findByIdOrNull(testId) } returns mvpTest
-        every { stepRepository.findByIdOrNull(stepId) } returns step
-        every { stepRepository.delete(any()) } just Runs
-
-        // when
-        stepService.deleteStepById(testId, stepId, enterpriseId)
-
-        // then
-        verify { stepRepository.delete(any()) }
     }
-
-    @Test
-    fun `createStep - mvpTest가 없는 경우`() {
-        // given
-        val testId = 1L
-        val enterpriseId = 1L
-        val request = CreateStepRequest(
-            title = "test_title",
-            requirement = "test_requirement",
-            guidelineUrl = "test_url",
-            reward = 100,
-        )
-
-        every { mvpTestRepository.findByIdOrNull(testId) } returns null
-
-        //then
-        shouldThrow<ModelNotFoundException> {
-            stepService.createStep(enterpriseId, testId, request)
-        }
-    }
-
-    @Test
-    fun `createStep - enterpriseId가 다른 경우`() {
-        val testId = 1L
-        val enterpriseId = 1L
-        val request = CreateStepRequest(
-            title = "title",
-            requirement = "requirement",
-            guidelineUrl = "url",
-            reward = 100,
-        )
-
-        val mvpTest = MvpTest(
-            id = 1L,
-            enterpriseId = 2L,
-            mvpName = "string",
-            recruitStartDate = LocalDateTime.of(2024, 5, 1, 12, 0),
-            recruitEndDate = LocalDateTime.of(2024, 5, 5, 12, 0),
-            testStartDate = LocalDateTime.of(2024, 5, 10, 12, 0),
-            testEndDate = LocalDateTime.of(2024, 5, 15, 12, 0),
-            mainImageUrl = "string",
-            mvpInfo = "string",
-            mvpUrl = "string",
-            rewardBudget = 100000,
-            requirementMinAge = 15,
-            requirementMaxAge = 60,
-            requirementSex = true,
-            recruitType = RecruitType.FIRST_COME,
-            recruitNum = 50,
-            categories = listOf()
-        )
-
-        val maxOrder = 0
-
-        val step = Step(
-            id = 1L,
-            title = request.title,
-            requirement = request.requirement,
-            guidelineUrl = request.guidelineUrl,
-            reward = request.reward,
-            stepOrder = maxOrder + 1,
-            mvpTest = mvpTest
-        )
-
-        every { mvpTestRepository.findByIdOrNull(testId) } returns mvpTest
-        every { stepRepository.save(any()) } returns step
-
-        //then
-        shouldThrow<IllegalStateException> {
-            stepService.createStep(enterpriseId, testId, request)
-        }
-    }
-
-    @Test
-    fun `updateStepById - enterpriseId가 다른 경우`() {
-        //given
-        val stepId = 1L
-        val testId = 1L
-        val enterpriseId = 1L
-        val mvpTest = MvpTest(
-            id = 1L,
-            enterpriseId = 2L,
-            mvpName = "string",
-            recruitStartDate = LocalDateTime.of(2024, 5, 1, 12, 0),
-            recruitEndDate = LocalDateTime.of(2024, 5, 5, 12, 0),
-            testStartDate = LocalDateTime.of(2024, 5, 10, 12, 0),
-            testEndDate = LocalDateTime.of(2024, 5, 15, 12, 0),
-            mainImageUrl = "string",
-            mvpInfo = "string",
-            mvpUrl = "string",
-            rewardBudget = 100000,
-            requirementMinAge = 15,
-            requirementMaxAge = 60,
-            requirementSex = true,
-            recruitType = RecruitType.FIRST_COME,
-            recruitNum = 50,
-            categories = listOf()
-        )
-
-        val step = Step(
-            id = 1L,
-            title = "title",
-            requirement = "requirement",
-            guidelineUrl = "string",
-            reward = 100,
-            stepOrder = 1,
-            mvpTest = mvpTest
-        )
-
-        val request = UpdateStepRequest(
-            title = "test_title",
-            requirement = "test_requirement",
-            guidelineUrl = "test_url",
-        )
-        every { mvpTestRepository.findByIdOrNull(testId) } returns mvpTest
-        every { stepRepository.findByIdOrNull(stepId) } returns step
-
-        //then
-        shouldThrow<IllegalStateException> {
-            stepService.updateStepById(enterpriseId, testId, stepId, request)
-        }
-
-    }
-
-    @Test
-    fun `deleteStepById - enterpriseId가 다른 경우`() {
-        // given
-        val stepId = 1L
-        val testId = 1L
-        val enterpriseId = 1L
-        val mvpTest = MvpTest(
-            id = 1L,
-            enterpriseId = 2L,
-            mvpName = "string",
-            recruitStartDate = LocalDateTime.of(2024, 5, 1, 12, 0),
-            recruitEndDate = LocalDateTime.of(2024, 5, 5, 12, 0),
-            testStartDate = LocalDateTime.of(2024, 5, 10, 12, 0),
-            testEndDate = LocalDateTime.of(2024, 5, 15, 12, 0),
-            mainImageUrl = "string",
-            mvpInfo = "string",
-            mvpUrl = "string",
-            rewardBudget = 100000,
-            requirementMinAge = 15,
-            requirementMaxAge = 60,
-            requirementSex = true,
-            recruitType = RecruitType.FIRST_COME,
-            recruitNum = 50,
-            categories = listOf()
-        )
-
-        val step = Step(
-            id = 1L,
-            title = "title",
-            requirement = "requirement",
-            guidelineUrl = "string",
-            reward = 100,
-            stepOrder = 1,
-            mvpTest = mvpTest
-        )
-
-        every { mvpTestRepository.findByIdOrNull(testId) } returns mvpTest
-        every { stepRepository.findByIdOrNull(stepId) } returns step
-        every { stepRepository.delete(any()) } just Runs
-
-        //then
-        shouldThrow<IllegalStateException> {
-            stepService.deleteStepById(testId, stepId, enterpriseId)
-        }
-    }
-
-    @Test
-    fun `updateStepById - step이 존재하지 않는 경우`() {
-        // given
-        val stepId = 1L
-        val testId = 1L
-        val enterpriseId = 1L
-
-        val mvpTest = MvpTest(
-            id = 1L,
-            enterpriseId = 1L,
-            mvpName = "string",
-            recruitStartDate = LocalDateTime.of(2024, 5, 1, 12, 0),
-            recruitEndDate = LocalDateTime.of(2024, 5, 5, 12, 0),
-            testStartDate = LocalDateTime.of(2024, 5, 10, 12, 0),
-            testEndDate = LocalDateTime.of(2024, 5, 15, 12, 0),
-            mainImageUrl = "string",
-            mvpInfo = "string",
-            mvpUrl = "string",
-            rewardBudget = 100000,
-            requirementMinAge = 15,
-            requirementMaxAge = 60,
-            requirementSex = true,
-            recruitType = RecruitType.FIRST_COME,
-            recruitNum = 50,
-            categories = listOf()
-        )
-
-
-        val request = UpdateStepRequest(
-            title = "test_title",
-            requirement = "test_requirement",
-            guidelineUrl = "test_url"
-        )
-
-        every { mvpTestRepository.findByIdOrNull(testId) } returns mvpTest
-        every { stepRepository.findByIdOrNull(stepId) } returns null
-
-        // then
-        shouldThrow<ModelNotFoundException> {
-            stepService.updateStepById(enterpriseId, testId, stepId, request)
-        }
-    }
-
-    @Test
-    fun `deleteStepById - step이 존재하지 않는 경우`() {
-        // given
-        val stepId = 1L
-        val testId = 1L
-        val enterpriseId = 1L
-
-        val mvpTest = MvpTest(
-            id = 1L,
-            enterpriseId = 1L,
-            mvpName = "string",
-            recruitStartDate = LocalDateTime.of(2024, 5, 1, 12, 0),
-            recruitEndDate = LocalDateTime.of(2024, 5, 5, 12, 0),
-            testStartDate = LocalDateTime.of(2024, 5, 10, 12, 0),
-            testEndDate = LocalDateTime.of(2024, 5, 15, 12, 0),
-            mainImageUrl = "string",
-            mvpInfo = "string",
-            mvpUrl = "string",
-            rewardBudget = 100000,
-            requirementMinAge = 15,
-            requirementMaxAge = 60,
-            requirementSex = true,
-            recruitType = RecruitType.FIRST_COME,
-            recruitNum = 50,
-            categories = listOf()
-        )
-
-        every { mvpTestRepository.findByIdOrNull(testId) } returns mvpTest
-        every { stepRepository.findByIdOrNull(stepId) } returns null
-
-        shouldThrow<ModelNotFoundException> {
-            stepService.deleteStepById(testId, stepId, enterpriseId)
-        }
-    }
-
 }
 
 

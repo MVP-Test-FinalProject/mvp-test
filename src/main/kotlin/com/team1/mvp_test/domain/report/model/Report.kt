@@ -1,6 +1,7 @@
 package com.team1.mvp_test.domain.report.model
 
 import com.team1.mvp_test.domain.member.model.MemberTest
+import com.team1.mvp_test.domain.report.dto.UpdateReportRequest
 import com.team1.mvp_test.domain.step.model.Step
 import jakarta.persistence.*
 import jakarta.validation.constraints.Size
@@ -8,7 +9,8 @@ import jakarta.validation.constraints.Size
 @Entity
 @Table(name = "report")
 class Report(
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
     @field:Size(min = 5, max = 50, message = "1")
@@ -23,12 +25,13 @@ class Report(
     @Column(name = "feedback")
     var feedback: String,
 
-    @Column(name = "is_confirmed")
-    var isConfirmed: Boolean,
+    @Enumerated(EnumType.STRING)
+    @Column(name = "state")
+    var state: ReportState = ReportState.PENDING,
 
     @field:Size(min = 5, max = 500, message = "4")
     @Column(name = "reason")
-    var reason: String?,
+    var reason: String? = null,
 
     @ManyToOne
     @JoinColumn(name = "step_id")
@@ -43,7 +46,21 @@ class Report(
     var reportMedia: MutableList<ReportMedia> = mutableListOf(),
 
     ) {
+    fun addReportMedia(media: ReportMedia) {
+        reportMedia.add(media)
+    }
 
+    fun clearReportMedia() {
+        reportMedia.clear()
+    }
 
+    fun updateReport(request: UpdateReportRequest) {
+        title = request.title
+        body = request.body
+        feedback = request.feedback
+    }
 
+    fun approve() {
+        state = ReportState.APPROVED
+    }
 }

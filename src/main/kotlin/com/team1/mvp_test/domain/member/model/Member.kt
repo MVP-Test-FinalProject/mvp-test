@@ -1,6 +1,7 @@
 package com.team1.mvp_test.domain.member.model
 
 import com.team1.mvp_test.domain.member.dto.MemberUpdateRequest
+import com.team1.mvp_test.domain.member.dto.SignUpInfoRequest
 import com.team1.mvp_test.domain.oauth.provider.OAuthProvider
 import jakarta.persistence.*
 import jakarta.validation.constraints.Min
@@ -44,5 +45,13 @@ class Member(
     fun updateMember(request: MemberUpdateRequest) {
         this.name = request.name
         this.info = request.info
+    }
+
+    fun updateSignUpInfo(request: SignUpInfoRequest) {
+        name = request.name
+        age = request.age
+        sex = request.sex
+        info = request.info
+        signUpState = true
     }
 }
