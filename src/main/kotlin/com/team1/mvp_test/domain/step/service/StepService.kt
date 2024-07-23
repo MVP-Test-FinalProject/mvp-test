@@ -50,7 +50,7 @@ class StepService(
     }
 
     @Transactional
-    fun updateStepById(enterpriseId: Long, stepId: Long, request: UpdateStepRequest): StepResponse {
+    fun updateStep(enterpriseId: Long, stepId: Long, request: UpdateStepRequest): StepResponse {
         val step = stepRepository.findByIdOrNull(stepId)
             ?: throw ModelNotFoundException("Step", stepId)
         if (step.mvpTest.enterpriseId != enterpriseId) throw NoPermissionException(MvpTestErrorMessage.NOT_AUTHORIZED.message)
@@ -59,7 +59,7 @@ class StepService(
     }
 
     @Transactional
-    fun deleteStepById(stepId: Long, enterpriseId: Long) {
+    fun deleteStep(enterpriseId: Long, stepId: Long) {
         val step = stepRepository.findByIdOrNull(stepId)
             ?: throw ModelNotFoundException("Step", stepId)
         if (step.mvpTest.enterpriseId != enterpriseId) throw NoPermissionException(MvpTestErrorMessage.NOT_AUTHORIZED.message)

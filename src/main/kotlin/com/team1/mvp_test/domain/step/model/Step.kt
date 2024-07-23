@@ -39,6 +39,5 @@ class Step(
         this.title = request.title
         this.requirement = request.requirement
         this.guidelineUrl = request.guidelineUrl
-
     }
 }

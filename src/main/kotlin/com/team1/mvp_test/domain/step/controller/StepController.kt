@@ -59,7 +59,7 @@ class StepController(
     ): ResponseEntity<StepResponse> {
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(stepService.updateStepById(userPrincipal.id, stepId, request))
+            .body(stepService.updateStep(userPrincipal.id, stepId, request))
     }
 
     @DeleteMapping("steps/{stepId}")
@@ -70,7 +70,7 @@ class StepController(
     ): ResponseEntity<Unit> {
         return ResponseEntity
             .status(HttpStatus.NO_CONTENT)
-            .body(stepService.deleteStepById(userPrincipal.id, stepId))
+            .body(stepService.deleteStep(userPrincipal.id, stepId))
     }
 
 }
