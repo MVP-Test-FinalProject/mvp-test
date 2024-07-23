@@ -94,7 +94,7 @@ class MvpTestService(
         val test = mvpTestRepository.findByIdOrNull(testId) ?: throw ModelNotFoundException("mvpTest", testId)
         val member = memberRepository.findByIdOrNull(memberId) ?: throw ModelNotFoundException("member", memberId)
         val recruitCount = memberTestRepository.countByTestIdAndState(testId, MemberTestState.APPROVED)
-        check(recruitCount >= test.recruitNum) { MvpTestErrorMessage.TEST_ALREADY_FULL.message }
+        check(recruitCount < test.recruitNum) { MvpTestErrorMessage.TEST_ALREADY_FULL.message }
         MemberTest(
             member = member,
             test = test,

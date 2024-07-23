@@ -1,11 +1,13 @@
 package com.team1.mvp_test.domain.enterprise.dto
 
+import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
 
 data class EnterpriseSignUpRequest(
-    @field:Pattern(regexp = "^[a-z0-9]+[a-z0-9._%+-]*@[a-z0-9.-]+\\.[a-z]$")
+    @field:NotBlank
+    @field:Email
     val email: String,
 
     @field:Size(min = 8)
