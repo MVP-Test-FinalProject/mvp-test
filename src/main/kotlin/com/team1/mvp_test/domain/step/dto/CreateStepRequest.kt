@@ -4,14 +4,14 @@ import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.Size
 
 data class CreateStepRequest(
-    @field:Size(min = 5, max = 20, message = "")
+    @field:Size(min = 5, max = 20)
     val title: String,
 
-    @field:Size(min = 10, max = 200, message = "")
+    @field:Size(min = 10, max = 200)
     val requirement: String,
 
     val guidelineUrl: String?,
 
-    @field:Min(value = 1000, message = "")
+    @field:Min(value = 1000)
     val reward: Int
 )

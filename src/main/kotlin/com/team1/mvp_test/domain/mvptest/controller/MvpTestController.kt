@@ -5,6 +5,7 @@ import com.team1.mvp_test.domain.mvptest.dto.MvpTestResponse
 import com.team1.mvp_test.domain.mvptest.dto.UpdateMvpTestRequest
 import com.team1.mvp_test.domain.mvptest.service.MvpTestService
 import com.team1.mvp_test.infra.security.UserPrincipal
+import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
@@ -20,7 +21,7 @@ class MvpTestController(
     @PostMapping
     @PreAuthorize("hasRole('ENTERPRISE')")
     fun createMvpTest(
-        @RequestBody request: CreateMvpTestRequest,
+        @Valid @RequestBody request: CreateMvpTestRequest,
         @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<MvpTestResponse> {
         return ResponseEntity
@@ -31,7 +32,7 @@ class MvpTestController(
     @PutMapping("/{testId}")
     @PreAuthorize("hasRole('ENTERPRISE')")
     fun updateMvpTest(
-        @RequestBody request: UpdateMvpTestRequest,
+        @Valid @RequestBody request: UpdateMvpTestRequest,
         @PathVariable("testId") testId: Long,
         @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<MvpTestResponse> {

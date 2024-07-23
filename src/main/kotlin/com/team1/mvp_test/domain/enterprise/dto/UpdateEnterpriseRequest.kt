@@ -1,14 +1,15 @@
 package com.team1.mvp_test.domain.enterprise.dto
 
+import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
 
 data class UpdateEnterpriseRequest(
 
-    @field:Size(min = 1)
+    @field:NotBlank
     val name: String,
 
-    @field:Size(min = 1)
+    @field:NotBlank
     val ceoName: String,
 
     @field:Size(min = 10, max = 11)

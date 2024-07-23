@@ -10,8 +10,9 @@ import java.time.LocalDateTime
 
 data class UpdateMvpTestRequest(
     @field:NotBlank
-    @field:Size(min = 1, max = 50)
+    @field:Size(max = 50)
     val mvpName: String,
+
     val recruitStartDate: LocalDateTime,
     val recruitEndDate: LocalDateTime,
     val testStartDate: LocalDateTime,

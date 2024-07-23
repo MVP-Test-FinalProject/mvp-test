@@ -4,6 +4,7 @@ import com.team1.mvp_test.domain.report.dto.ReportRequest
 import com.team1.mvp_test.domain.report.dto.ReportResponse
 import com.team1.mvp_test.domain.report.service.ReportService
 import com.team1.mvp_test.infra.security.UserPrincipal
+import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
@@ -19,7 +20,7 @@ class ReportController(
     @PostMapping("/steps/{step-id}/reports")
     fun createReport(
         @PathVariable("step-id") stepId: Long,
-        @RequestBody request: ReportRequest,
+        @Valid @RequestBody request: ReportRequest,
         @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<ReportResponse> {
         return ResponseEntity
@@ -31,7 +32,7 @@ class ReportController(
     @PutMapping("reports/{report-id}")
     fun updateReport(
         @PathVariable("report-id") reportId: Long,
-        @RequestBody request: ReportRequest,
+        @Valid @RequestBody request: ReportRequest,
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
     ): ResponseEntity<ReportResponse> {
         return ResponseEntity
