@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
-import java.time.LocalDate
+import java.time.LocalDateTime
 
 @Table(name = "mvp_test")
 @Entity
@@ -24,16 +24,16 @@ class MvpTest(
     var mvpName: String,
 
     @Column(name = "recruit_start_date")
-    var recruitStartDate: LocalDate,
+    var recruitStartDate: LocalDateTime,
 
     @Column(name = "recruit_ent_date")
-    var recruitEndDate: LocalDate,
+    var recruitEndDate: LocalDateTime,
 
     @Column(name = "test_start_date")
-    var testStartDate: LocalDate,
+    var testStartDate: LocalDateTime,
 
     @Column(name = "test_end_date")
-    var testEndDate: LocalDate,
+    var testEndDate: LocalDateTime,
 
     @Column(name = "main_image_url")
     var mainImageUrl: String,
@@ -101,7 +101,7 @@ class MvpTest(
     }
 
     private fun validateRecruitDate() {
-        require(recruitEndDate.isAfter(recruitStartDate) && recruitEndDate.isAfter(LocalDate.now())) {
+        require(recruitEndDate.isAfter(recruitStartDate) && recruitEndDate.isAfter(LocalDateTime.now())) {
             "모집 일자가 유효하지 않습니다."
         }
     }

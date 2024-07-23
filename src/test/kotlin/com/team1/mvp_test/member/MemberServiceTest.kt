@@ -49,11 +49,8 @@ class MemberServiceTest {
             id = "123",
             email = "email@email.com"
         )
-
         `when`(oAuthClientService.login(provider, code)).thenReturn(userInfo)
-
         val result = oAuthClientService.login(provider, code)
-
         assertEquals(userInfo, result)
     }
 }

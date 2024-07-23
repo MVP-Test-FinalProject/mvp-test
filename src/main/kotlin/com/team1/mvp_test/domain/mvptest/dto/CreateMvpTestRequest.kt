@@ -3,14 +3,14 @@ package com.team1.mvp_test.domain.mvptest.dto
 import com.team1.mvp_test.domain.mvptest.model.MvpTest
 import com.team1.mvp_test.domain.mvptest.model.MvpTestState
 import com.team1.mvp_test.domain.mvptest.model.RecruitType
-import java.time.LocalDate
+import java.time.LocalDateTime
 
 data class CreateMvpTestRequest(
     val mvpName: String,
-    val recruitStartDate: LocalDate,
-    val recruitEndDate: LocalDate,
-    val testStartDate: LocalDate,
-    val testEndDate: LocalDate,
+    val recruitStartDate: LocalDateTime,
+    val recruitEndDate: LocalDateTime,
+    val testStartDate: LocalDateTime,
+    val testEndDate: LocalDateTime,
     val mainImageUrl: String,
     val mvpInfo: String,
     val mvpUrl: String,
