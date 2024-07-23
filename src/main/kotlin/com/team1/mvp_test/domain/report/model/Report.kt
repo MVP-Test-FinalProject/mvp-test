@@ -1,7 +1,6 @@
 package com.team1.mvp_test.domain.report.model
 
 import com.team1.mvp_test.domain.member.model.MemberTest
-import com.team1.mvp_test.domain.report.dto.ReportRequest
 import com.team1.mvp_test.domain.step.model.Step
 import jakarta.persistence.*
 
@@ -49,10 +48,10 @@ class Report(
         reportMedia.clear()
     }
 
-    fun updateReport(request: ReportRequest) {
-        title = request.title
-        body = request.body
-        feedback = request.feedback
+    fun updateReport(title: String, body: String, feedback: String) {
+        this.title = title
+        this.body = body
+        this.feedback = feedback
     }
 
     fun approve() {

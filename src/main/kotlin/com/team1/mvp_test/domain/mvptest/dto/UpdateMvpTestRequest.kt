@@ -2,6 +2,7 @@ package com.team1.mvp_test.domain.mvptest.dto
 
 import com.team1.mvp_test.domain.member.model.Sex
 import com.team1.mvp_test.domain.mvptest.model.RecruitType
+import com.team1.mvp_test.domain.mvptest.model.UpdateMvpTestObject
 import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotBlank
@@ -44,4 +45,24 @@ data class UpdateMvpTestRequest(
     val recruitNum: Int,
 
     val categories: List<String>
-)
+) {
+    fun toObject(): UpdateMvpTestObject {
+        return UpdateMvpTestObject(
+            mvpName = this.mvpName,
+            recruitStartDate = this.recruitStartDate,
+            recruitEndDate = this.recruitEndDate,
+            testStartDate = this.testStartDate,
+            testEndDate = this.testEndDate,
+            mainImageUrl = this.mainImageUrl,
+            mvpInfo = this.mvpInfo,
+            mvpUrl = this.mvpUrl,
+            rewardBudget = this.rewardBudget,
+            requirementMinAge = this.requirementMinAge,
+            requirementMaxAge = this.requirementMaxAge,
+            requirementSex = this.requirementSex,
+            recruitType = this.recruitType,
+            recruitNum = this.recruitNum,
+        )
+
+    }
+}

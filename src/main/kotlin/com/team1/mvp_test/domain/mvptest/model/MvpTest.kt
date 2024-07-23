@@ -1,7 +1,6 @@
 package com.team1.mvp_test.domain.mvptest.model
 
 import com.team1.mvp_test.domain.member.model.Sex
-import com.team1.mvp_test.domain.mvptest.dto.UpdateMvpTestRequest
 import jakarta.persistence.*
 import java.time.LocalDateTime
 
@@ -69,21 +68,21 @@ class MvpTest(
 
     ) {
 
-    fun update(request: UpdateMvpTestRequest) {
-        mvpName = request.mvpName
-        recruitStartDate = request.recruitStartDate
-        recruitEndDate = request.recruitEndDate
-        testStartDate = request.testStartDate
-        testEndDate = request.testEndDate
-        mainImageUrl = request.mainImageUrl
-        mvpInfo = request.mvpInfo
-        mvpUrl = request.mvpUrl
-        rewardBudget = request.rewardBudget
-        requirementMinAge = request.requirementMinAge
-        requirementMaxAge = request.requirementMaxAge
-        requirementSex = request.requirementSex
-        recruitType = request.recruitType
-        recruitNum = request.recruitNum
+    fun update(updateObject: UpdateMvpTestObject) {
+        this.mvpName = updateObject.mvpName
+        this.recruitStartDate = updateObject.recruitStartDate
+        this.recruitEndDate = updateObject.recruitEndDate
+        this.testStartDate = updateObject.testStartDate
+        this.testEndDate = updateObject.testEndDate
+        this.mainImageUrl = updateObject.mainImageUrl
+        this.mvpInfo = updateObject.mvpInfo
+        this.mvpUrl = updateObject.mvpUrl
+        this.rewardBudget = updateObject.rewardBudget
+        this.requirementMinAge = updateObject.requirementMinAge
+        this.requirementMaxAge = updateObject.requirementMaxAge
+        this.requirementSex = updateObject.requirementSex
+        this.recruitType = updateObject.recruitType
+        this.recruitNum = updateObject.recruitNum
     }
 
     init {

@@ -60,7 +60,7 @@ class MvpTestService(
                 category = category
             ).let { map -> mvpTestCategoryMapRepository.save(map) }
         }
-        mvpTest.update(request)
+        mvpTest.update(request.toObject())
         return MvpTestResponse.from(mvpTest, request.categories)
     }
 

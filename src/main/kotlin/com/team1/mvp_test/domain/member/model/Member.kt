@@ -1,7 +1,5 @@
 package com.team1.mvp_test.domain.member.model
 
-import com.team1.mvp_test.domain.member.dto.MemberUpdateRequest
-import com.team1.mvp_test.domain.member.dto.SignUpInfoRequest
 import com.team1.mvp_test.domain.oauth.provider.OAuthProvider
 import jakarta.persistence.*
 
@@ -38,16 +36,16 @@ class Member(
     @Column(name = "signup_state")
     var signUpState: Boolean = false,
 ) {
-    fun updateMember(request: MemberUpdateRequest) {
-        this.name = request.name
-        this.info = request.info
+    fun updateMember(name: String, info: String?) {
+        this.name = name
+        this.info = info
     }
 
-    fun updateSignUpInfo(request: SignUpInfoRequest) {
-        name = request.name
-        age = request.age
-        sex = request.sex
-        info = request.info
+    fun updateSignUpInfo(name: String, age: Int, sex: Sex, info: String?) {
+        this.name = name
+        this.age = age
+        this.sex = sex
+        this.info = info
         signUpState = true
     }
 }

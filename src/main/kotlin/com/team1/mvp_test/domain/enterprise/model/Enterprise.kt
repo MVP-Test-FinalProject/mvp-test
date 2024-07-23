@@ -1,6 +1,5 @@
 package com.team1.mvp_test.domain.enterprise.model
 
-import com.team1.mvp_test.domain.enterprise.dto.UpdateEnterpriseRequest
 import jakarta.persistence.*
 
 @Entity
@@ -28,9 +27,9 @@ class Enterprise(
     @Column(name = "state")
     var state: EnterpriseState = EnterpriseState.PENDING,
 ) {
-    fun update(request: UpdateEnterpriseRequest) {
-        this.name = request.name
-        this.ceoName = request.ceoName
-        this.phoneNumber = request.phoneNumber
+    fun update(name: String, ceoName: String, phoneNumber: String) {
+        this.name = name
+        this.ceoName = ceoName
+        this.phoneNumber = phoneNumber
     }
 }

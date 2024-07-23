@@ -22,7 +22,11 @@ class EnterpriseService(
     fun updateProfile(enterpriseId: Long, request: UpdateEnterpriseRequest): EnterpriseResponse {
         val enterprise = enterpriseRepository.findByIdOrNull(enterpriseId)
             ?: throw ModelNotFoundException("Enterprise", enterpriseId)
-        enterprise.update(request)
+        enterprise.update(
+            name = request.name,
+            ceoName = request.ceoName,
+            phoneNumber = request.phoneNumber,
+        )
         return EnterpriseResponse.from(enterprise)
     }
 }

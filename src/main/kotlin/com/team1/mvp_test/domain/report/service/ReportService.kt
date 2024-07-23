@@ -56,7 +56,11 @@ class ReportService(
         if (report.memberTest.member.id != memberId) throw NoPermissionException(ReportErrorMessage.NOT_AUTHORIZED.message)
         check(report.state != ReportState.APPROVED) { ReportErrorMessage.ALREADY_APPROVED.message }
         checkDateCondition(report.step.mvpTest)
-        report.updateReport(request)
+        report.updateReport(
+            title = report.title,
+            body = report.body,
+            feedback = report.feedback,
+        )
         report.clearReportMedia()
         request.mediaUrl.map { reportMediaRepository.save(ReportMedia(mediaUrl = it)) }
             .forEach { report.addReportMedia(it) }
