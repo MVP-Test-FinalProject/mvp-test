@@ -18,9 +18,9 @@ data class MvpTestResponse(
     val rewardBudget: Int,
     val requirementMinAge: Int?,
     val requirementMaxAge: Int?,
-    val requirementSex: Boolean?,
+    val requirementSex: String?,
     val recruitType: RecruitType,
-    val recruitNum: Long,
+    val recruitNum: Int,
     val categories: List<String>
 ) {
     companion object {
@@ -39,7 +39,7 @@ data class MvpTestResponse(
                 rewardBudget = mvpTest.rewardBudget,
                 requirementMinAge = mvpTest.requirementMinAge,
                 requirementMaxAge = mvpTest.requirementMaxAge,
-                requirementSex = mvpTest.requirementSex,
+                requirementSex = mvpTest.requirementSex?.name,
                 recruitType = mvpTest.recruitType,
                 recruitNum = mvpTest.recruitNum,
                 categories = categories

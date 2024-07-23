@@ -3,8 +3,6 @@ package com.team1.mvp_test.domain.step.model
 import com.team1.mvp_test.domain.mvptest.model.MvpTest
 import com.team1.mvp_test.domain.step.dto.UpdateStepRequest
 import jakarta.persistence.*
-import jakarta.validation.constraints.Min
-import jakarta.validation.constraints.Size
 
 @Table(name = "step")
 @Entity
@@ -14,11 +12,9 @@ class Step(
     val id: Long? = null,
 
     @Column(name = "title")
-    @field:Size(min = 5, max = 20, message = "")
     var title: String,
 
     @Column(name = "requirement")
-    @field:Size(min = 10, max = 200, message = "")
     var requirement: String,
 
     @Column(name = "guideline_url")
@@ -28,7 +24,6 @@ class Step(
     var stepOrder: Int,
 
     @Column(name = "reward")
-    @field:Min(value = 1, message = "")
     var reward: Int,
 
     @ManyToOne

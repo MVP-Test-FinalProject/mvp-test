@@ -1,4 +1,4 @@
-package com.team1.mvp_test.enterprise
+package com.team1.mvp_test.domain.enterprise
 
 import com.team1.mvp_test.common.exception.PasswordIncorrectException
 import com.team1.mvp_test.domain.enterprise.dto.EnterpriseSignUpRequest

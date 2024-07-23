@@ -1,5 +1,6 @@
 package com.team1.mvp_test.domain.mvptest.model
 
+import com.team1.mvp_test.domain.member.model.Sex
 import jakarta.validation.Validation
 import jakarta.validation.Validator
 import jakarta.validation.ValidatorFactory
@@ -38,7 +39,7 @@ class MvpTestTest {
         val rewardBudget = 10000
         val requirementMinAge = 20
         val requirementMaxAge = 40
-        val recruitNum = 50L
+        val recruitNum = 50
 
         // Act
         val actual = MvpTest(
@@ -54,7 +55,7 @@ class MvpTestTest {
             rewardBudget = rewardBudget,
             requirementMinAge = requirementMinAge,
             requirementMaxAge = requirementMaxAge,
-            requirementSex = null,
+            requirementSex = Sex.MALE,
             recruitType = RecruitType.FIRST_COME,
             recruitNum = recruitNum,
             state = MvpTestState.APPROVED
@@ -80,7 +81,7 @@ class MvpTestTest {
         val rewardBudget = 10000
         val requirementMinAge = 20
         val requirementMaxAge = 40
-        val recruitNum = 50L
+        val recruitNum = 50
 
         // Act
         val actual = MvpTest(
@@ -96,7 +97,7 @@ class MvpTestTest {
             rewardBudget = rewardBudget,
             requirementMinAge = requirementMinAge,
             requirementMaxAge = requirementMaxAge,
-            requirementSex = null,
+            requirementSex = Sex.MALE,
             recruitType = RecruitType.FIRST_COME,
             recruitNum = recruitNum,
             state = MvpTestState.APPROVED
@@ -124,7 +125,7 @@ class MvpTestTest {
         val rewardBudget = 10000
         val requirementMinAge = 20
         val requirementMaxAge = 40
-        val recruitNum = 50L
+        val recruitNum = 50
 
         // Act
         val actual = assertThrows<IllegalArgumentException> {
@@ -141,7 +142,7 @@ class MvpTestTest {
                 rewardBudget = rewardBudget,
                 requirementMinAge = requirementMinAge,
                 requirementMaxAge = requirementMaxAge,
-                requirementSex = null,
+                requirementSex = Sex.MALE,
                 recruitType = RecruitType.FIRST_COME,
                 recruitNum = recruitNum,
                 state = MvpTestState.APPROVED
@@ -167,7 +168,7 @@ class MvpTestTest {
         val rewardBudget = 10000
         val requirementMinAge = 20
         val requirementMaxAge = 40
-        val recruitNum = 50L
+        val recruitNum = 50
 
         // Act
         val actual = assertThrows<IllegalArgumentException> {
@@ -184,7 +185,7 @@ class MvpTestTest {
                 rewardBudget = rewardBudget,
                 requirementMinAge = requirementMinAge,
                 requirementMaxAge = requirementMaxAge,
-                requirementSex = null,
+                requirementSex = Sex.MALE,
                 recruitType = RecruitType.FIRST_COME,
                 recruitNum = recruitNum,
                 state = MvpTestState.APPROVED
@@ -210,7 +211,7 @@ class MvpTestTest {
         val rewardBudget = 10000
         val requirementMinAge = 20
         val requirementMaxAge = 40
-        val recruitNum = 50L
+        val recruitNum = 50
 
         // Act
         val actual = assertThrows<IllegalArgumentException> {
@@ -227,7 +228,7 @@ class MvpTestTest {
                 rewardBudget = rewardBudget,
                 requirementMinAge = requirementMinAge,
                 requirementMaxAge = requirementMaxAge,
-                requirementSex = null,
+                requirementSex = Sex.MALE,
                 recruitType = RecruitType.FIRST_COME,
                 recruitNum = recruitNum,
                 state = MvpTestState.APPROVED
@@ -253,7 +254,7 @@ class MvpTestTest {
         val rewardBudget = 1000
         val requirementMinAge = 20
         val requirementMaxAge = 40
-        val recruitNum = 50L
+        val recruitNum = 50
 
         // Act
         val actual = MvpTest(
@@ -269,7 +270,7 @@ class MvpTestTest {
             rewardBudget = rewardBudget,
             requirementMinAge = requirementMinAge,
             requirementMaxAge = requirementMaxAge,
-            requirementSex = null,
+            requirementSex = Sex.MALE,
             recruitType = RecruitType.FIRST_COME,
             recruitNum = recruitNum,
             state = MvpTestState.APPROVED
@@ -297,7 +298,7 @@ class MvpTestTest {
         val rewardBudget = 10000
         val requirementMinAge = -1
         val requirementMaxAge = 40
-        val recruitNum = 50L
+        val recruitNum = 50
 
         // Act
         val actual = MvpTest(
@@ -313,7 +314,7 @@ class MvpTestTest {
             rewardBudget = rewardBudget,
             requirementMinAge = requirementMinAge,
             requirementMaxAge = requirementMaxAge,
-            requirementSex = null,
+            requirementSex = Sex.MALE,
             recruitType = RecruitType.FIRST_COME,
             recruitNum = recruitNum,
             state = MvpTestState.APPROVED
@@ -341,7 +342,7 @@ class MvpTestTest {
         val rewardBudget = 10000
         val requirementMinAge = 60
         val requirementMaxAge = 40
-        val recruitNum = 50L
+        val recruitNum = 50
 
         // Act
         val actual = assertThrows<IllegalArgumentException> {
@@ -358,7 +359,7 @@ class MvpTestTest {
                 rewardBudget = rewardBudget,
                 requirementMinAge = requirementMinAge,
                 requirementMaxAge = requirementMaxAge,
-                requirementSex = null,
+                requirementSex = Sex.MALE,
                 recruitType = RecruitType.FIRST_COME,
                 recruitNum = recruitNum,
                 state = MvpTestState.APPROVED
@@ -384,7 +385,7 @@ class MvpTestTest {
         val rewardBudget = 10000
         val requirementMinAge = 10
         val requirementMaxAge = 40
-        val recruitNum = -1L
+        val recruitNum = -1
 
         // Act
         val actual = MvpTest(
@@ -400,7 +401,7 @@ class MvpTestTest {
             rewardBudget = rewardBudget,
             requirementMinAge = requirementMinAge,
             requirementMaxAge = requirementMaxAge,
-            requirementSex = null,
+            requirementSex = Sex.MALE,
             recruitType = RecruitType.FIRST_COME,
             recruitNum = recruitNum,
             state = MvpTestState.APPROVED

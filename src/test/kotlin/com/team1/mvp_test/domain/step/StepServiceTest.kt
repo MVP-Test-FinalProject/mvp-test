@@ -1,7 +1,8 @@
-package com.team1.mvp_test.step
+package com.team1.mvp_test.domain.step
 
 import com.team1.mvp_test.common.exception.ModelNotFoundException
 import com.team1.mvp_test.common.exception.NoPermissionException
+import com.team1.mvp_test.domain.member.model.Sex
 import com.team1.mvp_test.domain.mvptest.model.MvpTest
 import com.team1.mvp_test.domain.mvptest.model.MvpTestState
 import com.team1.mvp_test.domain.mvptest.model.RecruitType
@@ -104,7 +105,7 @@ class StepServiceTest : BehaviorSpec({
             rewardBudget = 100000,
             requirementMinAge = 15,
             requirementMaxAge = 60,
-            requirementSex = true,
+            requirementSex = Sex.MALE,
             recruitType = RecruitType.FIRST_COME,
             recruitNum = 50,
             state = MvpTestState.APPROVED

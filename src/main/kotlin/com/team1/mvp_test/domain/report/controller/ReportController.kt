@@ -1,7 +1,7 @@
 package com.team1.mvp_test.domain.report.controller
 
+import com.team1.mvp_test.domain.report.dto.ReportRequest
 import com.team1.mvp_test.domain.report.dto.ReportResponse
-import com.team1.mvp_test.domain.report.dto.UpdateReportRequest
 import com.team1.mvp_test.domain.report.service.ReportService
 import com.team1.mvp_test.infra.security.UserPrincipal
 import org.springframework.http.HttpStatus
@@ -19,7 +19,7 @@ class ReportController(
     @PostMapping("/steps/{step-id}/reports")
     fun createReport(
         @PathVariable("step-id") stepId: Long,
-        @RequestBody request: UpdateReportRequest,
+        @RequestBody request: ReportRequest,
         @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<ReportResponse> {
         return ResponseEntity
@@ -31,7 +31,7 @@ class ReportController(
     @PutMapping("reports/{report-id}")
     fun updateReport(
         @PathVariable("report-id") reportId: Long,
-        @RequestBody request: UpdateReportRequest,
+        @RequestBody request: ReportRequest,
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
     ): ResponseEntity<ReportResponse> {
         return ResponseEntity

@@ -1,11 +1,8 @@
 package com.team1.mvp_test.domain.mvptest.model
 
+import com.team1.mvp_test.domain.member.model.Sex
 import com.team1.mvp_test.domain.mvptest.dto.UpdateMvpTestRequest
 import jakarta.persistence.*
-import jakarta.validation.constraints.Max
-import jakarta.validation.constraints.Min
-import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.Size
 import java.time.LocalDateTime
 
 @Table(name = "mvp_test")
@@ -18,8 +15,6 @@ class MvpTest(
     @Column(name = "enterprise_id")
     val enterpriseId: Long,
 
-    @field:NotBlank
-    @field:Size(min = 1, max = 50)
     @Column(name = "mvp_name")
     var mvpName: String,
 
@@ -44,28 +39,25 @@ class MvpTest(
     @Column(name = "mvp_url")
     var mvpUrl: String,
 
-    @field:Min(10000)
     @Column(name = "reword_budget")
     var rewardBudget: Int,
 
-    @field:Min(1)
-    @field:Max(80)
     @Column(name = "requirement_min_age")
     var requirementMinAge: Int?,
 
     @Column(name = "requirement_max_age")
     var requirementMaxAge: Int?,
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "requirement_sex")
-    var requirementSex: Boolean?,
+    var requirementSex: Sex,
 
     @Column(name = "recruit_type")
     @Enumerated(EnumType.STRING)
     var recruitType: RecruitType,
 
-    @field:Min(1)
     @Column(name = "recruit_num")
-    var recruitNum: Long,
+    var recruitNum: Int,
 
     @Column(name = "state")
     @Enumerated(EnumType.STRING)
