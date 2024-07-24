@@ -84,33 +84,4 @@ class MvpTest(
         this.recruitType = updateObject.recruitType
         this.recruitNum = updateObject.recruitNum
     }
-
-    init {
-        validateRecruitDate()
-        validateTestDate()
-        validateAgeRule()
-    }
-
-    private fun validateRecruitDate() {
-        require(recruitEndDate.isAfter(recruitStartDate) && recruitEndDate.isAfter(LocalDateTime.now())) {
-            "모집 일자가 유효하지 않습니다."
-        }
-    }
-
-    private fun validateTestDate() {
-        require(
-            testStartDate.isAfter(recruitStartDate) &&
-                    testEndDate.isAfter(testStartDate) &&
-                    testEndDate.isAfter(recruitEndDate)
-        ) {
-            "테스트 일자가 유효하지 않습니다."
-        }
-    }
-
-    private fun validateAgeRule() {
-        require(requirementMaxAge == null || requirementMinAge == null || requirementMaxAge!! > requirementMinAge!!) {
-            "최대 나이는 최소 나이보다 큰 값이어야 합니다."
-        }
-    }
-
 }

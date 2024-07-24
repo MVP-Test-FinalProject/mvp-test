@@ -19,6 +19,7 @@ import com.team1.mvp_test.domain.mvptest.repository.MvpTestRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 @Service
 class MvpTestService(
@@ -30,6 +31,14 @@ class MvpTestService(
 ) {
     @Transactional
     fun createMvpTest(enterpriseId: Long, request: CreateMvpTestRequest): MvpTestResponse {
+        checkRequirement(
+            recruitStartDate = request.recruitStartDate,
+            recruitEndDate = request.recruitEndDate,
+            testStartDate = request.testStartDate,
+            testEndDate = request.testEndDate,
+            minAge = request.requirementMinAge,
+            maxAge = request.requirementMaxAge
+        )
         val mvpTest = request.toMvpTest(enterpriseId)
             .let { mvpTestRepository.save(it) }
         request.categories.forEach {
@@ -45,6 +54,14 @@ class MvpTestService(
 
     @Transactional
     fun updateMvpTest(enterpriseId: Long, testId: Long, request: UpdateMvpTestRequest): MvpTestResponse {
+        checkRequirement(
+            recruitStartDate = request.recruitStartDate,
+            recruitEndDate = request.recruitEndDate,
+            testStartDate = request.testStartDate,
+            testEndDate = request.testEndDate,
+            minAge = request.requirementMinAge,
+            maxAge = request.requirementMaxAge
+        )
         val mvpTest = mvpTestRepository.findByIdOrNull(testId)
             ?: throw ModelNotFoundException("MvpTest", testId)
         if (mvpTest.enterpriseId != enterpriseId) throw NoPermissionException(MvpTestErrorMessage.NOT_AUTHORIZED.message)
@@ -102,4 +119,47 @@ class MvpTestService(
         ).let { memberTestRepository.save(it) }
     }
 
+    private fun checkRequirement(
+        recruitStartDate: LocalDateTime,
+        recruitEndDate: LocalDateTime,
+        testStartDate: LocalDateTime,
+        testEndDate: LocalDateTime,
+        minAge: Int?,
+        maxAge: Int?
+    ) {
+        require(
+            isRecruitDateValid(
+                recruitStartDate,
+                recruitEndDate
+            )
+        ) { MvpTestErrorMessage.RECRUIT_DATE_NOT_VALID.message }
+        require(isTestDateValid(recruitEndDate, testStartDate, testEndDate)) {
+            MvpTestErrorMessage.TEST_DATE_NOT_VALID.message
+        }
+        require(
+            isAgeRuleValid(
+                minAge,
+                maxAge
+            )
+        ) { MvpTestErrorMessage.AGE_RULE_INVALID.message }
+    }
+
+    private fun isRecruitDateValid(startDate: LocalDateTime, endDate: LocalDateTime): Boolean {
+        return startDate.isBefore(endDate)
+    }
+
+    private fun isTestDateValid(
+        recruitEndDate: LocalDateTime,
+        testStartDate: LocalDateTime,
+        testEndDate: LocalDateTime
+    ): Boolean {
+        return testStartDate.isAfter(recruitEndDate) &&
+                testEndDate.isAfter(testStartDate)
+    }
+
+    private fun isAgeRuleValid(minAge: Int?, maxAge: Int?): Boolean {
+        return if (maxAge == null || minAge == null) true
+        else if (minAge <= maxAge) true
+        else false
+    }
 }
