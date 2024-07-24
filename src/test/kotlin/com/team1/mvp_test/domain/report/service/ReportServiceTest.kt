@@ -3,11 +3,12 @@ package com.team1.mvp_test.domain.report.service
 import com.team1.mvp_test.common.exception.NoPermissionException
 import com.team1.mvp_test.domain.member.model.Member
 import com.team1.mvp_test.domain.member.model.MemberTest
+import com.team1.mvp_test.domain.member.model.Sex
 import com.team1.mvp_test.domain.member.repository.MemberTestRepository
 import com.team1.mvp_test.domain.mvptest.model.MvpTest
 import com.team1.mvp_test.domain.mvptest.model.MvpTestState
 import com.team1.mvp_test.domain.mvptest.model.RecruitType
-import com.team1.mvp_test.domain.report.dto.UpdateReportRequest
+import com.team1.mvp_test.domain.report.dto.ReportRequest
 import com.team1.mvp_test.domain.report.model.Report
 import com.team1.mvp_test.domain.report.model.ReportState
 import com.team1.mvp_test.domain.report.repository.ReportMediaRepository
@@ -131,7 +132,7 @@ class ReportServiceTest : BehaviorSpec({
         private const val STEP_ID = 1L
         private const val REPORT_ID = 1L
         private const val APPROVED_REPORT_ID = 2L
-        private val request = UpdateReportRequest(
+        private val request = ReportRequest(
             title = "Test title",
             body = "Test body",
             feedback = "Test feedback",
@@ -151,9 +152,9 @@ class ReportServiceTest : BehaviorSpec({
             rewardBudget = 1000,
             requirementMinAge = 0,
             requirementMaxAge = 200,
-            requirementSex = null,
+            requirementSex = Sex.MALE,
             recruitType = RecruitType.FIRST_COME,
-            recruitNum = 100L,
+            recruitNum = 100,
             state = MvpTestState.APPROVED
         )
         private val step = Step(
@@ -170,7 +171,7 @@ class ReportServiceTest : BehaviorSpec({
             name = "test member name",
             email = "test@test.com",
             age = 20,
-            sex = "test sex",
+            sex = Sex.MALE,
             info = "test info",
             signUpState = true
         )

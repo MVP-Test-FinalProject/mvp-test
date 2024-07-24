@@ -5,8 +5,8 @@ import com.team1.mvp_test.common.exception.ModelNotFoundException
 import com.team1.mvp_test.common.exception.NoPermissionException
 import com.team1.mvp_test.domain.member.repository.MemberTestRepository
 import com.team1.mvp_test.domain.mvptest.model.MvpTest
+import com.team1.mvp_test.domain.report.dto.ReportRequest
 import com.team1.mvp_test.domain.report.dto.ReportResponse
-import com.team1.mvp_test.domain.report.dto.UpdateReportRequest
 import com.team1.mvp_test.domain.report.model.Report
 import com.team1.mvp_test.domain.report.model.ReportMedia
 import com.team1.mvp_test.domain.report.model.ReportState
@@ -27,7 +27,7 @@ class ReportService(
 ) {
 
     @Transactional
-    fun createReport(memberId: Long, stepId: Long, request: UpdateReportRequest): ReportResponse {
+    fun createReport(memberId: Long, stepId: Long, request: ReportRequest): ReportResponse {
         val step = stepRepository.findByIdOrNull(stepId) ?: throw ModelNotFoundException("step", stepId)
         val memberTest = memberTestRepository.findByMemberIdAndTestId(memberId, step.mvpTest.id!!)
             ?: throw NoPermissionException(ReportErrorMessage.NO_PERMISSION.message)
@@ -51,12 +51,16 @@ class ReportService(
     }
 
     @Transactional
-    fun updateReport(memberId: Long, reportId: Long, request: UpdateReportRequest): ReportResponse {
+    fun updateReport(memberId: Long, reportId: Long, request: ReportRequest): ReportResponse {
         val report = reportRepository.findByIdOrNull(reportId) ?: throw ModelNotFoundException("report", reportId)
         if (report.memberTest.member.id != memberId) throw NoPermissionException(ReportErrorMessage.NOT_AUTHORIZED.message)
         check(report.state != ReportState.APPROVED) { ReportErrorMessage.ALREADY_APPROVED.message }
         checkDateCondition(report.step.mvpTest)
-        report.updateReport(request)
+        report.updateReport(
+            title = report.title,
+            body = report.body,
+            feedback = report.feedback,
+        )
         report.clearReportMedia()
         request.mediaUrl.map { reportMediaRepository.save(ReportMedia(mediaUrl = it)) }
             .forEach { report.addReportMedia(it) }

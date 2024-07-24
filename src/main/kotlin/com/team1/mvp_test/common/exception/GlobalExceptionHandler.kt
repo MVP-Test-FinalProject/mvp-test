@@ -1,9 +1,9 @@
 package com.team1.mvp_test.common.exception
 
 import com.team1.mvp_test.common.exception.dto.ErrorResponse
-import jakarta.validation.ConstraintViolationException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 
@@ -36,10 +36,12 @@ class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ErrorResponse(e.message))
     }
 
-    @ExceptionHandler(ConstraintViolationException::class)
-    fun handleConstraintViolation(e: ConstraintViolationException): ResponseEntity<ErrorResponse> {
-        val errorDetails = e.constraintViolations.map { it.message }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ErrorResponse(message = e.constraintViolations.map { it.message }.joinToString()))
+    @ExceptionHandler(MethodArgumentNotValidException::class)
+    fun handleMethodArgumentNotValid(e: MethodArgumentNotValidException): ResponseEntity<ErrorResponse> {
+        val fieldError = e.fieldError
+        val message = "${fieldError?.field}의 입력 값 [${fieldError?.rejectedValue}] 이 유효하지 않습니다"
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ErrorResponse(message))
     }
+
 
 }

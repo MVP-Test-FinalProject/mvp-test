@@ -11,7 +11,7 @@ data class MemberUpdateResponse(
         fun from(member: Member): MemberUpdateResponse {
             return MemberUpdateResponse(
                 name = member.name,
-                sex = member.sex,
+                sex = member.sex?.name,
                 info = member.info,
             )
         }

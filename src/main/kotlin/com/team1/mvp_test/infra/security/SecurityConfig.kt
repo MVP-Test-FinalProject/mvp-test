@@ -27,8 +27,8 @@ class SecurityConfig(
                     "/",
                     "/swagger-ui/**",
                     "/v3/api-docs/**",
-                    "/enterprise/login",
-                    "/enterprise/sign-up",
+                    "api/v1/enterprise/login",
+                    "api/v1/enterprise/sign-up",
                     "/member/oauth/**"
                 )
                     .permitAll()

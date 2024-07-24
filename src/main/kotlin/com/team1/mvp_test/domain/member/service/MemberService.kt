@@ -19,14 +19,22 @@ class MemberService(
     @Transactional
     fun updateSignUpInfo(memberId: Long, request: SignUpInfoRequest): MemberResponse {
         val member = memberRepository.findByIdOrNull(memberId) ?: throw ModelNotFoundException("Member", memberId)
-        member.updateSignUpInfo(request)
+        member.updateSignUpInfo(
+            name = request.name,
+            age = request.age,
+            sex = request.sex,
+            info = request.info
+        )
         return MemberResponse.from(member)
     }
 
     @Transactional
     fun updateMember(memberId: Long, request: MemberUpdateRequest): MemberUpdateResponse {
         val member = memberRepository.findByIdOrNull(memberId) ?: throw ModelNotFoundException("Member", memberId)
-        member.updateMember(request)
+        member.updateMember(
+            name = request.name,
+            info = request.info
+        )
         return MemberUpdateResponse.from(member)
     }
 
