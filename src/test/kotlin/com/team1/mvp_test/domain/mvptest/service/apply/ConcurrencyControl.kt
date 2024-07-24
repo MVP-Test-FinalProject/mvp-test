@@ -1,6 +1,7 @@
 package com.team1.mvp_test.domain.mvptest.service.apply
 
 import com.team1.mvp_test.domain.member.model.Member
+import com.team1.mvp_test.domain.member.model.Sex
 import com.team1.mvp_test.domain.member.repository.MemberRepository
 import com.team1.mvp_test.domain.member.repository.MemberTestRepository
 import com.team1.mvp_test.domain.mvptest.model.MvpTest
@@ -41,7 +42,7 @@ class ConcurrencyControl {
 
     @Test
     fun testConcurrencyControl() {
-        val threadCount = 10
+        val threadCount = 100
 
         val executor = Executors.newFixedThreadPool(threadCount)
         val barrier = CyclicBarrier(threadCount)
@@ -64,7 +65,7 @@ class ConcurrencyControl {
             rewardBudget = 10000,
             requirementMinAge = null,
             requirementMaxAge = null,
-            requirementSex = null,
+            requirementSex = Sex.MALE,
             recruitType = RecruitType.FIRST_COME,
             recruitNum = 50,
             state = MvpTestState.APPROVED
