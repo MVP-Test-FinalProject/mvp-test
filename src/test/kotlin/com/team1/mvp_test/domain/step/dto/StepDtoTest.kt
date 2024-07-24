@@ -22,6 +22,7 @@ class StepDtoTest : BehaviorSpec({
             }
         }
     }
+
     Given("제목이 20자 초과인 경우") {
         val request = CreateStepRequest(
             title = "제목".repeat(11),
@@ -69,6 +70,7 @@ class StepDtoTest : BehaviorSpec({
             }
         }
     }
+
     Given("리워드가 1000 미만인 경우") {
         val request = CreateStepRequest(
             title = "제목입니다",
@@ -85,5 +87,19 @@ class StepDtoTest : BehaviorSpec({
         }
     }
 
-}) {
-}
+    Given("올바른 입력에 대해서") {
+        val request = CreateStepRequest(
+            title = "제목입니다",
+            requirement = "회원가입 후 사진을 촬영해서 업로드해주세요",
+            guidelineUrl = null,
+            reward = 1000
+        )
+        When("CreateStepRequest 검증 시") {
+            val violations = validator.validate(request)
+            Then("통과한다") {
+                violations.size shouldBe 0
+            }
+        }
+    }
+
+})

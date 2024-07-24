@@ -108,7 +108,7 @@ class EnterpriseDtoTest : BehaviorSpec({
             }
         }
     }
-    
+
     Given("전화번호 양식이 맞지 않는 경우") {
         val request = EnterpriseSignUpRequest(
             email = "email@email.com",
@@ -122,6 +122,22 @@ class EnterpriseDtoTest : BehaviorSpec({
             Then("통과하지 못한다") {
                 violations.size shouldBe 1
                 violations.first().propertyPath.toString() shouldBe "phoneNumber"
+            }
+        }
+    }
+
+    Given("올바른 입력에 대해서") {
+        val request = EnterpriseSignUpRequest(
+            email = "email@email.com",
+            password = "1234qwer",
+            name = "팀1",
+            ceoName = "김민수",
+            phoneNumber = "01000000000"
+        )
+        When("EnterpriseSignupRequest 검증 시") {
+            val violations = validator.validate(request)
+            Then("통과한다") {
+                violations.size shouldBe 0
             }
         }
     }

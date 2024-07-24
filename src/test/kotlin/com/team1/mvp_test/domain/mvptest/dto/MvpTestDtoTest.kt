@@ -38,6 +38,7 @@ class MvpTestDtoTest : BehaviorSpec({
             }
         }
     }
+
     Given("이름이 50자 이상인 경우") {
         val request = CreateMvpTestRequest(
             mvpName = "111111111111111".repeat(5),
@@ -64,6 +65,7 @@ class MvpTestDtoTest : BehaviorSpec({
             }
         }
     }
+
     Given("리워드 총액이 10000미만인 경우") {
         val request = CreateMvpTestRequest(
             mvpName = "MVP 이름",
@@ -90,6 +92,7 @@ class MvpTestDtoTest : BehaviorSpec({
             }
         }
     }
+
     Given("모집인원이 1미만인 경우") {
         val request = CreateMvpTestRequest(
             mvpName = "MVP 이름",
@@ -113,6 +116,32 @@ class MvpTestDtoTest : BehaviorSpec({
             Then("통과하지 못한다") {
                 violations.size shouldBe 1
                 violations.first().propertyPath.toString() shouldBe "recruitNum"
+            }
+        }
+    }
+
+    Given("올바른 입력에 대해서") {
+        val request = CreateMvpTestRequest(
+            mvpName = "MVP 이름",
+            recruitStartDate = LocalDateTime.of(2025, 7, 24, 0, 0),
+            recruitEndDate = LocalDateTime.of(2025, 7, 26, 0, 0),
+            testStartDate = LocalDateTime.of(2025, 8, 1, 0, 0),
+            testEndDate = LocalDateTime.of(2025, 8, 2, 0, 0),
+            mainImageUrl = "image.png",
+            mvpInfo = "mvp 정보입니다",
+            mvpUrl = "https://mvp.casd",
+            rewardBudget = 10000,
+            requirementMinAge = 15,
+            requirementMaxAge = 20,
+            requirementSex = Sex.FEMALE,
+            recruitType = RecruitType.FIRST_COME,
+            recruitNum = 10,
+            categories = listOf()
+        )
+        When("CreateMvpRequest 검증 시") {
+            val violations = validator.validate(request)
+            Then("통과한다") {
+                violations.size shouldBe 0
             }
         }
     }

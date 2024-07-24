@@ -72,4 +72,19 @@ class MemberDtoTest : BehaviorSpec({
         }
     }
 
+    Given("올바른 입력에 대해서") {
+        val request = SignUpInfoRequest(
+            name = "이름",
+            age = 16,
+            sex = Sex.MALE,
+            info = "정보입니다"
+        )
+        When("SignUpInfoRequest 검증 시") {
+            val violations = validator.validate(request)
+            Then("통과한다") {
+                violations.size shouldBe 0
+            }
+        }
+    }
+
 })
