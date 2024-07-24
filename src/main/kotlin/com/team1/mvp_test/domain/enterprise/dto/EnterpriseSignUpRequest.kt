@@ -3,14 +3,12 @@ package com.team1.mvp_test.domain.enterprise.dto
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
-import jakarta.validation.constraints.Size
 
 data class EnterpriseSignUpRequest(
     @field:NotBlank
     @field:Email
     val email: String,
 
-    @field:Size(min = 8)
     @field:Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*\\d)[A-Za-z\\d@$!%*?&]{8,}$")
     val password: String,
 
