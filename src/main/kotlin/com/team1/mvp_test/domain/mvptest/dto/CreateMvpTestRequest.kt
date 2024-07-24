@@ -4,7 +4,6 @@ import com.team1.mvp_test.domain.member.model.Sex
 import com.team1.mvp_test.domain.mvptest.model.MvpTest
 import com.team1.mvp_test.domain.mvptest.model.MvpTestState
 import com.team1.mvp_test.domain.mvptest.model.RecruitType
-import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
@@ -32,13 +31,8 @@ data class CreateMvpTestRequest(
     @field:Min(10000)
     val rewardBudget: Int,
 
-    @field:Min(15)
-    @field:Max(99)
     val requirementMinAge: Int?,
-
-    @field:Max(100)
     val requirementMaxAge: Int?,
-
     val requirementSex: Sex,
     val recruitType: RecruitType,
 
