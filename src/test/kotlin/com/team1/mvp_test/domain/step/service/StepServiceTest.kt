@@ -1,4 +1,4 @@
-package com.team1.mvp_test.domain.step
+package com.team1.mvp_test.domain.step.service
 
 import com.team1.mvp_test.common.exception.ModelNotFoundException
 import com.team1.mvp_test.common.exception.NoPermissionException
@@ -11,7 +11,6 @@ import com.team1.mvp_test.domain.step.dto.CreateStepRequest
 import com.team1.mvp_test.domain.step.dto.UpdateStepRequest
 import com.team1.mvp_test.domain.step.model.Step
 import com.team1.mvp_test.domain.step.repository.StepRepository
-import com.team1.mvp_test.domain.step.service.StepService
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.every
