@@ -6,6 +6,7 @@ import com.team1.mvp_test.domain.member.dto.MemberUpdateResponse
 import com.team1.mvp_test.domain.member.dto.SignUpInfoRequest
 import com.team1.mvp_test.domain.member.service.MemberService
 import com.team1.mvp_test.infra.security.UserPrincipal
+import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
@@ -21,7 +22,7 @@ class MemberController(
     @PreAuthorize("hasRole('MEMBER')")
     fun updateSignUpInfo(
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
-        @RequestBody request: SignUpInfoRequest
+        @Valid @RequestBody request: SignUpInfoRequest
     ): ResponseEntity<MemberResponse> {
         return ResponseEntity
             .status(HttpStatus.OK)
@@ -32,7 +33,7 @@ class MemberController(
     @PreAuthorize("hasRole('MEMBER')")
     fun updateMember(
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
-        @RequestBody request: MemberUpdateRequest
+        @Valid @RequestBody request: MemberUpdateRequest
     ): ResponseEntity<MemberUpdateResponse> {
         return ResponseEntity
             .status(HttpStatus.OK)

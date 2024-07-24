@@ -18,7 +18,7 @@ data class MemberResponse(
                 name = member.name,
                 email = member.email,
                 age = member.age,
-                sex = member.sex,
+                sex = member.sex?.name,
                 info = member.info,
                 signupState = member.signUpState,
             )

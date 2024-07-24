@@ -54,7 +54,11 @@ class StepService(
         val step = stepRepository.findByIdOrNull(stepId)
             ?: throw ModelNotFoundException("Step", stepId)
         if (step.mvpTest.enterpriseId != enterpriseId) throw NoPermissionException(MvpTestErrorMessage.NOT_AUTHORIZED.message)
-        step.updateStep(request)
+        step.updateStep(
+            title = request.title,
+            requirement = request.requirement,
+            guidelineUrl = request.guidelineUrl,
+        )
         return StepResponse.from(step)
     }
 

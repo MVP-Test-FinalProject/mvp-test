@@ -4,6 +4,7 @@ import com.team1.mvp_test.domain.enterprise.dto.*
 import com.team1.mvp_test.domain.enterprise.service.EnterpriseAuthService
 import com.team1.mvp_test.domain.enterprise.service.EnterpriseService
 import com.team1.mvp_test.infra.security.UserPrincipal
+import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
@@ -19,7 +20,7 @@ class EnterpriseController(
 
     @PostMapping("/sign-up")
     fun signUp(
-        @RequestBody request: EnterpriseSignUpRequest
+        @Valid @RequestBody request: EnterpriseSignUpRequest
     ): ResponseEntity<EnterpriseResponse> {
         return ResponseEntity
             .status(HttpStatus.CREATED)
@@ -50,7 +51,7 @@ class EnterpriseController(
     @PreAuthorize("hasRole('ENTERPRISE')")
     fun updateProfile(
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
-        @RequestBody request: UpdateEnterpriseRequest
+        @Valid @RequestBody request: UpdateEnterpriseRequest
     ): ResponseEntity<EnterpriseResponse> {
         return ResponseEntity
             .status(HttpStatus.OK)

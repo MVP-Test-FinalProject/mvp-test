@@ -6,6 +6,7 @@ import com.team1.mvp_test.domain.step.dto.StepResponse
 import com.team1.mvp_test.domain.step.dto.UpdateStepRequest
 import com.team1.mvp_test.domain.step.service.StepService
 import com.team1.mvp_test.infra.security.UserPrincipal
+import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
@@ -33,7 +34,7 @@ class StepController(
     @PreAuthorize("hasRole('ENTERPRISE')")
     fun createStep(
         @PathVariable testId: Long,
-        @RequestBody request: CreateStepRequest,
+        @Valid @RequestBody request: CreateStepRequest,
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
     ): ResponseEntity<StepResponse> {
         return ResponseEntity
@@ -54,7 +55,7 @@ class StepController(
     @PreAuthorize("hasRole('ENTERPRISE')")
     fun updateStepById(
         @PathVariable stepId: Long,
-        @RequestBody request: UpdateStepRequest,
+        @Valid @RequestBody request: UpdateStepRequest,
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
     ): ResponseEntity<StepResponse> {
         return ResponseEntity

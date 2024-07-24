@@ -1,4 +1,4 @@
-package com.team1.mvp_test.member
+package com.team1.mvp_test.domain.member
 
 import com.team1.mvp_test.domain.member.repository.MemberRepository
 import com.team1.mvp_test.domain.member.service.MemberService
