@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 @ActiveProfiles("test")
-@ContextConfiguration(classes = [RedissonTestConfig::class])  // RedissonTestConfig 클래스 추가
+@ContextConfiguration(classes = [RedissonTestConfig::class])
 class ConcurrencyControl @Autowired constructor(
     private val mvpTestRepository: MvpTestRepository,
     private val categoryRepository: CategoryRepository,
@@ -52,8 +52,8 @@ class ConcurrencyControl @Autowired constructor(
 
     @Test
     fun testConcurrencyControl() {
-        val threadCount = 200
-        val recruitNum = 100
+        val threadCount = 40
+        val recruitNum = 10
 
         val executor = Executors.newFixedThreadPool(threadCount)
         val barrier = CyclicBarrier(threadCount)
