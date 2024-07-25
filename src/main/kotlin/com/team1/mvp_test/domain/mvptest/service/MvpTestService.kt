@@ -117,7 +117,7 @@ class MvpTestService(
 
         if (test.recruitType == RecruitType.FIRST_COME) {
             val lock: RLock = redissonClient.getLock("applyToMvpTest:$testId")
-            val isLocked = lock.tryLock(1, 5, TimeUnit.SECONDS)
+            val isLocked = lock.tryLock(2, 6, TimeUnit.SECONDS)
 
             if (!isLocked) {
                 throw RuntimeException("Lock 획득 실패!")
