@@ -5,6 +5,7 @@ on:
     branches: 
       - "master" 
       - "dev"
+      - "feat/#36-ci-pipeline"
   pull_request:
     branches: 
       - "master" 
