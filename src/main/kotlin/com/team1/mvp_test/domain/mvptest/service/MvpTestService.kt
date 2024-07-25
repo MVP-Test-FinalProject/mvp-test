@@ -16,10 +16,13 @@ import com.team1.mvp_test.domain.mvptest.model.MvpTestCategoryMap
 import com.team1.mvp_test.domain.mvptest.model.RecruitType
 import com.team1.mvp_test.domain.mvptest.repository.MvpTestCategoryMapRepository
 import com.team1.mvp_test.domain.mvptest.repository.MvpTestRepository
+import org.redisson.api.RLock
+import org.redisson.api.RedissonClient
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
+import java.util.concurrent.TimeUnit
 
 @Service
 class MvpTestService(
@@ -27,7 +30,8 @@ class MvpTestService(
     private val categoryRepository: CategoryRepository,
     private val mvpTestCategoryMapRepository: MvpTestCategoryMapRepository,
     private val memberRepository: MemberRepository,
-    private val memberTestRepository: MemberTestRepository
+    private val memberTestRepository: MemberTestRepository,
+    private val redissonClient: RedissonClient
 ) {
     @Transactional
     fun createMvpTest(enterpriseId: Long, request: CreateMvpTestRequest): MvpTestResponse {
@@ -110,13 +114,32 @@ class MvpTestService(
     fun applyToMvpTest(memberId: Long, testId: Long) {
         val test = mvpTestRepository.findByIdOrNull(testId) ?: throw ModelNotFoundException("mvpTest", testId)
         val member = memberRepository.findByIdOrNull(memberId) ?: throw ModelNotFoundException("member", memberId)
-        val recruitCount = memberTestRepository.countByTestIdAndState(testId, MemberTestState.APPROVED)
-        check(recruitCount < test.recruitNum) { MvpTestErrorMessage.TEST_ALREADY_FULL.message }
-        MemberTest(
-            member = member,
-            test = test,
-            state = if (test.recruitType == RecruitType.FIRST_COME) MemberTestState.APPROVED else MemberTestState.PENDING
-        ).let { memberTestRepository.save(it) }
+
+        if (test.recruitType == RecruitType.FIRST_COME) {
+            val lock: RLock = redissonClient.getLock("applyToMvpTest:$testId")
+            val isLocked = lock.tryLock(1, 5, TimeUnit.SECONDS)
+
+            if (!isLocked) {
+                throw RuntimeException("Lock 획득 실패!")
+            }
+            try {
+                val recruitCount = memberTestRepository.countByTestIdAndState(testId, MemberTestState.APPROVED)
+                check(recruitCount < test.recruitNum) { MvpTestErrorMessage.TEST_ALREADY_FULL.message }
+                MemberTest(
+                    member = member,
+                    test = test,
+                    state = MemberTestState.APPROVED
+                ).let { memberTestRepository.save(it) }
+            } finally {
+                lock.unlock()
+            }
+        } else {
+            MemberTest(
+                member = member,
+                test = test,
+                state = MemberTestState.PENDING
+            ).let { memberTestRepository.save(it) }
+        }
     }
 
     private fun checkRequirement(
