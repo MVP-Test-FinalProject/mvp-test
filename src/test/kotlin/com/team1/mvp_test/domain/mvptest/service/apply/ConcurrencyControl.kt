@@ -9,29 +9,23 @@ import com.team1.mvp_test.domain.mvptest.model.MvpTestState
 import com.team1.mvp_test.domain.mvptest.model.RecruitType
 import com.team1.mvp_test.domain.mvptest.repository.MvpTestRepository
 import com.team1.mvp_test.domain.mvptest.service.MvpTestService
-import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import java.time.LocalDateTime
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
-@SpringBootTest
-class ConcurrencyControl {
-    @Autowired
-    private lateinit var memberRepository: MemberRepository
 
-    @Autowired
-    private lateinit var mvpTestRepository: MvpTestRepository
-
-    @Autowired
-    private lateinit var memberTestRepository: MemberTestRepository
-
-    @Autowired
-    private lateinit var mvpTestService: MvpTestService
+@DataJpaTest(showSql = false)
+class ConcurrencyControl @Autowired constructor(
+    private var memberRepository: MemberRepository,
+    private var mvpTestRepository: MvpTestRepository,
+    private var memberTestRepository: MemberTestRepository
+) {
+    private var mvpTestService = MvpTestService(memberTestRepository)
 
     @BeforeEach
     fun setup() {
@@ -73,14 +67,17 @@ class ConcurrencyControl {
 
         repeat(threadCount) {
             executor.execute {
-                barrier.await()
-                mvpTestService.applyToMvpTest(memberId = it.toLong() + 1L, test.id!!)
+                try {
+                    barrier.await()
+                    mvpTestService.applyToMvpTest(memberId = it.toLong() + 1L, test.id!!)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
             }
         }
+
         executor.awaitTermination(5, TimeUnit.SECONDS)
 
-        memberTestRepository.findAll().size shouldBe 50
-
+        assert(memberTestRepository.findAll().size == 50)
     }
-
 }
