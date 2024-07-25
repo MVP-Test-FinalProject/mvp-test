@@ -42,6 +42,9 @@ dependencies {
     testImplementation("io.kotest:kotest-runner-junit5:5.7.2")
     testImplementation("io.kotest:kotest-assertions-core:5.7.2")
     testImplementation("com.ninja-squad:springmockk:3.0.1")
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
+    implementation ("org.redisson:redisson-spring-boot-starter:3.33.0")
+
 
     // Validation
     implementation("org.hibernate.validator:hibernate-validator:8.0.0.Final")
