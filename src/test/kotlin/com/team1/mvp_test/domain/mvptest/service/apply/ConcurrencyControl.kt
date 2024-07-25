@@ -1,5 +1,6 @@
 package com.team1.mvp_test.domain.mvptest.service.apply
 
+import com.team1.mvp_test.domain.category.repository.CategoryRepository
 import com.team1.mvp_test.domain.member.model.Member
 import com.team1.mvp_test.domain.member.model.Sex
 import com.team1.mvp_test.domain.member.repository.MemberRepository
@@ -7,12 +8,20 @@ import com.team1.mvp_test.domain.member.repository.MemberTestRepository
 import com.team1.mvp_test.domain.mvptest.model.MvpTest
 import com.team1.mvp_test.domain.mvptest.model.MvpTestState
 import com.team1.mvp_test.domain.mvptest.model.RecruitType
+import com.team1.mvp_test.domain.mvptest.repository.MvpTestCategoryMapRepository
 import com.team1.mvp_test.domain.mvptest.repository.MvpTestRepository
 import com.team1.mvp_test.domain.mvptest.service.MvpTestService
+import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.redisson.api.RedissonClient
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
+import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.ContextConfiguration
+import org.springframework.transaction.annotation.Propagation
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.Executors
@@ -20,12 +29,19 @@ import java.util.concurrent.TimeUnit
 
 
 @DataJpaTest(showSql = false)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Transactional(propagation = Propagation.NOT_SUPPORTED)
+@ActiveProfiles("test")
+@ContextConfiguration(classes = [RedissonTestConfig::class])  // RedissonTestConfig 클래스 추가
 class ConcurrencyControl @Autowired constructor(
-    private var memberRepository: MemberRepository,
-    private var mvpTestRepository: MvpTestRepository,
-    private var memberTestRepository: MemberTestRepository
+    private val mvpTestRepository: MvpTestRepository,
+    private val categoryRepository: CategoryRepository,
+    private val mvpTestCategoryMapRepository: MvpTestCategoryMapRepository,
+    private val memberRepository: MemberRepository,
+    private val memberTestRepository: MemberTestRepository,
+    private val redissonClient: RedissonClient,
 ) {
-    private var mvpTestService = MvpTestService(memberTestRepository)
+    private var mvpTestService = MvpTestService(mvpTestRepository, categoryRepository, mvpTestCategoryMapRepository, memberRepository, memberTestRepository, redissonClient)
 
     @BeforeEach
     fun setup() {
@@ -78,6 +94,6 @@ class ConcurrencyControl @Autowired constructor(
 
         executor.awaitTermination(5, TimeUnit.SECONDS)
 
-        assert(memberTestRepository.findAll().size == 50)
+        memberTestRepository.findAll().size shouldBe  50
     }
 }
