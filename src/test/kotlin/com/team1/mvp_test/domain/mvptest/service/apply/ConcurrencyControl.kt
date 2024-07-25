@@ -88,7 +88,8 @@ class ConcurrencyControl @Autowired constructor(
                     barrier.await()
                     mvpTestService.applyToMvpTest(memberId = it.toLong() + 1L, test.id!!)
                 } catch (e: Exception) {
-                    e.printStackTrace()
+                    //logger 도입시 변경
+                    println(e.message)
                 }
             }
         }
