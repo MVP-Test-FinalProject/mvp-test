@@ -52,7 +52,8 @@ class ConcurrencyControl @Autowired constructor(
 
     @Test
     fun testConcurrencyControl() {
-        val threadCount = 100
+        val threadCount = 200
+        val recruitNum = 100
 
         val executor = Executors.newFixedThreadPool(threadCount)
         val barrier = CyclicBarrier(threadCount)
@@ -77,7 +78,7 @@ class ConcurrencyControl @Autowired constructor(
             requirementMaxAge = null,
             requirementSex = Sex.MALE,
             recruitType = RecruitType.FIRST_COME,
-            recruitNum = 50,
+            recruitNum = recruitNum,
             state = MvpTestState.APPROVED
         ).let { mvpTestRepository.save(it) }
 
@@ -94,6 +95,6 @@ class ConcurrencyControl @Autowired constructor(
 
         executor.awaitTermination(5, TimeUnit.SECONDS)
 
-        memberTestRepository.findAll().size shouldBe  50
+        memberTestRepository.findAll().size shouldBe recruitNum
     }
 }
