@@ -10,7 +10,8 @@ on:
     branches: 
       - "master" 
       - "dev"
-
+      - "feat/#36-ci-pipeline"
+      
 jobs:
   build:
 
