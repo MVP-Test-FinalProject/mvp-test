@@ -55,4 +55,4 @@ jobs:
         COOLSMS_API_SECRET: ${{secrets.COOLSMS_API_SECRET}}
       uses: gradle/gradle-build-action@749f47bda3e44aa060e82d7b3ef7e40d953bd629 # v2.6.0
       with:
-        arguments: build
+        arguments: build --info
