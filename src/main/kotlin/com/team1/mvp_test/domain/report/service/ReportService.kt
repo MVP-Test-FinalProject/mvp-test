@@ -13,9 +13,11 @@ import com.team1.mvp_test.domain.report.model.ReportState
 import com.team1.mvp_test.domain.report.repository.ReportMediaRepository
 import com.team1.mvp_test.domain.report.repository.ReportRepository
 import com.team1.mvp_test.domain.step.repository.StepRepository
+import com.team1.mvp_test.infra.s3.s3service.S3Service
 import jakarta.transaction.Transactional
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import org.springframework.web.multipart.MultipartFile
 import java.time.LocalDateTime
 
 @Service
@@ -24,10 +26,11 @@ class ReportService(
     private val stepRepository: StepRepository,
     private val memberTestRepository: MemberTestRepository,
     private val reportMediaRepository: ReportMediaRepository,
+    private val s3Service: S3Service
 ) {
 
     @Transactional
-    fun createReport(memberId: Long, stepId: Long, request: ReportRequest): ReportResponse {
+    fun createReport(memberId: Long, stepId: Long, request: ReportRequest, mediaFiles : MutableList<MultipartFile>): ReportResponse {
         val step = stepRepository.findByIdOrNull(stepId) ?: throw ModelNotFoundException("step", stepId)
         val memberTest = memberTestRepository.findByMemberIdAndTestId(memberId, step.mvpTest.id!!)
             ?: throw NoPermissionException(ReportErrorMessage.NO_PERMISSION.message)
@@ -37,6 +40,9 @@ class ReportService(
                 memberTest
             )
         ) { ReportErrorMessage.ALREADY_REPORTED.message }
+        if(mediaFiles.isEmpty()) throw IllegalStateException(ReportErrorMessage.REPORT_MEDIA_URL_NOT_EXIST.message)
+        if(mediaFiles.size > 10) throw IllegalStateException(ReportErrorMessage.REPORT_MEDIA_URL_COUNT_NOT_VALID.message)
+        val fileUrl = mediaFiles.let { s3Service.uploadReportFile(it) }
         val report = Report(
             title = request.title,
             body = request.body,
@@ -44,26 +50,42 @@ class ReportService(
             memberTest = memberTest,
             step = step
         ).let { reportRepository.save(it) }
-        request.mediaUrl.map { reportMediaRepository.save(ReportMedia(mediaUrl = it)) }
-            .forEach { report.addReportMedia(it) }
-        return reportRepository.save(report)
-            .let { ReportResponse.from(it) }
+
+         fileUrl.map { fileUrls ->
+            ReportMedia(mediaUrl = fileUrls).apply { report.addReportMedia(this) }
+        }.let { reportMediaRepository.saveAll(it) }
+
+        return reportRepository.save(report).let { ReportResponse.from(it) }
     }
 
     @Transactional
-    fun updateReport(memberId: Long, reportId: Long, request: ReportRequest): ReportResponse {
+    fun updateReport(memberId: Long, reportId: Long, request: ReportRequest,mediaFiles: MutableList<MultipartFile>): ReportResponse {
         val report = reportRepository.findByIdOrNull(reportId) ?: throw ModelNotFoundException("report", reportId)
         if (report.memberTest.member.id != memberId) throw NoPermissionException(ReportErrorMessage.NOT_AUTHORIZED.message)
         check(report.state != ReportState.APPROVED) { ReportErrorMessage.ALREADY_APPROVED.message }
         checkDateCondition(report.step.mvpTest)
         report.updateReport(
-            title = report.title,
-            body = report.body,
-            feedback = report.feedback,
+            title = request.title,
+            body = request.body,
+            feedback = request.feedback,
         )
+        if(mediaFiles.isEmpty()) throw IllegalStateException(ReportErrorMessage.REPORT_MEDIA_URL_NOT_EXIST.message)
+        if(mediaFiles.size > 10) throw IllegalStateException(ReportErrorMessage.REPORT_MEDIA_URL_COUNT_NOT_VALID.message)
+
+        val oldMediaUrls = report.reportMedia.map { it.mediaUrl }
+
+        reportMediaRepository.deleteAll(report.reportMedia)
+
         report.clearReportMedia()
-        request.mediaUrl.map { reportMediaRepository.save(ReportMedia(mediaUrl = it)) }
-            .forEach { report.addReportMedia(it) }
+        s3Service.deleteReportFiles(oldMediaUrls)
+
+        val fileUrl = mediaFiles.let { s3Service.uploadReportFile(it) }
+
+        fileUrl.map { fileUrls ->
+            ReportMedia(mediaUrl = fileUrls).apply { report.addReportMedia(this) }
+        }.let { reportMediaRepository.saveAll(it) }
+
+
         return reportRepository.save(report)
             .let { ReportResponse.from(it) }
     }

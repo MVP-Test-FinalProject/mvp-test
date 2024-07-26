@@ -20,9 +20,6 @@ data class CreateMvpTestRequest(
     val testEndDate: LocalDateTime,
 
     @field:NotBlank
-    val mainImageUrl: String,
-
-    @field:NotBlank
     val mvpInfo: String,
 
     @field:NotBlank
@@ -41,7 +38,7 @@ data class CreateMvpTestRequest(
 
     val categories: List<String>
 ) {
-    fun toMvpTest(enterpriseId: Long): MvpTest {
+    fun toMvpTest(enterpriseId: Long, mainImageUrl: String): MvpTest {
         return MvpTest(
             enterpriseId = enterpriseId,
             mvpName = mvpName,

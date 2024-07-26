@@ -15,12 +15,16 @@ import com.team1.mvp_test.domain.report.repository.ReportMediaRepository
 import com.team1.mvp_test.domain.report.repository.ReportRepository
 import com.team1.mvp_test.domain.step.model.Step
 import com.team1.mvp_test.domain.step.repository.StepRepository
+import com.team1.mvp_test.infra.s3.s3service.S3Service
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.mock.web.MockMultipartFile
+import org.springframework.web.multipart.MultipartFile
 import java.time.LocalDateTime
 
 
@@ -30,13 +34,72 @@ class ReportServiceTest : BehaviorSpec({
     val reportMediaRepository = mockk<ReportMediaRepository>(relaxed = true)
     val stepRepository = mockk<StepRepository>(relaxed = true)
     val memberTestRepository = mockk<MemberTestRepository>(relaxed = true)
+    val s3Service = mockk<S3Service>(relaxed = true)
 
     val reportService = ReportService(
         reportRepository = reportRepository,
         reportMediaRepository = reportMediaRepository,
         stepRepository = stepRepository,
-        memberTestRepository = memberTestRepository
+        memberTestRepository = memberTestRepository,
+        s3Service = s3Service
     )
+    Given("createReport 실행 시") {
+        every { memberTestRepository.findByIdOrNull(any()) } returns memberTest
+        every { stepRepository.findByIdOrNull(any()) } returns step
+        every { s3Service.uploadReportFile(invalidMediaFileList) } throws IllegalArgumentException("Invalid file type. Only JPEG and PNG are allowed.")
+        When("파일 형식이 jpg, jpeg, png 이 아니면") {
+            Then("IllegalArgumentException 예외 발생") {
+                shouldThrow<IllegalArgumentException> {
+                    reportService.createReport(MEMBER_ID, STEP_ID, request, invalidMediaFileList)
+                }
+            }
+        }
+    }
+
+    Given("createReport 실행 시 ") {
+        every { memberTestRepository.findByIdOrNull(any()) } returns memberTest
+        every { stepRepository.findByIdOrNull(any()) } returns step
+        every { s3Service.uploadReportFile(emptyMediaFileList) } throws IllegalArgumentException("Invalid file type. Only JPEG and PNG are allowed.")
+        When("파일이 없으면 ") {
+            Then("IllegalArgumentException 예외 발생") {
+                shouldThrowExactly<IllegalArgumentException> {
+                    reportService.createReport(MEMBER_ID, STEP_ID, request, emptyMediaFileList)
+                }
+            }
+        }
+    }
+
+    Given("updateReport 실행 ") {
+        every { memberTestRepository.findByIdOrNull(any()) } returns memberTest
+        every { stepRepository.findByIdOrNull(any()) } returns step
+        every { reportRepository.findByIdOrNull(any()) } returns report
+        every { reportMediaRepository.deleteAll(any()) } returns Unit
+        every { s3Service.deleteReportFiles(any()) } returns Unit
+        every { s3Service.uploadReportFile(invalidMediaFileList) } returns emptyList()
+        When("파일 형식이 jpg, jpeg, png 이 아니면") {
+            Then("IllegalArgumentException 예외 발생") {
+                shouldThrowExactly<IllegalArgumentException> {
+                    reportService.updateReport(MEMBER_ID, REPORT_ID, request, invalidMediaFileList)
+                }
+            }
+        }
+    }
+
+    Given("updateReport 실행") {
+        every { memberTestRepository.findByIdOrNull(any()) } returns memberTest
+        every { stepRepository.findByIdOrNull(any()) } returns step
+        every { reportRepository.findByIdOrNull(any()) } returns report
+        every { reportMediaRepository.deleteAll(any()) } returns Unit
+        every { s3Service.deleteReportFiles(any()) } returns Unit
+        every { s3Service.uploadReportFile(emptyMediaFileList) } returns emptyList()
+        When("파일이 없으면 ") {
+            Then("IllegalArgumentException 예외 발생") {
+                shouldThrowExactly<IllegalArgumentException> {
+                    reportService.updateReport(MEMBER_ID, REPORT_ID, request, emptyMediaFileList)
+                }
+            }
+        }
+    }
 
     Given("작성 권한이 없는 사용자라면") {
         every { stepRepository.findByIdOrNull(any()) } returns step
@@ -44,7 +107,7 @@ class ReportServiceTest : BehaviorSpec({
         When("createReport 실행 시") {
             Then("NoPermissionException 예외를 던진다") {
                 shouldThrowExactly<NoPermissionException> {
-                    reportService.createReport(MEMBER_ID, STEP_ID, request)
+                    reportService.createReport(MEMBER_ID, STEP_ID, request, validMediaFileList)
                 }
             }
         }
@@ -56,7 +119,7 @@ class ReportServiceTest : BehaviorSpec({
         When("createReport 실행 시") {
             Then("IllegalStateException 예외를 던진다") {
                 shouldThrowExactly<IllegalStateException> {
-                    reportService.createReport(MEMBER_ID, STEP_ID, request)
+                    reportService.createReport(MEMBER_ID, STEP_ID, request, validMediaFileList)
                 }
             }
         }
@@ -67,7 +130,7 @@ class ReportServiceTest : BehaviorSpec({
         When("updateReport 실행 시") {
             Then("NoPermissionException 예외를 던진다") {
                 shouldThrowExactly<NoPermissionException> {
-                    reportService.updateReport(OTHER_MEMBER_ID, REPORT_ID, request)
+                    reportService.updateReport(OTHER_MEMBER_ID, REPORT_ID, request, validMediaFileList)
                 }
             }
         }
@@ -86,7 +149,7 @@ class ReportServiceTest : BehaviorSpec({
         When("updateReport 실행 시") {
             Then("IllegalStateException 예외를 던진다") {
                 shouldThrowExactly<IllegalStateException> {
-                    reportService.updateReport(MEMBER_ID, APPROVED_REPORT_ID, request)
+                    reportService.updateReport(MEMBER_ID, APPROVED_REPORT_ID, request, validMediaFileList)
                 }
             }
         }
@@ -123,6 +186,7 @@ class ReportServiceTest : BehaviorSpec({
         }
     }
 
+
 }) {
     companion object {
         private const val ENTERPRISE_ID = 1L
@@ -136,7 +200,6 @@ class ReportServiceTest : BehaviorSpec({
             title = "Test title",
             body = "Test body",
             feedback = "Test feedback",
-            mediaUrl = listOf("test url1", "test url2")
         )
         private val mvpTest = MvpTest(
             id = TEST_ID,
@@ -191,6 +254,7 @@ class ReportServiceTest : BehaviorSpec({
             step = step,
             memberTest = memberTest,
         )
+
         private val approvedReport = Report(
             id = APPROVED_REPORT_ID,
             title = "Test report title",
@@ -201,5 +265,36 @@ class ReportServiceTest : BehaviorSpec({
             step = step,
             memberTest = memberTest,
         )
+
+        private val validFile1 = MockMultipartFile(
+            "validFile1",
+            "test1.jpg",
+            "jpg",
+            ByteArray(1)
+        )
+
+        private val validFile2 = MockMultipartFile(
+            "validFile2",
+            "test2.jpg",
+            "jpg",
+            ByteArray(1)
+        )
+
+        private val invalidFile = MockMultipartFile(
+            "invalidFile",
+            "test3.pdf",
+            "pdf",
+            ByteArray(1)
+        )
+        private val emptyFile = MockMultipartFile(
+            "emptyFile",
+            "test4.jpg",
+            "jpg",
+            ByteArray(0)
+        )
+
+        private val validMediaFileList: MutableList<MultipartFile> = mutableListOf(validFile1, validFile2)
+        private val invalidMediaFileList: MutableList<MultipartFile> = mutableListOf(validFile1, invalidFile)
+        private val emptyMediaFileList: MutableList<MultipartFile> = mutableListOf(emptyFile)
     }
 }
