@@ -1,6 +1,5 @@
 package com.team1.mvp_test.infra.s3.s3service
 
-import com.amazonaws.AmazonServiceException
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.CannedAccessControlList
 import com.amazonaws.services.s3.model.DeleteObjectRequest
@@ -81,7 +80,7 @@ class S3Service(
     private fun getContentType(extension: String): String {
         return when (extension) {
             "jpg" -> "jpg"
-            "jpeg"-> "jpeg"
+            "jpeg" -> "jpeg"
             "png" -> "png"
             "ppt" -> "ppt"
             "pptx" -> "pptx"
@@ -91,19 +90,19 @@ class S3Service(
     }
 
     fun deleteFile(fileUrl: String) {
-        val baseUrl = "https://mvptest12.s3.ap-northeast-2.amazonaws.com/"
+        val baseUrl = "https://mvptest-bucket.s3.ap-northeast-2.amazonaws.com/"
         val filePath = URLDecoder.decode(fileUrl.removePrefix(baseUrl), StandardCharsets.UTF_8.name())
 
         amazonS3.deleteObject(DeleteObjectRequest(bucket, filePath))
     }
 
     fun deleteReportFiles(fileUrls: List<String>?) {
-        val baseUrl = "https://mvptest12.s3.ap-northeast-2.amazonaws.com/"
+        val baseUrl = "https://mvptest-bucket.s3.ap-northeast-2.amazonaws.com/"
 
         fileUrls?.forEach { fileUrl ->
             val filePath = URLDecoder.decode(fileUrl.removePrefix(baseUrl), StandardCharsets.UTF_8.name())
 
-        amazonS3.deleteObject(DeleteObjectRequest(bucket, filePath))
+            amazonS3.deleteObject(DeleteObjectRequest(bucket, filePath))
 
         }
     }
