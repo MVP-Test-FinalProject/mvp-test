@@ -9,7 +9,7 @@ data class MemberResponse(
     val age: Int?,
     val sex: String?,
     val info: String?,
-    val signupState: Boolean,
+    val state: String,
 ) {
     companion object {
         fun from(member: Member): MemberResponse {
@@ -20,7 +20,7 @@ data class MemberResponse(
                 age = member.age,
                 sex = member.sex?.name,
                 info = member.info,
-                signupState = member.signUpState,
+                state = member.state.name,
             )
         }
     }

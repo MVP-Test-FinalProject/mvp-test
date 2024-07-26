@@ -17,7 +17,6 @@ class MvpTestDtoTest : BehaviorSpec({
             recruitEndDate = LocalDateTime.of(2025, 7, 26, 0, 0),
             testStartDate = LocalDateTime.of(2025, 8, 1, 0, 0),
             testEndDate = LocalDateTime.of(2025, 8, 2, 0, 0),
-            mainImageUrl = "",
             mvpInfo = "",
             mvpUrl = "",
             rewardBudget = 10000,
@@ -31,9 +30,9 @@ class MvpTestDtoTest : BehaviorSpec({
         When("CreateMvpRequest 검증 시") {
             val violations = validator.validate(request).toMutableList()
             Then("통과하지 못한다") {
-                violations.size shouldBe 4
+                violations.size shouldBe 3
                 violations.map { it.propertyPath.toString() }.sorted() shouldBe mutableListOf(
-                    "mvpName", "mainImageUrl", "mvpInfo", "mvpUrl"
+                    "mvpName", "mvpInfo", "mvpUrl"
                 ).sorted()
             }
         }
@@ -46,7 +45,6 @@ class MvpTestDtoTest : BehaviorSpec({
             recruitEndDate = LocalDateTime.of(2025, 7, 26, 0, 0),
             testStartDate = LocalDateTime.of(2025, 8, 1, 0, 0),
             testEndDate = LocalDateTime.of(2025, 8, 2, 0, 0),
-            mainImageUrl = "image.png",
             mvpInfo = "mvp 정보입니다",
             mvpUrl = "https://mvp.casd",
             rewardBudget = 10000,
@@ -73,7 +71,6 @@ class MvpTestDtoTest : BehaviorSpec({
             recruitEndDate = LocalDateTime.of(2025, 7, 26, 0, 0),
             testStartDate = LocalDateTime.of(2025, 8, 1, 0, 0),
             testEndDate = LocalDateTime.of(2025, 8, 2, 0, 0),
-            mainImageUrl = "image.png",
             mvpInfo = "mvp 정보입니다",
             mvpUrl = "https://mvp.casd",
             rewardBudget = 9999,
@@ -100,7 +97,6 @@ class MvpTestDtoTest : BehaviorSpec({
             recruitEndDate = LocalDateTime.of(2025, 7, 26, 0, 0),
             testStartDate = LocalDateTime.of(2025, 8, 1, 0, 0),
             testEndDate = LocalDateTime.of(2025, 8, 2, 0, 0),
-            mainImageUrl = "image.png",
             mvpInfo = "mvp 정보입니다",
             mvpUrl = "https://mvp.casd",
             rewardBudget = 10000,
@@ -127,7 +123,6 @@ class MvpTestDtoTest : BehaviorSpec({
             recruitEndDate = LocalDateTime.of(2025, 7, 26, 0, 0),
             testStartDate = LocalDateTime.of(2025, 8, 1, 0, 0),
             testEndDate = LocalDateTime.of(2025, 8, 2, 0, 0),
-            mainImageUrl = "image.png",
             mvpInfo = "mvp 정보입니다",
             mvpUrl = "https://mvp.casd",
             rewardBudget = 10000,
@@ -144,6 +139,7 @@ class MvpTestDtoTest : BehaviorSpec({
                 violations.size shouldBe 0
             }
         }
+
     }
 
 })
