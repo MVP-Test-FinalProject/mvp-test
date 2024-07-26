@@ -19,9 +19,6 @@ data class UpdateMvpTestRequest(
     val testEndDate: LocalDateTime,
 
     @field:NotBlank
-    val mainImageUrl: String,
-
-    @field:NotBlank
     val mvpInfo: String,
 
     @field:NotBlank
@@ -42,14 +39,14 @@ data class UpdateMvpTestRequest(
 
     val categories: List<String>
 ) {
-    fun toObject(): UpdateMvpTestObject {
+    fun toObject(mainImageUrl:String): UpdateMvpTestObject {
         return UpdateMvpTestObject(
             mvpName = this.mvpName,
             recruitStartDate = this.recruitStartDate,
             recruitEndDate = this.recruitEndDate,
             testStartDate = this.testStartDate,
             testEndDate = this.testEndDate,
-            mainImageUrl = this.mainImageUrl,
+            mainImageUrl = mainImageUrl,
             mvpInfo = this.mvpInfo,
             mvpUrl = this.mvpUrl,
             rewardBudget = this.rewardBudget,

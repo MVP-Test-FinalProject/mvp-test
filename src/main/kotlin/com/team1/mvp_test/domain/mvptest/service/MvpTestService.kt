@@ -16,9 +16,11 @@ import com.team1.mvp_test.domain.mvptest.model.MvpTestCategoryMap
 import com.team1.mvp_test.domain.mvptest.model.RecruitType
 import com.team1.mvp_test.domain.mvptest.repository.MvpTestCategoryMapRepository
 import com.team1.mvp_test.domain.mvptest.repository.MvpTestRepository
+import com.team1.mvp_test.infra.s3.s3service.S3Service
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.multipart.MultipartFile
 import java.time.LocalDateTime
 
 @Service
@@ -27,10 +29,11 @@ class MvpTestService(
     private val categoryRepository: CategoryRepository,
     private val mvpTestCategoryMapRepository: MvpTestCategoryMapRepository,
     private val memberRepository: MemberRepository,
-    private val memberTestRepository: MemberTestRepository
+    private val memberTestRepository: MemberTestRepository,
+    private val s3Service: S3Service
 ) {
     @Transactional
-    fun createMvpTest(enterpriseId: Long, request: CreateMvpTestRequest): MvpTestResponse {
+    fun createMvpTest(enterpriseId: Long, request: CreateMvpTestRequest,mainImageFile: MultipartFile): MvpTestResponse {
         checkRequirement(
             recruitStartDate = request.recruitStartDate,
             recruitEndDate = request.recruitEndDate,
@@ -39,7 +42,11 @@ class MvpTestService(
             minAge = request.requirementMinAge,
             maxAge = request.requirementMaxAge
         )
-        val mvpTest = request.toMvpTest(enterpriseId)
+        if (mainImageFile.isEmpty)  throw IllegalArgumentException(MvpTestErrorMessage.MAIN_URL_NOT_EXIST.message)
+
+        val file = s3Service.uploadMvpTestFile(mainImageFile)
+
+        val mvpTest = request.toMvpTest(enterpriseId,file)
             .let { mvpTestRepository.save(it) }
         request.categories.forEach {
             val category = categoryRepository.findByName(it)
@@ -53,7 +60,7 @@ class MvpTestService(
     }
 
     @Transactional
-    fun updateMvpTest(enterpriseId: Long, testId: Long, request: UpdateMvpTestRequest): MvpTestResponse {
+    fun updateMvpTest(enterpriseId: Long, testId: Long, request: UpdateMvpTestRequest, mainImageFile: MultipartFile): MvpTestResponse {
         checkRequirement(
             recruitStartDate = request.recruitStartDate,
             recruitEndDate = request.recruitEndDate,
@@ -77,7 +84,12 @@ class MvpTestService(
                 category = category
             ).let { map -> mvpTestCategoryMapRepository.save(map) }
         }
-        mvpTest.update(request.toObject())
+        if (mainImageFile.isEmpty) throw IllegalArgumentException(MvpTestErrorMessage.MAIN_URL_NOT_EXIST.message)
+
+        mvpTest.mainImageUrl.let { s3Service.deleteFile(it) }
+        val file = mainImageFile.let { s3Service.uploadMvpTestFile(it) }
+
+        mvpTest.update(request.toObject(file))
         return MvpTestResponse.from(mvpTest, request.categories)
     }
 
