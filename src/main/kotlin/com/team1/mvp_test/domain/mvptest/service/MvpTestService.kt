@@ -127,13 +127,7 @@ class MvpTestService(
         val test = mvpTestRepository.findByIdOrNull(testId) ?: throw ModelNotFoundException("mvpTest", testId)
         val member = memberRepository.findByIdOrNull(memberId) ?: throw ModelNotFoundException("member", memberId)
         memberService.checkMemberActive(member)
-        val recruitCount = memberTestRepository.countByTestIdAndState(testId, MemberTestState.APPROVED)
-        check(recruitCount < test.recruitNum) { MvpTestErrorMessage.TEST_ALREADY_FULL.message }
-        MemberTest(
-            member = member,
-            test = test,
-            state = if (test.recruitType == RecruitType.FIRST_COME) MemberTestState.APPROVED else MemberTestState.PENDING
-        ).let { memberTestRepository.save(it) }
+
 
         if (test.recruitType == RecruitType.FIRST_COME) {
             val lock = redissonService.getLock("applyToMvpTest:$testId",2,6)
