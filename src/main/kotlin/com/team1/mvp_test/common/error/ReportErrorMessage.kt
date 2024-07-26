@@ -9,5 +9,8 @@ enum class ReportErrorMessage(val message: String) {
     TITLE_LENGTH_INCORRECT("TITLE 을 5~50 자 이내로 입력해 주세요"),
     CONTENT_LENGTH_INCORRECT("BODY, FEEDBACK, REASON 을 5~500 자 이내로 입력해 주세요"),
     ALREADY_APPROVED("이미 승인된 보고서 입니다"),
-    ALREADY_REPORTED("이미 보고서를 작성 했습니다")
+    ALREADY_REPORTED("이미 보고서를 작성 했습니다"),
+    REPORT_MEDIA_URL_NOT_EXIST("보고서에 사진 파일은 필수입니다."),
+    REPORT_MEDIA_URL_COUNT_NOT_VALID("보고서에 사진 파일은 최대 10개 업로드 가능합니다.")
+
 }

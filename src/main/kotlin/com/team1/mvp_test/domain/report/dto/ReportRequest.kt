@@ -9,8 +9,6 @@ data class ReportRequest(
     @field:Size(min = 5, max = 500)
     val body: String,
 
-    val mediaUrl: List<String>,
-
     @field:Size(min = 5, max = 500)
     val feedback: String,
 )
