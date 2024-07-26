@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 
 @RestController
 @RequestMapping("api/v1")
@@ -34,12 +35,13 @@ class StepController(
     @PreAuthorize("hasRole('ENTERPRISE')")
     fun createStep(
         @PathVariable testId: Long,
-        @Valid @RequestBody request: CreateStepRequest,
+        @Valid @RequestPart("request") request: CreateStepRequest,
+        @RequestPart("guidelineFile") guidelineFile :MultipartFile?,
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
     ): ResponseEntity<StepResponse> {
         return ResponseEntity
             .status(HttpStatus.CREATED)
-            .body(stepService.createStep(userPrincipal.id, testId, request))
+            .body(stepService.createStep(userPrincipal.id, testId, request, guidelineFile))
     }
 
     @GetMapping("steps/{stepId}")
@@ -55,12 +57,13 @@ class StepController(
     @PreAuthorize("hasRole('ENTERPRISE')")
     fun updateStepById(
         @PathVariable stepId: Long,
-        @Valid @RequestBody request: UpdateStepRequest,
+        @Valid @RequestPart("request") request: UpdateStepRequest,
+        @RequestPart("guidelineFile") guidelineFile :MultipartFile?,
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
     ): ResponseEntity<StepResponse> {
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(stepService.updateStep(userPrincipal.id, stepId, request))
+            .body(stepService.updateStep(userPrincipal.id, stepId, request, guidelineFile))
     }
 
     @DeleteMapping("steps/{stepId}")

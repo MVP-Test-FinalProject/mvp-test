@@ -10,8 +10,6 @@ data class CreateStepRequest(
     @field:Size(min = 10, max = 200)
     val requirement: String,
 
-    val guidelineUrl: String?,
-
     @field:Min(value = 1000)
     val reward: Int
 )
