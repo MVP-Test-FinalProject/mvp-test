@@ -13,7 +13,8 @@ class MemberDtoTest : BehaviorSpec({
             name = "",
             age = 15,
             sex = Sex.MALE,
-            info = null
+            info = null,
+            phoneNumber = "01012345678"
         )
         When("SignUpInfoRequest 검증 시") {
             val violations = validator.validate(request)
@@ -29,7 +30,8 @@ class MemberDtoTest : BehaviorSpec({
             name = "이름",
             age = 10,
             sex = Sex.MALE,
-            info = null
+            info = null,
+            phoneNumber = "01012345678"
         )
         When("SignUpInfoRequest 검증 시") {
             val violations = validator.validate(request)
@@ -45,7 +47,8 @@ class MemberDtoTest : BehaviorSpec({
             name = "이름",
             age = 101,
             sex = Sex.MALE,
-            info = null
+            info = null,
+            phoneNumber = "01012345678"
         )
         When("SignUpInfoRequest 검증 시") {
             val violations = validator.validate(request)
@@ -61,7 +64,8 @@ class MemberDtoTest : BehaviorSpec({
             name = "이름",
             age = 16,
             sex = Sex.MALE,
-            info = "정보입니다".repeat(101)
+            info = "정보입니다".repeat(101),
+            phoneNumber = "01012345678"
         )
         When("SignUpInfoRequest 검증 시") {
             val violations = validator.validate(request)
@@ -77,7 +81,8 @@ class MemberDtoTest : BehaviorSpec({
             name = "이름",
             age = 16,
             sex = Sex.MALE,
-            info = "정보입니다"
+            info = "정보입니다",
+            phoneNumber = "01012345678"
         )
         When("SignUpInfoRequest 검증 시") {
             val violations = validator.validate(request)
