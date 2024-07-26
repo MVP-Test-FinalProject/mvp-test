@@ -45,8 +45,8 @@ jobs:
       env:
      
         AUTH_JWT_ISSUER: ${{secrets.AUTH_JWT_ISSUER}}
-        AUTH_JWT_ACCESSTOKEN_SECRET: ${{secrets.AUTH_JWT_ACCESSTOKEN_SECRET}}
-        AUTH_JWT_ACCESSTOKEN_EXPIRATION_HOUR: ${{secrets.AUTH_JWT_ACCESSTOKEN_EXPIRATION_HOUR}}
+        AUTH_JWT_ACCESSTOKENSECRET: ${{secrets.AUTH_JWT_ACCESSTOKEN_SECRET}}
+        AUTH_JWT_ACCESSTOKENEXPIRATION_HOUR: ${{secrets.AUTH_JWT_ACCESSTOKEN_EXPIRATION_HOUR}}
 
         OAUTH2_NAVER_CLIENT_ID: ${{secrets.OAUTH2_NAVER_CLIENT_ID}}
         OAUTH2_NAVER_CLIENT_SECRET: ${{secrets.OAUTH2_NAVER_CLIENT_SECRET}}
@@ -72,4 +72,4 @@ jobs:
 
       uses: gradle/gradle-build-action@749f47bda3e44aa060e82d7b3ef7e40d953bd629 # v2.6.0
       with:
-        arguments: build --info
+        arguments: build 
