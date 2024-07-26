@@ -11,7 +11,6 @@ class ReportDtoTest : BehaviorSpec({
         val request = ReportRequest(
             title = "제목",
             body = "내용입니다",
-            mediaUrl = listOf(),
             feedback = "피드백입니다"
         )
         When("ReportRequest 검증 시") {
@@ -27,7 +26,6 @@ class ReportDtoTest : BehaviorSpec({
         val request = ReportRequest(
             title = "제목".repeat(26),
             body = "내용입니다",
-            mediaUrl = listOf(),
             feedback = "피드백입니다"
         )
         When("ReportRequest 검증 시") {
@@ -43,7 +41,6 @@ class ReportDtoTest : BehaviorSpec({
         val request = ReportRequest(
             title = "제목입니다",
             body = "내용",
-            mediaUrl = listOf(),
             feedback = "피드백입니다"
         )
         When("ReportRequest 검증 시") {
@@ -59,7 +56,6 @@ class ReportDtoTest : BehaviorSpec({
         val request = ReportRequest(
             title = "제목입니다",
             body = "내용입니다".repeat(101),
-            mediaUrl = listOf(),
             feedback = "피드백입니다"
         )
         When("ReportRequest 검증 시") {
@@ -75,7 +71,6 @@ class ReportDtoTest : BehaviorSpec({
         val request = ReportRequest(
             title = "제목입니다",
             body = "내용입니다",
-            mediaUrl = listOf(),
             feedback = "피드백"
         )
         When("ReportRequest 검증 시") {
@@ -91,7 +86,6 @@ class ReportDtoTest : BehaviorSpec({
         val request = ReportRequest(
             title = "제목입니다",
             body = "내용입니다",
-            mediaUrl = listOf(),
             feedback = "피드백입니다".repeat(100)
         )
         When("ReportRequest 검증 시") {
@@ -107,7 +101,6 @@ class ReportDtoTest : BehaviorSpec({
         val request = ReportRequest(
             title = "제목입니다",
             body = "내용입니다",
-            mediaUrl = listOf(),
             feedback = "피드백입니다"
         )
         When("ReportRequest 검증 시") {
