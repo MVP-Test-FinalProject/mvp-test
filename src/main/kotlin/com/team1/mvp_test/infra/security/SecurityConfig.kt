@@ -30,7 +30,8 @@ class SecurityConfig(
                     "api/v1/enterprise/login",
                     "api/v1/enterprise/sign-up",
                     "/member/oauth/**",
-                    "/message/"
+                    "/message/**",
+                    "/admin/**"
                 )
                     .permitAll()
                     .anyRequest().authenticated()
