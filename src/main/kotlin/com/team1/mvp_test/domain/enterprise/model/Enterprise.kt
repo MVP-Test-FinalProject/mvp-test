@@ -32,4 +32,8 @@ class Enterprise(
         this.ceoName = ceoName
         this.phoneNumber = phoneNumber
     }
+
+    fun approve() {
+        this.state = EnterpriseState.APPROVED
+    }
 }

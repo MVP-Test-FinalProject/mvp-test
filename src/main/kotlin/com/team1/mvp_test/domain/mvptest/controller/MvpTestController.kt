@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 
 @RestController
 @RequestMapping("api/v1/mvp-tests")
@@ -21,24 +22,26 @@ class MvpTestController(
     @PostMapping
     @PreAuthorize("hasRole('ENTERPRISE')")
     fun createMvpTest(
-        @Valid @RequestBody request: CreateMvpTestRequest,
+        @Valid @RequestPart("request") request: CreateMvpTestRequest,
+        @RequestPart("mainImageFile") mainImageFile: MultipartFile,
         @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<MvpTestResponse> {
         return ResponseEntity
             .status(HttpStatus.CREATED)
-            .body(mvpTestService.createMvpTest(userPrincipal.id, request))
+            .body(mvpTestService.createMvpTest(userPrincipal.id, request, mainImageFile))
     }
 
     @PutMapping("/{testId}")
     @PreAuthorize("hasRole('ENTERPRISE')")
     fun updateMvpTest(
-        @Valid @RequestBody request: UpdateMvpTestRequest,
+        @Valid @RequestPart("request") request: UpdateMvpTestRequest,
+        @RequestPart("mainImageFile") mainImageFile: MultipartFile,
         @PathVariable("testId") testId: Long,
         @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<MvpTestResponse> {
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(mvpTestService.updateMvpTest(userPrincipal.id, testId, request))
+            .body(mvpTestService.updateMvpTest(userPrincipal.id, testId, request, mainImageFile))
     }
 
     @DeleteMapping("/{testId}")
