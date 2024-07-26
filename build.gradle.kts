@@ -40,7 +40,8 @@ dependencies {
     testImplementation("io.kotest:kotest-runner-junit5:5.7.2")
     testImplementation("io.kotest:kotest-assertions-core:5.7.2")
     testImplementation("com.ninja-squad:springmockk:3.0.1")
-
+    implementation("net.nurigo:sdk:4.2.7")
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
     // Validation
     implementation("org.hibernate.validator:hibernate-validator:8.0.0.Final")
     implementation("jakarta.validation:jakarta.validation-api:3.0.0")
