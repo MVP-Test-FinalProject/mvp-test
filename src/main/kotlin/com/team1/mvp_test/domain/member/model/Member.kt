@@ -36,8 +36,8 @@ class Member(
     @Column(name = "provider_id")
     val providerId: String? = null,
 
-    @Column(name = "signup_state")
-    var signUpState: Boolean = false,
+    @Column(name = "state")
+    var state: MemberState = MemberState.PENDING
 ) {
     fun updateMember(name: String, info: String?) {
         this.name = name
@@ -50,6 +50,6 @@ class Member(
         this.sex = sex
         this.info = info
         this.phoneNumber = phoneNumber
-        signUpState = true
+        this.state = MemberState.ACTIVE
     }
 }
