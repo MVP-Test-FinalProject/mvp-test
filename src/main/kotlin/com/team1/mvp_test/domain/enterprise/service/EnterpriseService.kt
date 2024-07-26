@@ -29,4 +29,19 @@ class EnterpriseService(
         )
         return EnterpriseResponse.from(enterprise)
     }
+
+    @Transactional
+    fun getAllEnterprises(): List<EnterpriseResponse> {
+        return enterpriseRepository.findAll().map {
+            EnterpriseResponse.from(it)
+        }
+    }
+
+    @Transactional
+    fun approveEnterprise(enterpriseId: Long): EnterpriseResponse {
+        val enterprise = enterpriseRepository.findByIdOrNull(enterpriseId)
+            ?: throw ModelNotFoundException("Enterprise", enterpriseId)
+        enterprise.approve()
+        return EnterpriseResponse.from(enterprise)
+    }
 }

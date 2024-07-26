@@ -9,6 +9,7 @@ import com.team1.mvp_test.domain.member.model.MemberTest
 import com.team1.mvp_test.domain.member.model.MemberTestState
 import com.team1.mvp_test.domain.member.repository.MemberRepository
 import com.team1.mvp_test.domain.member.repository.MemberTestRepository
+import com.team1.mvp_test.domain.member.service.MemberService
 import com.team1.mvp_test.domain.mvptest.dto.CreateMvpTestRequest
 import com.team1.mvp_test.domain.mvptest.dto.MvpTestResponse
 import com.team1.mvp_test.domain.mvptest.dto.UpdateMvpTestRequest
@@ -30,7 +31,8 @@ class MvpTestService(
     private val mvpTestCategoryMapRepository: MvpTestCategoryMapRepository,
     private val memberRepository: MemberRepository,
     private val memberTestRepository: MemberTestRepository,
-    private val s3Service: S3Service
+    private val s3Service: S3Service,
+    private val memberService: MemberService
 ) {
     @Transactional
     fun createMvpTest(enterpriseId: Long, request: CreateMvpTestRequest,mainImageFile: MultipartFile): MvpTestResponse {
@@ -122,6 +124,7 @@ class MvpTestService(
     fun applyToMvpTest(memberId: Long, testId: Long) {
         val test = mvpTestRepository.findByIdOrNull(testId) ?: throw ModelNotFoundException("mvpTest", testId)
         val member = memberRepository.findByIdOrNull(memberId) ?: throw ModelNotFoundException("member", memberId)
+        memberService.checkMemberActive(member)
         val recruitCount = memberTestRepository.countByTestIdAndState(testId, MemberTestState.APPROVED)
         check(recruitCount < test.recruitNum) { MvpTestErrorMessage.TEST_ALREADY_FULL.message }
         MemberTest(

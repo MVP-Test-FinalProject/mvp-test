@@ -3,12 +3,14 @@ package com.team1.mvp_test.domain.enterprise.service
 import com.team1.mvp_test.common.Role
 import com.team1.mvp_test.common.error.EnterpriseErrorMessage
 import com.team1.mvp_test.common.exception.ModelNotFoundException
+import com.team1.mvp_test.common.exception.NoPermissionException
 import com.team1.mvp_test.common.exception.PasswordIncorrectException
 import com.team1.mvp_test.domain.enterprise.dto.EnterpriseLoginResponse
 import com.team1.mvp_test.domain.enterprise.dto.EnterpriseResponse
 import com.team1.mvp_test.domain.enterprise.dto.EnterpriseSignUpRequest
 import com.team1.mvp_test.domain.enterprise.dto.LoginRequest
 import com.team1.mvp_test.domain.enterprise.model.Enterprise
+import com.team1.mvp_test.domain.enterprise.model.EnterpriseState
 import com.team1.mvp_test.domain.enterprise.repository.EnterpriseRepository
 import com.team1.mvp_test.infra.security.jwt.JwtHelper
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -38,6 +40,7 @@ class EnterpriseAuthService(
         val enterprise = enterpriseRepository.findByEmail(request.email)
             ?: throw ModelNotFoundException("Enterprise", request.email)
         if (!passwordEncoder.matches(request.password, enterprise.password)) throw PasswordIncorrectException()
+        if (enterprise.state == EnterpriseState.PENDING) throw NoPermissionException(EnterpriseErrorMessage.PENDING_STATE.message)
         return jwtHelper.generateAccessToken(
             subject = enterprise.id!!.toString(),
             email = enterprise.email,
