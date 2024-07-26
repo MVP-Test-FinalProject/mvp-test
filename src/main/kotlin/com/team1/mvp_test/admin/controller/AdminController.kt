@@ -3,8 +3,8 @@ package com.team1.mvp_test.admin.controller
 import com.team1.mvp_test.admin.dto.AdminLoginRequest
 import com.team1.mvp_test.admin.dto.AdminLoginResponse
 import com.team1.mvp_test.admin.service.AdminAuthService
-import com.team1.mvp_test.admin.service.AdminService
 import com.team1.mvp_test.domain.enterprise.dto.EnterpriseResponse
+import com.team1.mvp_test.domain.enterprise.service.EnterpriseService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/admin")
 class AdminController(
-    private val adminService: AdminService,
+    private val enterpriseService: EnterpriseService,
     private val adminAuthService: AdminAuthService
 ) {
 
@@ -22,7 +22,7 @@ class AdminController(
     fun getAllEnterprises(): ResponseEntity<List<EnterpriseResponse>> {
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(adminService.getAllEnterprises())
+            .body(enterpriseService.getAllEnterprises())
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -32,7 +32,7 @@ class AdminController(
     ): ResponseEntity<EnterpriseResponse> {
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(adminService.approveEnterprise(enterpriseId))
+            .body(enterpriseService.approveEnterprise(enterpriseId))
     }
 
     @PostMapping("/login")
