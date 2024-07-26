@@ -2,6 +2,7 @@ package com.team1.mvp_test.domain.report.service
 
 import com.team1.mvp_test.common.exception.NoPermissionException
 import com.team1.mvp_test.domain.member.model.Member
+import com.team1.mvp_test.domain.member.model.MemberState
 import com.team1.mvp_test.domain.member.model.MemberTest
 import com.team1.mvp_test.domain.member.model.Sex
 import com.team1.mvp_test.domain.member.repository.MemberTestRepository
@@ -236,7 +237,7 @@ class ReportServiceTest : BehaviorSpec({
             age = 20,
             sex = Sex.MALE,
             info = "test info",
-            signUpState = true
+            state = MemberState.ACTIVE
         )
 
         private val memberTest = MemberTest(

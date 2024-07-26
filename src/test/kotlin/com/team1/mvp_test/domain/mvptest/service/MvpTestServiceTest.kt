@@ -4,6 +4,7 @@ import com.team1.mvp_test.domain.category.repository.CategoryRepository
 import com.team1.mvp_test.domain.member.model.Sex
 import com.team1.mvp_test.domain.member.repository.MemberRepository
 import com.team1.mvp_test.domain.member.repository.MemberTestRepository
+import com.team1.mvp_test.domain.member.service.MemberService
 import com.team1.mvp_test.domain.mvptest.dto.CreateMvpTestRequest
 import com.team1.mvp_test.domain.mvptest.dto.UpdateMvpTestRequest
 import com.team1.mvp_test.domain.mvptest.model.MvpTest
@@ -28,6 +29,7 @@ class MvpTestServiceTest : BehaviorSpec({
     val s3Service = mockk<S3Service>()
     val memberRepository = mockk<MemberRepository>()
     val memberTestRepository = mockk<MemberTestRepository>()
+    val memberService = mockk<MemberService>()
 
     val mvpTestService = MvpTestService(
         mvpTestRepository = mvpTestRepository,
@@ -35,7 +37,8 @@ class MvpTestServiceTest : BehaviorSpec({
         mvpTestCategoryMapRepository = mvpTestCategoryMapRepository,
         memberRepository = memberRepository,
         memberTestRepository = memberTestRepository,
-        s3Service = s3Service
+        s3Service = s3Service,
+        memberService = memberService
     )
 
     Given("createMvpTest 실행 ") {
