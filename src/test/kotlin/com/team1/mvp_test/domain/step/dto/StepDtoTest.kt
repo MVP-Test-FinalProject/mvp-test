@@ -11,7 +11,6 @@ class StepDtoTest : BehaviorSpec({
         val request = CreateStepRequest(
             title = "제목",
             requirement = "회원가입 후 사진을 촬영해서 업로드해주세요",
-            guidelineUrl = null,
             reward = 10000
         )
         When("CreateStepRequest 검증 시") {
@@ -27,7 +26,6 @@ class StepDtoTest : BehaviorSpec({
         val request = CreateStepRequest(
             title = "제목".repeat(11),
             requirement = "회원가입 후 사진을 촬영해서 업로드해주세요",
-            guidelineUrl = null,
             reward = 10000
         )
         When("CreateStepRequest 검증 시") {
@@ -43,7 +41,6 @@ class StepDtoTest : BehaviorSpec({
         val request = CreateStepRequest(
             title = "제목입니다",
             requirement = "요구사항",
-            guidelineUrl = null,
             reward = 10000
         )
         When("CreateStepRequest 검증 시") {
@@ -59,7 +56,6 @@ class StepDtoTest : BehaviorSpec({
         val request = CreateStepRequest(
             title = "제목입니다",
             requirement = "요구사항".repeat(100),
-            guidelineUrl = null,
             reward = 10000
         )
         When("CreateStepRequest 검증 시") {
@@ -75,7 +71,6 @@ class StepDtoTest : BehaviorSpec({
         val request = CreateStepRequest(
             title = "제목입니다",
             requirement = "회원가입 후 사진을 촬영해서 업로드해주세요",
-            guidelineUrl = null,
             reward = 999
         )
         When("CreateStepRequest 검증 시") {
@@ -91,7 +86,6 @@ class StepDtoTest : BehaviorSpec({
         val request = CreateStepRequest(
             title = "제목입니다",
             requirement = "회원가입 후 사진을 촬영해서 업로드해주세요",
-            guidelineUrl = null,
             reward = 1000
         )
         When("CreateStepRequest 검증 시") {

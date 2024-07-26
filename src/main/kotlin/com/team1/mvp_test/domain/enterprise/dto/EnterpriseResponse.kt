@@ -8,6 +8,7 @@ data class EnterpriseResponse(
     val name: String,
     val ceoName: String,
     val phoneNumber: String,
+    val state: String,
 ) {
     companion object {
         fun from(enterprise: Enterprise): EnterpriseResponse {
@@ -17,6 +18,7 @@ data class EnterpriseResponse(
                 name = enterprise.name,
                 ceoName = enterprise.ceoName,
                 phoneNumber = enterprise.phoneNumber,
+                state = enterprise.state.name
             )
         }
     }

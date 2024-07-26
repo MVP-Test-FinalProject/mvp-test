@@ -9,5 +9,4 @@ data class UpdateStepRequest(
     @field:Size(min = 10, max = 200)
     val requirement: String,
 
-    val guidelineUrl: String?
 )

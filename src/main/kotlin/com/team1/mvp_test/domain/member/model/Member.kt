@@ -26,6 +26,9 @@ class Member(
     @Column(name = "info")
     var info: String? = null,
 
+    @Column(name = "phone_number")
+    var phoneNumber: String? = null,
+
     @Enumerated(EnumType.STRING)
     @Column(name = "provider_name")
     val providerName: OAuthProvider? = null,
@@ -33,19 +36,20 @@ class Member(
     @Column(name = "provider_id")
     val providerId: String? = null,
 
-    @Column(name = "signup_state")
-    var signUpState: Boolean = false,
+    @Column(name = "state")
+    var state: MemberState = MemberState.PENDING
 ) {
     fun updateMember(name: String, info: String?) {
         this.name = name
         this.info = info
     }
 
-    fun updateSignUpInfo(name: String, age: Int, sex: Sex, info: String?) {
+    fun updateSignUpInfo(name: String, age: Int, sex: Sex, info: String?, phoneNumber: String) {
         this.name = name
         this.age = age
         this.sex = sex
         this.info = info
-        signUpState = true
+        this.phoneNumber = phoneNumber
+        this.state = MemberState.ACTIVE
     }
 }
