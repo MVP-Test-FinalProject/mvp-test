@@ -17,15 +17,13 @@ import com.team1.mvp_test.domain.mvptest.model.MvpTestCategoryMap
 import com.team1.mvp_test.domain.mvptest.model.RecruitType
 import com.team1.mvp_test.domain.mvptest.repository.MvpTestCategoryMapRepository
 import com.team1.mvp_test.domain.mvptest.repository.MvpTestRepository
+import com.team1.mvp_test.infra.redisson.RedissonService
 import com.team1.mvp_test.infra.s3.s3service.S3Service
-import org.redisson.api.RLock
-import org.redisson.api.RedissonClient
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import java.time.LocalDateTime
-import java.util.concurrent.TimeUnit
 
 @Service
 class MvpTestService(
@@ -34,7 +32,7 @@ class MvpTestService(
     private val mvpTestCategoryMapRepository: MvpTestCategoryMapRepository,
     private val memberRepository: MemberRepository,
     private val memberTestRepository: MemberTestRepository,
-    private val redissonClient: RedissonClient,
+    private val redissonService: RedissonService,
     private val s3Service: S3Service,
     private val memberService: MemberService
 ) {
@@ -138,12 +136,8 @@ class MvpTestService(
         ).let { memberTestRepository.save(it) }
 
         if (test.recruitType == RecruitType.FIRST_COME) {
-            val lock: RLock = redissonClient.getLock("applyToMvpTest:$testId")
-            val isLocked = lock.tryLock(2, 6, TimeUnit.SECONDS)
+            val lock = redissonService.getLock("applyToMvpTest:$testId",2,6)
 
-            if (!isLocked) {
-                throw RuntimeException("Lock 획득 실패!")
-            }
             try {
                 val recruitCount = memberTestRepository.countByTestIdAndState(testId, MemberTestState.APPROVED)
                 check(recruitCount < test.recruitNum) { MvpTestErrorMessage.TEST_ALREADY_FULL.message }
@@ -153,7 +147,7 @@ class MvpTestService(
                     state = MemberTestState.APPROVED
                 ).let { memberTestRepository.save(it) }
             } finally {
-                lock.unlock()
+                redissonService.unlock(lock)
             }
         } else {
             MemberTest(
