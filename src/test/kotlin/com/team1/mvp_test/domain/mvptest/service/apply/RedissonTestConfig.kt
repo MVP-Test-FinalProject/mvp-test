@@ -1,5 +1,9 @@
 package com.team1.mvp_test.domain.mvptest.service.apply
 
+import com.team1.mvp_test.domain.member.service.MemberService
+import com.team1.mvp_test.infra.redisson.RedissonService
+import com.team1.mvp_test.infra.s3.s3service.S3Service
+import org.mockito.Mockito
 import org.redisson.Redisson
 import org.redisson.api.RedissonClient
 import org.redisson.config.Config
@@ -14,5 +18,21 @@ class RedissonTestConfig {
     fun redissonTestClient(): RedissonClient {
         val config = Config.fromYAML(ClassPathResource("redisson.yml").inputStream)
         return Redisson.create(config)
+    }
+
+    @Bean
+    fun redissonService(redissonClient: RedissonClient): RedissonService {
+        return RedissonService(redissonClient)
+    }
+
+
+    @Bean
+    fun s3Service(): S3Service {
+        return Mockito.mock(S3Service::class.java)
+    }
+
+    @Bean
+    fun memberService(): MemberService {
+        return Mockito.mock(MemberService::class.java)
     }
 }

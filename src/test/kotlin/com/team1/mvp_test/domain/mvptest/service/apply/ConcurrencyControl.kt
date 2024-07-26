@@ -5,16 +5,18 @@ import com.team1.mvp_test.domain.member.model.Member
 import com.team1.mvp_test.domain.member.model.Sex
 import com.team1.mvp_test.domain.member.repository.MemberRepository
 import com.team1.mvp_test.domain.member.repository.MemberTestRepository
+import com.team1.mvp_test.domain.member.service.MemberService
 import com.team1.mvp_test.domain.mvptest.model.MvpTest
 import com.team1.mvp_test.domain.mvptest.model.MvpTestState
 import com.team1.mvp_test.domain.mvptest.model.RecruitType
 import com.team1.mvp_test.domain.mvptest.repository.MvpTestCategoryMapRepository
 import com.team1.mvp_test.domain.mvptest.repository.MvpTestRepository
 import com.team1.mvp_test.domain.mvptest.service.MvpTestService
+import com.team1.mvp_test.infra.redisson.RedissonService
+import com.team1.mvp_test.infra.s3.s3service.S3Service
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.redisson.api.RedissonClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
@@ -39,9 +41,11 @@ class ConcurrencyControl @Autowired constructor(
     private val mvpTestCategoryMapRepository: MvpTestCategoryMapRepository,
     private val memberRepository: MemberRepository,
     private val memberTestRepository: MemberTestRepository,
-    private val redissonClient: RedissonClient,
+    private val redissonService: RedissonService,
+    private val s3Service: S3Service,
+    private val memberService: MemberService
 ) {
-    private var mvpTestService = MvpTestService(mvpTestRepository, categoryRepository, mvpTestCategoryMapRepository, memberRepository, memberTestRepository, redissonClient)
+    private var mvpTestService = MvpTestService(mvpTestRepository, categoryRepository, mvpTestCategoryMapRepository, memberRepository, memberTestRepository, redissonService, s3Service, memberService)
 
     @BeforeEach
     fun setup() {
@@ -52,8 +56,8 @@ class ConcurrencyControl @Autowired constructor(
 
     @Test
     fun testConcurrencyControl() {
-        val threadCount = 40
-        val recruitNum = 10
+        val threadCount = 100
+        val recruitNum = 50
 
         val executor = Executors.newFixedThreadPool(threadCount)
         val barrier = CyclicBarrier(threadCount)
