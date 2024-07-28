@@ -44,7 +44,7 @@ jobs:
     - name: Build with Gradle
       env:
      
-        #AUTH_JWT_ISSUER: ${{secrets.AUTH_JWT_ISSUER}}
+        AUTH_JWT_ISSUER: ${{secrets.AUTH_JWT_ISSUER}}
         AUTH_JWT_ACCESSTOKENSECRET: ${{secrets.AUTH_JWT_ACCESSTOKENSECRET}}
         AUTH_JWT_ACCESSTOKENEXPIRATIONHOUR: ${{secrets.AUTH_JWT_ACCESSTOKENEXPIRATIONHOUR}}
 
@@ -72,4 +72,4 @@ jobs:
 
       uses: gradle/gradle-build-action@749f47bda3e44aa060e82d7b3ef7e40d953bd629 # v2.6.0
       with:
-        arguments: build --info
+        arguments: build
