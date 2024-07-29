@@ -79,15 +79,33 @@ class BatchServiceTest @Autowired constructor(
         batchService.provideRewardAllTests(todayDate)
 
         // Then : 성공적으로 작업을 종료한다
+        // BatchData
         val batchData = batchDataRepository.findByIdOrNull(1L)
         batchData shouldNotBe null
         batchData!!.totalCount shouldBe 5
         batchData.failedCount shouldBe 0
         batchData.status shouldBe BatchStatus.COMPLETED
-        batchJobDataRepository.findAllByBatchId(1L).size shouldBe 5
+
+        // BatchJobData
+        val batchJobs = batchJobDataRepository.findAllByBatchId(1L)
+        batchJobs.size shouldBe 5
+        batchJobs.forEach {
+            it.status shouldBe BatchStatus.COMPLETED
+        }
+
+        // Member-point
         memberRepository.findByIdOrNull(1L)?.point shouldBe 3000
         memberRepository.findByIdOrNull(2L)?.point shouldBe 1000
         memberRepository.findByIdOrNull(3L)?.point shouldBe 3000
+        memberRepository.findByIdOrNull(4L)?.point shouldBe 0
+        memberRepository.findByIdOrNull(5L)?.point shouldBe 0
+
+        // MvpTest settlement 완료 여부
+        mvpTestRepository.findAll().forEach {
+            it.settlementDate shouldNotBe null
+        }
+
+        mvpTestRepository.findAllUnsettledMvpTests(todayDate).size shouldBe 0
 
     }
 
