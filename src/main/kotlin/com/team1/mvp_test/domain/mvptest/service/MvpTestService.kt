@@ -17,6 +17,7 @@ import com.team1.mvp_test.domain.mvptest.model.MvpTestCategoryMap
 import com.team1.mvp_test.domain.mvptest.model.RecruitType
 import com.team1.mvp_test.domain.mvptest.repository.MvpTestCategoryMapRepository
 import com.team1.mvp_test.domain.mvptest.repository.MvpTestRepository
+import com.team1.mvp_test.infra.redisson.RedissonService
 import com.team1.mvp_test.infra.s3.s3service.S3Service
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -31,6 +32,7 @@ class MvpTestService(
     private val mvpTestCategoryMapRepository: MvpTestCategoryMapRepository,
     private val memberRepository: MemberRepository,
     private val memberTestRepository: MemberTestRepository,
+    private val redissonService: RedissonService,
     private val s3Service: S3Service,
     private val memberService: MemberService
 ) {
@@ -125,13 +127,29 @@ class MvpTestService(
         val test = mvpTestRepository.findByIdOrNull(testId) ?: throw ModelNotFoundException("mvpTest", testId)
         val member = memberRepository.findByIdOrNull(memberId) ?: throw ModelNotFoundException("member", memberId)
         memberService.checkMemberActive(member)
-        val recruitCount = memberTestRepository.countByTestIdAndState(testId, MemberTestState.APPROVED)
-        check(recruitCount < test.recruitNum) { MvpTestErrorMessage.TEST_ALREADY_FULL.message }
-        MemberTest(
-            member = member,
-            test = test,
-            state = if (test.recruitType == RecruitType.FIRST_COME) MemberTestState.APPROVED else MemberTestState.PENDING
-        ).let { memberTestRepository.save(it) }
+
+
+        if (test.recruitType == RecruitType.FIRST_COME) {
+            val lock = redissonService.getLock("applyToMvpTest:$testId",2,6)
+
+            try {
+                val recruitCount = memberTestRepository.countByTestIdAndState(testId, MemberTestState.APPROVED)
+                check(recruitCount < test.recruitNum) { MvpTestErrorMessage.TEST_ALREADY_FULL.message }
+                MemberTest(
+                    member = member,
+                    test = test,
+                    state = MemberTestState.APPROVED
+                ).let { memberTestRepository.save(it) }
+            } finally {
+                redissonService.unlock(lock)
+            }
+        } else {
+            MemberTest(
+                member = member,
+                test = test,
+                state = MemberTestState.PENDING
+            ).let { memberTestRepository.save(it) }
+        }
     }
 
     private fun checkRequirement(

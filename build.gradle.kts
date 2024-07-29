@@ -46,6 +46,8 @@ dependencies {
     implementation("org.hibernate.validator:hibernate-validator:8.0.0.Final")
     implementation("jakarta.validation:jakarta.validation-api:3.0.0")
     implementation("org.glassfish:jakarta.el:4.0.2") // Required for EL expression support
+
+    implementation ("org.redisson:redisson-spring-boot-starter:3.33.0")
 }
 
 tasks.withType<KotlinCompile> {
