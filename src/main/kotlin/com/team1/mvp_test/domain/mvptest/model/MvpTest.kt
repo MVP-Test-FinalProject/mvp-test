@@ -65,8 +65,9 @@ class MvpTest(
     @Column(name = "reject_reason")
     var rejectReason: String? = null,
 
-
-    ) {
+    @Column(name = "settlement_date")
+    var settlementDate: LocalDateTime? = null
+) {
 
     fun update(updateObject: UpdateMvpTestObject) {
         this.mvpName = updateObject.mvpName
