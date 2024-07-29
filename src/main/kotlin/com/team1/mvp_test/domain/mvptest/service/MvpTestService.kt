@@ -5,6 +5,8 @@ import com.team1.mvp_test.common.error.MvpTestErrorMessage
 import com.team1.mvp_test.common.exception.ModelNotFoundException
 import com.team1.mvp_test.common.exception.NoPermissionException
 import com.team1.mvp_test.domain.category.repository.CategoryRepository
+import com.team1.mvp_test.domain.member.model.Member
+import com.team1.mvp_test.domain.member.model.MemberState
 import com.team1.mvp_test.domain.member.model.MemberTest
 import com.team1.mvp_test.domain.member.model.MemberTestState
 import com.team1.mvp_test.domain.member.repository.MemberRepository
@@ -13,6 +15,7 @@ import com.team1.mvp_test.domain.member.service.MemberService
 import com.team1.mvp_test.domain.mvptest.dto.CreateMvpTestRequest
 import com.team1.mvp_test.domain.mvptest.dto.MvpTestResponse
 import com.team1.mvp_test.domain.mvptest.dto.UpdateMvpTestRequest
+import com.team1.mvp_test.domain.mvptest.model.MvpTest
 import com.team1.mvp_test.domain.mvptest.model.MvpTestCategoryMap
 import com.team1.mvp_test.domain.mvptest.model.RecruitType
 import com.team1.mvp_test.domain.mvptest.repository.MvpTestCategoryMapRepository
@@ -22,6 +25,7 @@ import com.team1.mvp_test.infra.s3.s3service.S3Service
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.transaction.support.TransactionSynchronizationManager
 import org.springframework.web.multipart.MultipartFile
 import java.time.LocalDateTime
 
@@ -37,7 +41,11 @@ class MvpTestService(
     private val memberService: MemberService
 ) {
     @Transactional
-    fun createMvpTest(enterpriseId: Long, request: CreateMvpTestRequest,mainImageFile: MultipartFile): MvpTestResponse {
+    fun createMvpTest(
+        enterpriseId: Long,
+        request: CreateMvpTestRequest,
+        mainImageFile: MultipartFile
+    ): MvpTestResponse {
         checkRequirement(
             recruitStartDate = request.recruitStartDate,
             recruitEndDate = request.recruitEndDate,
@@ -46,11 +54,11 @@ class MvpTestService(
             minAge = request.requirementMinAge,
             maxAge = request.requirementMaxAge
         )
-        if (mainImageFile.isEmpty)  throw IllegalArgumentException(MvpTestErrorMessage.MAIN_URL_NOT_EXIST.message)
+        if (mainImageFile.isEmpty) throw IllegalArgumentException(MvpTestErrorMessage.MAIN_URL_NOT_EXIST.message)
 
         val file = s3Service.uploadMvpTestFile(mainImageFile)
 
-        val mvpTest = request.toMvpTest(enterpriseId,file)
+        val mvpTest = request.toMvpTest(enterpriseId, file)
             .let { mvpTestRepository.save(it) }
         request.categories.forEach {
             val category = categoryRepository.findByName(it)
@@ -64,7 +72,12 @@ class MvpTestService(
     }
 
     @Transactional
-    fun updateMvpTest(enterpriseId: Long, testId: Long, request: UpdateMvpTestRequest, mainImageFile: MultipartFile): MvpTestResponse {
+    fun updateMvpTest(
+        enterpriseId: Long,
+        testId: Long,
+        request: UpdateMvpTestRequest,
+        mainImageFile: MultipartFile
+    ): MvpTestResponse {
         checkRequirement(
             recruitStartDate = request.recruitStartDate,
             recruitEndDate = request.recruitEndDate,
@@ -127,22 +140,21 @@ class MvpTestService(
         val test = mvpTestRepository.findByIdOrNull(testId) ?: throw ModelNotFoundException("mvpTest", testId)
         val member = memberRepository.findByIdOrNull(memberId) ?: throw ModelNotFoundException("member", memberId)
         memberService.checkMemberActive(member)
+        checkMemberCondition(member, test)
 
 
         if (test.recruitType == RecruitType.FIRST_COME) {
-            val lock = redissonService.getLock("applyToMvpTest:$testId",2,6)
+            println(TransactionSynchronizationManager.isActualTransactionActive())
+            val lock = redissonService.getLock("applyToMvpTest:$testId", 2000, 6000)
 
-            try {
-                val recruitCount = memberTestRepository.countByTestIdAndState(testId, MemberTestState.APPROVED)
-                check(recruitCount < test.recruitNum) { MvpTestErrorMessage.TEST_ALREADY_FULL.message }
-                MemberTest(
-                    member = member,
-                    test = test,
-                    state = MemberTestState.APPROVED
-                ).let { memberTestRepository.save(it) }
-            } finally {
-                redissonService.unlock(lock)
-            }
+            val recruitCount = memberTestRepository.countByTestIdAndState(testId, MemberTestState.APPROVED)
+            check(recruitCount < test.recruitNum) { MvpTestErrorMessage.TEST_ALREADY_FULL.message }
+            MemberTest(
+                member = member,
+                test = test,
+                state = MemberTestState.APPROVED
+            ).let { memberTestRepository.save(it) }
+            redissonService.unlock(lock)
         } else {
             MemberTest(
                 member = member,
@@ -194,5 +206,20 @@ class MvpTestService(
         return if (maxAge == null || minAge == null) true
         else if (minAge <= maxAge) true
         else false
+    }
+
+    private fun checkMemberCondition(member: Member, test: MvpTest) {
+        if (member.state != MemberState.ACTIVE) {
+            throw IllegalStateException(MvpTestErrorMessage.NOT_ACTIVE_USER.message)
+        }
+        if (test.requirementSex != member.sex) {
+            throw IllegalStateException(MvpTestErrorMessage.SEX_RULE_INVALID.message)
+        }
+        if (test.requirementMinAge != null && test.requirementMinAge!! > member.age!!) {
+            throw IllegalStateException(MvpTestErrorMessage.AGE_RULE_INVALID.message)
+        }
+        if (test.requirementMaxAge != null && test.requirementMaxAge!! < member.age!!) {
+            throw IllegalStateException(MvpTestErrorMessage.AGE_RULE_INVALID.message)
+        }
     }
 }
