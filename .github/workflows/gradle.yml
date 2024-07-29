@@ -76,8 +76,8 @@ jobs:
         COOLSMS_API_DOMAIN: ${{secrets.COOLSMS_API_DOMAIN}}
         COOLSMS_FROMNUMBER: ${{secrets.COOLSMS_FROMNUMBER}}
 
-        DATA_REDIS_HOST: ${{secret.DATA_REDIS_HOST}}
-        DATA_REDIS_PORT: ${{secret.DATA_REDIS_PORT}}
+        DATA_REDIS_HOST: ${{secrets.DATA_REDIS_HOST}}
+        DATA_REDIS_PORT: ${{secrets.DATA_REDIS_PORT}}
 
       uses: gradle/gradle-build-action@749f47bda3e44aa060e82d7b3ef7e40d953bd629 # v2.6.0
       with:
