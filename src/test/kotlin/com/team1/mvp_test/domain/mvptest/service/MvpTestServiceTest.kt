@@ -12,6 +12,7 @@ import com.team1.mvp_test.domain.mvptest.model.MvpTestState
 import com.team1.mvp_test.domain.mvptest.model.RecruitType
 import com.team1.mvp_test.domain.mvptest.repository.MvpTestCategoryMapRepository
 import com.team1.mvp_test.domain.mvptest.repository.MvpTestRepository
+import com.team1.mvp_test.infra.redisson.RedissonService
 import com.team1.mvp_test.infra.s3.s3service.S3Service
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
@@ -30,6 +31,7 @@ class MvpTestServiceTest : BehaviorSpec({
     val memberRepository = mockk<MemberRepository>()
     val memberTestRepository = mockk<MemberTestRepository>()
     val memberService = mockk<MemberService>()
+    val redissonService = mockk<RedissonService>()
 
     val mvpTestService = MvpTestService(
         mvpTestRepository = mvpTestRepository,
@@ -38,6 +40,7 @@ class MvpTestServiceTest : BehaviorSpec({
         memberRepository = memberRepository,
         memberTestRepository = memberTestRepository,
         s3Service = s3Service,
+        redissonService = redissonService,
         memberService = memberService
     )
 
