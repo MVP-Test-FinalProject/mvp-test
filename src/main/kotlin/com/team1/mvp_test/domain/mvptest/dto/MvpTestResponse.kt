@@ -39,7 +39,7 @@ data class MvpTestResponse(
                 rewardBudget = mvpTest.rewardBudget,
                 requirementMinAge = mvpTest.requirementMinAge,
                 requirementMaxAge = mvpTest.requirementMaxAge,
-                requirementSex = mvpTest.requirementSex.name,
+                requirementSex = mvpTest.requirementSex?.name,
                 recruitType = mvpTest.recruitType,
                 recruitNum = mvpTest.recruitNum,
                 categories = categories
