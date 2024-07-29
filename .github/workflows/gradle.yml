@@ -25,17 +25,6 @@ jobs:
         ports:
           - 6379:6379
 
-    # services:
-    #   mysql:
-    #     image: mysql:8.0
-    #     env:
-    #       MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}  # 원하는 비밀번호로 변경
-    #       MYSQL_DATABASE: ${{ secrets.MYSQL_DEMOAPI_DATABASE_NAME }}   # 데이터베이스 이름 설정
-    #       MYSQL_USER: ${{ secrets.MYSQL_USER_NAME }}         # MySQL 사용자 이름 설정
-    #       MYSQL_PASSWORD: ${{ secrets.MYSQL_USER_PASSWORD }}       # 사용자 비밀번호 설정
-    #     ports:
-    #       - 3306:3306
-
     steps:
     - name: Checkout code            # 내 코드 체크아웃
       uses: actions/checkout@v4      # 체크아웃 actions 사용
@@ -82,4 +71,4 @@ jobs:
 
       uses: gradle/gradle-build-action@749f47bda3e44aa060e82d7b3ef7e40d953bd629 # v2.6.0
       with:
-        arguments: build --info
+        arguments: build 
