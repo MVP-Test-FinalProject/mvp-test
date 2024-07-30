@@ -12,6 +12,7 @@ import com.team1.mvp_test.domain.mvptest.model.RecruitType
 import com.team1.mvp_test.domain.mvptest.repository.MvpTestCategoryMapRepository
 import com.team1.mvp_test.domain.mvptest.repository.MvpTestRepository
 import com.team1.mvp_test.domain.mvptest.service.MvpTestService
+import com.team1.mvp_test.infra.querydsl.QueryDslConfig
 import com.team1.mvp_test.infra.redisson.RedissonService
 import com.team1.mvp_test.infra.s3.s3service.S3Service
 import io.kotest.matchers.shouldBe
@@ -20,6 +21,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
+import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.transaction.annotation.Propagation
@@ -33,6 +35,7 @@ import java.util.concurrent.TimeUnit
 @DataJpaTest(showSql = false)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
+@Import(value = [QueryDslConfig::class])
 @ActiveProfiles("test")
 @ContextConfiguration(classes = [RedissonTestConfig::class])
 class ConcurrencyControl @Autowired constructor(
@@ -45,7 +48,16 @@ class ConcurrencyControl @Autowired constructor(
     private val s3Service: S3Service,
     private val memberService: MemberService
 ) {
-    private var mvpTestService = MvpTestService(mvpTestRepository, categoryRepository, mvpTestCategoryMapRepository, memberRepository, memberTestRepository, redissonService, s3Service, memberService)
+    private var mvpTestService = MvpTestService(
+        mvpTestRepository,
+        categoryRepository,
+        mvpTestCategoryMapRepository,
+        memberRepository,
+        memberTestRepository,
+        redissonService,
+        s3Service,
+        memberService
+    )
 
     @BeforeEach
     fun setup() {

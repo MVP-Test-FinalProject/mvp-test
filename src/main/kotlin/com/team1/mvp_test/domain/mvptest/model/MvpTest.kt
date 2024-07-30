@@ -42,14 +42,14 @@ class MvpTest(
     var rewardBudget: Int,
 
     @Column(name = "requirement_min_age")
-    var requirementMinAge: Int?,
+    var requirementMinAge: Int? = null,
 
     @Column(name = "requirement_max_age")
-    var requirementMaxAge: Int?,
+    var requirementMaxAge: Int? = null,
 
     @Enumerated(EnumType.STRING)
     @Column(name = "requirement_sex")
-    var requirementSex: Sex,
+    var requirementSex: Sex? = null,
 
     @Column(name = "recruit_type")
     @Enumerated(EnumType.STRING)
@@ -65,8 +65,9 @@ class MvpTest(
     @Column(name = "reject_reason")
     var rejectReason: String? = null,
 
-
-    ) {
+    @Column(name = "settlement_date")
+    var settlementDate: LocalDateTime? = null
+) {
 
     fun update(updateObject: UpdateMvpTestObject) {
         this.mvpName = updateObject.mvpName
