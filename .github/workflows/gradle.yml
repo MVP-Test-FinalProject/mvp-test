@@ -81,5 +81,5 @@ jobs:
 
     - name: Build and Push Docker image
       run: |
-        docker build -t seungheyon/myfirsthub:myDockerImage .
+        docker build -t seungheyon/myfirsthub .
         docker push seungheyon/myfirsthub
