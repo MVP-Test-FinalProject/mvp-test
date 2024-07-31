@@ -5,12 +5,12 @@ on:
     branches: 
       - "master" 
       - "dev"
-      - "feat/#53-docker-image-빌드"
+      - "53-docker-image-빌드"
   pull_request:
     branches: 
       - "master" 
       - "dev"
-      - "feat/#53-docker-image-빌드"
+      - "53-docker-image-빌드"
 
 
       
