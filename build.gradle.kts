@@ -48,6 +48,8 @@ dependencies {
     implementation("org.glassfish:jakarta.el:4.0.2") // Required for EL expression support
 
     implementation ("org.redisson:redisson-spring-boot-starter:3.33.0")
+    //embedded redis for redisson test
+    testImplementation("it.ozimov:embedded-redis:0.7.2")
 }
 
 tasks.withType<KotlinCompile> {
