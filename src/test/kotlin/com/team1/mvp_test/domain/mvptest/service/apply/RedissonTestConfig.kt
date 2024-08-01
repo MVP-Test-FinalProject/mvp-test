@@ -3,6 +3,8 @@ package com.team1.mvp_test.domain.mvptest.service.apply
 import com.team1.mvp_test.domain.member.service.MemberService
 import com.team1.mvp_test.infra.redisson.RedissonService
 import com.team1.mvp_test.infra.s3.s3service.S3Service
+import jakarta.annotation.PostConstruct
+import jakarta.annotation.PreDestroy
 import org.mockito.Mockito
 import org.redisson.Redisson
 import org.redisson.api.RedissonClient
@@ -10,9 +12,23 @@ import org.redisson.config.Config
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.core.io.ClassPathResource
+import redis.embedded.RedisServer
+
 
 @TestConfiguration
 class RedissonTestConfig {
+    //embedded redis 초기화
+    private var redisServer: RedisServer = RedisServer(6380)
+
+    //embedded redis 서버를 테스트 실행 이전에 열고, 끝나기 전에 닫는 로직
+    @PostConstruct
+    fun startRedis() {
+        redisServer.start()
+    }
+    @PreDestroy
+    fun stopRedis() {
+        redisServer.stop()
+    }
 
     @Bean
     fun redissonTestClient(): RedissonClient {
@@ -21,10 +37,9 @@ class RedissonTestConfig {
     }
 
     @Bean
-    fun redissonService(redissonClient: RedissonClient): RedissonService {
-        return RedissonService(redissonClient)
+    fun redissonService(redissonTestClient: RedissonClient): RedissonService {
+        return RedissonService(redissonTestClient)
     }
-
 
     @Bean
     fun s3Service(): S3Service {
