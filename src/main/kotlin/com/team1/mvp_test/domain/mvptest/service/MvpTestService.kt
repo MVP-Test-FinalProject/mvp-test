@@ -25,7 +25,6 @@ import com.team1.mvp_test.infra.s3.s3service.S3Service
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.transaction.support.TransactionSynchronizationManager
 import org.springframework.web.multipart.MultipartFile
 import java.time.LocalDateTime
 
@@ -144,7 +143,6 @@ class MvpTestService(
 
 
         if (test.recruitType == RecruitType.FIRST_COME) {
-            println(TransactionSynchronizationManager.isActualTransactionActive())
             val lock = redissonService.getLock("applyToMvpTest:$testId", 2000, 6000)
 
             val recruitCount = memberTestRepository.countByTestIdAndState(testId, MemberTestState.APPROVED)
@@ -177,9 +175,9 @@ class MvpTestService(
                 recruitStartDate,
                 recruitEndDate
             )
-        ) { MvpTestErrorMessage.RECRUIT_DATE_NOT_VALID.message }
+        ) { MvpTestErrorMessage.RECRUIT_DATE_INVALID.message }
         require(isTestDateValid(recruitEndDate, testStartDate, testEndDate)) {
-            MvpTestErrorMessage.TEST_DATE_NOT_VALID.message
+            MvpTestErrorMessage.TEST_DATE_INVALID.message
         }
         require(
             isAgeRuleValid(
