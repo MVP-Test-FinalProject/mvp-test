@@ -5,12 +5,10 @@ on:
     branches: 
       - "master" 
       - "dev"
-      - "feat/#36-ci-pipeline"
   pull_request:
     branches: 
       - "master" 
       - "dev"
-      - "feat/#36-ci-pipeline"
 
 
       
@@ -71,4 +69,15 @@ jobs:
 
       uses: gradle/gradle-build-action@749f47bda3e44aa060e82d7b3ef7e40d953bd629 # v2.6.0
       with:
-        arguments: build --info
+        arguments: build bootJar
+
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_ACCESSTOKEN }}
+
+    - name: Build and Push Docker image
+      run: |
+        docker build -t seungheyon/myfirsthub .
+        docker push seungheyon/myfirsthub
