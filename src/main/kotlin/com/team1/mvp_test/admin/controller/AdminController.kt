@@ -28,16 +28,6 @@ class AdminController(
             .body(enterpriseService.getAllEnterprises())
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @PatchMapping("/enterprises/{enterpriseId}/approve")
-    fun approveEnterprise(
-        @PathVariable enterpriseId: Long,
-    ): ResponseEntity<EnterpriseResponse> {
-        return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(enterpriseService.approveEnterprise(enterpriseId))
-    }
-
     @PostMapping("/login")
     fun login(
         @RequestBody request: AdminLoginRequest
@@ -47,6 +37,7 @@ class AdminController(
             .body(adminAuthService.login(request))
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/rewards/settle")
     fun settleReward(): ResponseEntity<Unit> {
         return ResponseEntity
