@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface ReportRepository : JpaRepository<Report, Long> {
-
     fun existsByStepAndMemberTest(step: Step, memberTest: MemberTest): Boolean
-
+    fun findAllByMemberTest(memberTest: MemberTest): List<Report>
 }

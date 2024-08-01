@@ -37,7 +37,10 @@ class Member(
     val providerId: String? = null,
 
     @Column(name = "state")
-    var state: MemberState = MemberState.PENDING
+    var state: MemberState = MemberState.PENDING,
+
+    @Column(name = "point")
+    var point: Int = 0,
 ) {
     fun updateMember(name: String, info: String?) {
         this.name = name
@@ -51,5 +54,9 @@ class Member(
         this.info = info
         this.phoneNumber = phoneNumber
         this.state = MemberState.ACTIVE
+    }
+
+    fun settleReward(reward: Int) {
+        point += reward
     }
 }
