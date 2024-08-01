@@ -2,6 +2,7 @@ package com.team1.mvp_test.domain.mvptest.service.apply
 
 import com.team1.mvp_test.domain.category.repository.CategoryRepository
 import com.team1.mvp_test.domain.member.model.Member
+import com.team1.mvp_test.domain.member.model.MemberState
 import com.team1.mvp_test.domain.member.model.Sex
 import com.team1.mvp_test.domain.member.repository.MemberRepository
 import com.team1.mvp_test.domain.member.repository.MemberTestRepository
@@ -44,9 +45,10 @@ class ConcurrencyControl @Autowired constructor(
     private val mvpTestCategoryMapRepository: MvpTestCategoryMapRepository,
     private val memberRepository: MemberRepository,
     private val memberTestRepository: MemberTestRepository,
+    @Autowired
     private val redissonService: RedissonService,
     private val s3Service: S3Service,
-    private val memberService: MemberService
+    private val memberService: MemberService,
 ) {
     private var mvpTestService = MvpTestService(
         mvpTestRepository,
@@ -66,6 +68,8 @@ class ConcurrencyControl @Autowired constructor(
         memberTestRepository.deleteAll()
     }
 
+
+    // 테스트 실행 전에 로컬에서 6380 포트가 비어있는지 확인해주세요
     @Test
     fun testConcurrencyControl() {
         val threadCount = 100
@@ -75,7 +79,7 @@ class ConcurrencyControl @Autowired constructor(
         val barrier = CyclicBarrier(threadCount)
 
         repeat(threadCount) {
-            memberRepository.save(Member(id = it.toLong() + 1L, email = "test@test.test"))
+            memberRepository.save(Member(id = it.toLong() + 1L, email = "test@test.test", sex = Sex.MALE, state = MemberState.ACTIVE))
         }
 
         val test = MvpTest(

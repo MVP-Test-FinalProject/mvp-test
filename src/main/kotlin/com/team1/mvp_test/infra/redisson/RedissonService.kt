@@ -10,9 +10,9 @@ class RedissonService(
     private val redissonClient: RedissonClient,
 ) {
 
-    fun getLock(key: String, waitTime: Long, leaseTime: Long): RLock {
+    fun getLock(key: String, waitTime: Long, releaseTime: Long): RLock {
         val lock = redissonClient.getLock("Lock:$key")
-        if (!lock.tryLock(waitTime, leaseTime, TimeUnit.SECONDS)) {
+        if (!lock.tryLock(waitTime, releaseTime, TimeUnit.MILLISECONDS)) {
             throw RuntimeException("Lock 획득 실패!")
         }
         return lock
