@@ -21,8 +21,8 @@ class ReportController(
     @PostMapping("/steps/{step-id}/reports")
     fun createReport(
         @PathVariable("step-id") stepId: Long,
-        @Valid @RequestPart("request") request: ReportRequest,
-        @RequestPart("mediaFiles") mediaFiles: MutableList<MultipartFile>,
+        @Valid request: ReportRequest,
+        mediaFiles: MutableList<MultipartFile>,
         @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<ReportResponse> {
         return ResponseEntity
@@ -34,8 +34,8 @@ class ReportController(
     @PutMapping("/reports/{report-id}")
     fun updateReport(
         @PathVariable("report-id") reportId: Long,
-        @Valid @RequestPart("request") request: ReportRequest,
-        @RequestPart("mediaFiles") mediaFiles: MutableList<MultipartFile>,
+        @Valid request: ReportRequest,
+        mediaFiles: MutableList<MultipartFile>,
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
     ): ResponseEntity<ReportResponse> {
         return ResponseEntity
