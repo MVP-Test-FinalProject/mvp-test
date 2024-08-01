@@ -1,6 +1,8 @@
 package com.team1.mvp_test.domain.mvptest.service
 
 import com.team1.mvp_test.domain.category.repository.CategoryRepository
+import com.team1.mvp_test.domain.enterprise.model.Enterprise
+import com.team1.mvp_test.domain.enterprise.model.EnterpriseState
 import com.team1.mvp_test.domain.enterprise.repository.EnterpriseRepository
 import com.team1.mvp_test.domain.member.model.Member
 import com.team1.mvp_test.domain.member.model.MemberState
@@ -50,6 +52,7 @@ class MvpTestServiceTest : BehaviorSpec({
     )
 
     Given("createMvpTest 실행 ") {
+        every { enterpriseRepository.findByIdOrNull(any()) } returns enterprise
         every { s3Service.uploadMvpTestFile(invalidFile) } throws IllegalArgumentException("Invalid file type. Only JPEG and PNG are allowed.")
         When("파일 형식이 jpg, jpeg, png 이 아니면") {
             Then("IllegalArgumentException 예외 발생") {
@@ -60,6 +63,7 @@ class MvpTestServiceTest : BehaviorSpec({
         }
     }
     Given("createMvpTest 실행 시 ") {
+        every { enterpriseRepository.findByIdOrNull(any()) } returns enterprise
         every { s3Service.uploadMvpTestFile(emptyFile) } throws IllegalArgumentException("Invalid file type. Only JPEG and PNG are allowed.")
         When("파일이 없으면 ") {
             Then("IllegalArgumentException 예외 발생") {
@@ -170,6 +174,16 @@ class MvpTestServiceTest : BehaviorSpec({
             recruitType = RecruitType.FIRST_COME,
             recruitNum = 50,
             state = MvpTestState.APPROVED
+        )
+        private val enterprise = Enterprise(
+            id = ENTERPRISE_ID,
+            email = "test@test.com",
+            name = "testName",
+            ceoName = "testCeoName",
+            password = "pWdjH0wrRuybq9ccRSDug2Z",
+            phoneNumber = "01012345678",
+            state = EnterpriseState.APPROVED,
+            reason = null
         )
 
         private val createMvpTestRequest = CreateMvpTestRequest(
