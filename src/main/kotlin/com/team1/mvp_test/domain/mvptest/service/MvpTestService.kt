@@ -5,6 +5,8 @@ import com.team1.mvp_test.common.error.MvpTestErrorMessage
 import com.team1.mvp_test.common.exception.ModelNotFoundException
 import com.team1.mvp_test.common.exception.NoPermissionException
 import com.team1.mvp_test.domain.category.repository.CategoryRepository
+import com.team1.mvp_test.domain.enterprise.model.EnterpriseState
+import com.team1.mvp_test.domain.enterprise.repository.EnterpriseRepository
 import com.team1.mvp_test.domain.member.model.Member
 import com.team1.mvp_test.domain.member.model.MemberState
 import com.team1.mvp_test.domain.member.model.MemberTest
@@ -37,7 +39,8 @@ class MvpTestService(
     private val memberTestRepository: MemberTestRepository,
     private val redissonService: RedissonService,
     private val s3Service: S3Service,
-    private val memberService: MemberService
+    private val memberService: MemberService,
+    private val enterpriseRepository: EnterpriseRepository,
 ) {
     @Transactional
     fun createMvpTest(
@@ -45,6 +48,10 @@ class MvpTestService(
         request: CreateMvpTestRequest,
         mainImageFile: MultipartFile
     ): MvpTestResponse {
+        val enterprise = enterpriseRepository.findByIdOrNull(enterpriseId)
+            ?: throw ModelNotFoundException("enterprise", enterpriseId)
+
+        if (enterprise.state == EnterpriseState.BLOCKED) throw NoPermissionException(MvpTestErrorMessage.BLOCKED_STATE_ENTERPRISE.message)
         checkRequirement(
             recruitStartDate = request.recruitStartDate,
             recruitEndDate = request.recruitEndDate,
@@ -114,6 +121,7 @@ class MvpTestService(
         val mvpTest = mvpTestRepository.findByIdOrNull(testId)
             ?: throw ModelNotFoundException("MvpTest", testId)
         if (mvpTest.enterpriseId != enterpriseId) throw NoPermissionException(MvpTestErrorMessage.NOT_AUTHORIZED.message)
+        mvpTest.mainImageUrl.let { s3Service.deleteFile(it) }
         mvpTestRepository.delete(mvpTest)
     }
 
@@ -140,7 +148,6 @@ class MvpTestService(
         val member = memberRepository.findByIdOrNull(memberId) ?: throw ModelNotFoundException("member", memberId)
         memberService.checkMemberActive(member)
         checkMemberCondition(member, test)
-
 
         if (test.recruitType == RecruitType.FIRST_COME) {
             val lock = redissonService.getLock("applyToMvpTest:$testId", 2000, 6000)
