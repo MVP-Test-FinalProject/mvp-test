@@ -14,10 +14,13 @@ import org.springframework.context.annotation.Bean
 import org.springframework.core.io.ClassPathResource
 import redis.embedded.RedisServer
 
+
 @TestConfiguration
 class RedissonTestConfig {
-    private val redisServer: RedisServer = RedisServer(6380)
+    //embedded redis 초기화
+    private var redisServer: RedisServer = RedisServer(6380)
 
+    //embedded redis 서버를 테스트 실행 이전에 열고, 끝나기 전에 닫는 로직
     @PostConstruct
     fun startRedis() {
         redisServer.start()
