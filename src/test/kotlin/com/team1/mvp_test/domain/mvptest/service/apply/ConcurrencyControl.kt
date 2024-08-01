@@ -100,7 +100,7 @@ class ConcurrencyControl @Autowired constructor(
             }
         }
 
-        executor.awaitTermination(10, TimeUnit.SECONDS)
+        executor.awaitTermination(5, TimeUnit.SECONDS)
 
         memberTestRepository.findAll().size shouldBe recruitNum
     }

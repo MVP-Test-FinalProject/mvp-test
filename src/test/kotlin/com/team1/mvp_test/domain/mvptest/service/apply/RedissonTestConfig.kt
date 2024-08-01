@@ -16,7 +16,7 @@ import redis.embedded.RedisServer
 
 @TestConfiguration
 class RedissonTestConfig {
-    private val redisServer: RedisServer = RedisServer(6379)
+    private val redisServer: RedisServer = RedisServer(6380)
 
     @PostConstruct
     fun startRedis() {
