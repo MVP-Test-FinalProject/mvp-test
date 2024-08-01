@@ -68,6 +68,8 @@ class ConcurrencyControl @Autowired constructor(
         memberTestRepository.deleteAll()
     }
 
+
+    // 테스트 실행 전에 로컬에서 6380 포트가 비어있는지 확인해주세요
     @Test
     fun testConcurrencyControl() {
         val threadCount = 100
