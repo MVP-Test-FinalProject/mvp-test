@@ -24,7 +24,7 @@ class StepService(
     private val mvpTestRepository: MvpTestRepository,
     private val s3Service: S3Service,
     private val memberTestRepository: MemberTestRepository,
-    private val reportRepository: ReportRepository
+    private val reportRepository: ReportRepository,
 ) {
     fun getStepList(enterpriseId: Long, testId: Long): List<StepListResponse> {
         val mvpTest = mvpTestRepository.findByIdOrNull(testId)

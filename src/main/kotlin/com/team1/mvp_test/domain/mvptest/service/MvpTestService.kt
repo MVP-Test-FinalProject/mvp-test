@@ -15,6 +15,7 @@ import com.team1.mvp_test.domain.member.repository.MemberRepository
 import com.team1.mvp_test.domain.member.repository.MemberTestRepository
 import com.team1.mvp_test.domain.member.service.MemberService
 import com.team1.mvp_test.domain.mvptest.dto.CreateMvpTestRequest
+import com.team1.mvp_test.domain.mvptest.dto.MemberInfoResponse
 import com.team1.mvp_test.domain.mvptest.dto.MvpTestResponse
 import com.team1.mvp_test.domain.mvptest.dto.UpdateMvpTestRequest
 import com.team1.mvp_test.domain.mvptest.model.MvpTest
@@ -166,6 +167,19 @@ class MvpTestService(
                 test = test,
                 state = MemberTestState.PENDING
             ).let { memberTestRepository.save(it) }
+        }
+    }
+
+    fun getMemberList(testId: Long, enterpriseId: Long): List<MemberInfoResponse> {
+        return mvpTestRepository.findMemberList(testId, enterpriseId)
+    }
+
+    fun getMvpTestsByEnterprise(enterpriseId: Long): List<MvpTestResponse> {
+        val test = mvpTestRepository.findAllByEnterpriseId(enterpriseId)
+
+        return test.map { mvpTest ->
+            val categories = mvpTestCategoryMapRepository.findAllByMvpTestId(mvpTest.id!!).map { it.category.name }
+            MvpTestResponse.from(mvpTest, categories)
         }
     }
 
