@@ -1,6 +1,9 @@
 package com.team1.mvp_test.domain.mvptest.service
 
 import com.team1.mvp_test.domain.category.repository.CategoryRepository
+import com.team1.mvp_test.domain.enterprise.model.Enterprise
+import com.team1.mvp_test.domain.enterprise.model.EnterpriseState
+import com.team1.mvp_test.domain.enterprise.repository.EnterpriseRepository
 import com.team1.mvp_test.domain.member.model.Member
 import com.team1.mvp_test.domain.member.model.MemberState
 import com.team1.mvp_test.domain.member.model.Sex
@@ -34,6 +37,7 @@ class MvpTestServiceTest : BehaviorSpec({
     val memberTestRepository = mockk<MemberTestRepository>()
     val memberService = mockk<MemberService>(relaxed = true)
     val redissonService = mockk<RedissonService>()
+    val enterpriseRepository = mockk<EnterpriseRepository>()
 
     val mvpTestService = MvpTestService(
         mvpTestRepository = mvpTestRepository,
@@ -43,10 +47,12 @@ class MvpTestServiceTest : BehaviorSpec({
         memberTestRepository = memberTestRepository,
         s3Service = s3Service,
         redissonService = redissonService,
-        memberService = memberService
+        memberService = memberService,
+        enterpriseRepository = enterpriseRepository,
     )
 
     Given("createMvpTest 실행 ") {
+        every { enterpriseRepository.findByIdOrNull(any()) } returns enterprise
         every { s3Service.uploadMvpTestFile(invalidFile) } throws IllegalArgumentException("Invalid file type. Only JPEG and PNG are allowed.")
         When("파일 형식이 jpg, jpeg, png 이 아니면") {
             Then("IllegalArgumentException 예외 발생") {
@@ -57,6 +63,7 @@ class MvpTestServiceTest : BehaviorSpec({
         }
     }
     Given("createMvpTest 실행 시 ") {
+        every { enterpriseRepository.findByIdOrNull(any()) } returns enterprise
         every { s3Service.uploadMvpTestFile(emptyFile) } throws IllegalArgumentException("Invalid file type. Only JPEG and PNG are allowed.")
         When("파일이 없으면 ") {
             Then("IllegalArgumentException 예외 발생") {
@@ -95,11 +102,11 @@ class MvpTestServiceTest : BehaviorSpec({
         }
     }
 
-    Given("member 의 state 가 active 가 아닐때"){
+    Given("member 의 state 가 active 가 아닐때") {
         every { mvpTestRepository.findByIdOrNull(TEST_ID) } returns mvpTest
-        val member = Member(id =1L, email = "test@test.com", state = MemberState.PENDING)
+        val member = Member(id = 1L, email = "test@test.com", state = MemberState.PENDING)
         every { memberRepository.findByIdOrNull(any()) } returns member
-        When("applyMvpTest 실행시"){
+        When("applyMvpTest 실행시") {
             Then("IllegalStateException 발생")
             shouldThrow<IllegalStateException> {
                 mvpTestService.applyToMvpTest(1L, TEST_ID)
@@ -107,11 +114,11 @@ class MvpTestServiceTest : BehaviorSpec({
         }
     }
 
-    Given("member 의 sex 가 test 의 requireSex 가 아닐경우"){
+    Given("member 의 sex 가 test 의 requireSex 가 아닐경우") {
         every { mvpTestRepository.findByIdOrNull(TEST_ID) } returns mvpTest
-        val member = Member(id =1L, email = "test@test.com", state = MemberState.ACTIVE, sex = Sex.FEMALE)
+        val member = Member(id = 1L, email = "test@test.com", state = MemberState.ACTIVE, sex = Sex.FEMALE)
         every { memberRepository.findByIdOrNull(any()) } returns member
-        When("applyMvpTest 실행시"){
+        When("applyMvpTest 실행시") {
             Then("IllegalStateException 발생") {
                 shouldThrow<IllegalStateException> {
                     mvpTestService.applyToMvpTest(1L, TEST_ID)
@@ -119,12 +126,12 @@ class MvpTestServiceTest : BehaviorSpec({
             }
         }
     }
-    Given("member 의 age 가 test 의 requireMinAge 보다 작으면"){
+    Given("member 의 age 가 test 의 requireMinAge 보다 작으면") {
         every { mvpTestRepository.findByIdOrNull(TEST_ID) } returns mvpTest
-        val member = Member(id =1L, email = "test@test.com", state = MemberState.ACTIVE, sex = Sex.FEMALE, age = 10)
+        val member = Member(id = 1L, email = "test@test.com", state = MemberState.ACTIVE, sex = Sex.FEMALE, age = 10)
         every { memberRepository.findByIdOrNull(any()) } returns member
-        When("applyMvpTest 실행시"){
-            Then("IllegalStateException 발생"){
+        When("applyMvpTest 실행시") {
+            Then("IllegalStateException 발생") {
                 shouldThrow<IllegalStateException> {
                     mvpTestService.applyToMvpTest(1L, TEST_ID)
                 }
@@ -132,12 +139,12 @@ class MvpTestServiceTest : BehaviorSpec({
         }
     }
 
-    Given("member 의 age 가 test 의 requireMaxAge 보다 크면"){
+    Given("member 의 age 가 test 의 requireMaxAge 보다 크면") {
         every { mvpTestRepository.findByIdOrNull(TEST_ID) } returns mvpTest
-        val member = Member(id =1L, email = "test@test.com", state = MemberState.ACTIVE, sex = Sex.FEMALE, age = 100)
+        val member = Member(id = 1L, email = "test@test.com", state = MemberState.ACTIVE, sex = Sex.FEMALE, age = 100)
         every { memberRepository.findByIdOrNull(any()) } returns member
-        When("applyMvpTest 실행시"){
-            Then("IllegalStateException 발생"){
+        When("applyMvpTest 실행시") {
+            Then("IllegalStateException 발생") {
                 shouldThrow<IllegalStateException> {
                     mvpTestService.applyToMvpTest(1L, TEST_ID)
                 }
@@ -167,6 +174,16 @@ class MvpTestServiceTest : BehaviorSpec({
             recruitType = RecruitType.FIRST_COME,
             recruitNum = 50,
             state = MvpTestState.APPROVED
+        )
+        private val enterprise = Enterprise(
+            id = ENTERPRISE_ID,
+            email = "test@test.com",
+            name = "testName",
+            ceoName = "testCeoName",
+            password = "pWdjH0wrRuybq9ccRSDug2Z",
+            phoneNumber = "01012345678",
+            state = EnterpriseState.APPROVED,
+            reason = null
         )
 
         private val createMvpTestRequest = CreateMvpTestRequest(

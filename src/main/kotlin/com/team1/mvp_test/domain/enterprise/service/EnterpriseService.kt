@@ -36,12 +36,4 @@ class EnterpriseService(
             EnterpriseResponse.from(it)
         }
     }
-
-    @Transactional
-    fun approveEnterprise(enterpriseId: Long): EnterpriseResponse {
-        val enterprise = enterpriseRepository.findByIdOrNull(enterpriseId)
-            ?: throw ModelNotFoundException("Enterprise", enterpriseId)
-        enterprise.approve()
-        return EnterpriseResponse.from(enterprise)
-    }
 }

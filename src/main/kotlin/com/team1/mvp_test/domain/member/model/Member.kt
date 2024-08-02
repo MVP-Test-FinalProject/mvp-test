@@ -37,10 +37,14 @@ class Member(
     val providerId: String? = null,
 
     @Column(name = "state")
+    @Enumerated(EnumType.STRING)
     var state: MemberState = MemberState.PENDING,
 
     @Column(name = "point")
     var point: Int = 0,
+
+    @Column(name = "reason")
+    var reason: String? = null,
 ) {
     fun updateMember(name: String, info: String?) {
         this.name = name
@@ -58,5 +62,14 @@ class Member(
 
     fun settleReward(reward: Int) {
         point += reward
+    }
+
+    fun active() {
+        this.state = MemberState.ACTIVE
+    }
+
+    fun block(reason: String) {
+        this.state = MemberState.BLOCKED
+        this.reason = reason
     }
 }

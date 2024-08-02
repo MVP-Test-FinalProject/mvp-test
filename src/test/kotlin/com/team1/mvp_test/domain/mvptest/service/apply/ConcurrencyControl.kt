@@ -1,6 +1,7 @@
 package com.team1.mvp_test.domain.mvptest.service.apply
 
 import com.team1.mvp_test.domain.category.repository.CategoryRepository
+import com.team1.mvp_test.domain.enterprise.repository.EnterpriseRepository
 import com.team1.mvp_test.domain.member.model.Member
 import com.team1.mvp_test.domain.member.model.MemberState
 import com.team1.mvp_test.domain.member.model.Sex
@@ -49,6 +50,7 @@ class ConcurrencyControl @Autowired constructor(
     private val redissonService: RedissonService,
     private val s3Service: S3Service,
     private val memberService: MemberService,
+    private val enterpriseRepository: EnterpriseRepository,
 ) {
     private var mvpTestService = MvpTestService(
         mvpTestRepository,
@@ -58,7 +60,8 @@ class ConcurrencyControl @Autowired constructor(
         memberTestRepository,
         redissonService,
         s3Service,
-        memberService
+        memberService,
+        enterpriseRepository
     )
 
     @BeforeEach
@@ -79,7 +82,14 @@ class ConcurrencyControl @Autowired constructor(
         val barrier = CyclicBarrier(threadCount)
 
         repeat(threadCount) {
-            memberRepository.save(Member(id = it.toLong() + 1L, email = "test@test.test", sex = Sex.MALE, state = MemberState.ACTIVE))
+            memberRepository.save(
+                Member(
+                    id = it.toLong() + 1L,
+                    email = "test@test.test",
+                    sex = Sex.MALE,
+                    state = MemberState.ACTIVE
+                )
+            )
         }
 
         val test = MvpTest(

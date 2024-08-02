@@ -22,8 +22,8 @@ class MvpTestController(
     @PostMapping
     @PreAuthorize("hasRole('ENTERPRISE')")
     fun createMvpTest(
-        @Valid @RequestPart("request") request: CreateMvpTestRequest,
-        @RequestPart("mainImageFile") mainImageFile: MultipartFile,
+        @Valid request: CreateMvpTestRequest,
+        mainImageFile: MultipartFile,
         @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<MvpTestResponse> {
         return ResponseEntity
@@ -34,8 +34,8 @@ class MvpTestController(
     @PutMapping("/{testId}")
     @PreAuthorize("hasRole('ENTERPRISE')")
     fun updateMvpTest(
-        @Valid @RequestPart("request") request: UpdateMvpTestRequest,
-        @RequestPart("mainImageFile") mainImageFile: MultipartFile,
+        @Valid request: UpdateMvpTestRequest,
+        mainImageFile: MultipartFile,
         @PathVariable("testId") testId: Long,
         @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<MvpTestResponse> {

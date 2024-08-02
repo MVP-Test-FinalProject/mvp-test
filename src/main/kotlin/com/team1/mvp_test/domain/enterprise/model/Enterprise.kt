@@ -26,6 +26,9 @@ class Enterprise(
 
     @Column(name = "state")
     var state: EnterpriseState = EnterpriseState.PENDING,
+
+    @Column(name = "reason")
+    var reason: String? = null,
 ) {
     fun update(name: String, ceoName: String, phoneNumber: String) {
         this.name = name
@@ -35,5 +38,14 @@ class Enterprise(
 
     fun approve() {
         this.state = EnterpriseState.APPROVED
+    }
+
+    fun reject(reason: String) {
+        this.state = EnterpriseState.REJECTED
+        this.reason = reason
+    }
+
+    fun block(reason: String) {
+        this.reason = reason
     }
 }

@@ -7,5 +7,4 @@ enum class MemberErrorMessage(val message: String) {
     NOT_ACTIVE("가입 완료된 계정이 아닙니다."),
     SIGN_UP_ALREADY_DONE("이미 가입이 완료된 계정입니다.")
 
-
 }
