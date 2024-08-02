@@ -121,6 +121,18 @@ class StepServiceTest : BehaviorSpec({
         }
     }
 
+    Given("getStepOverview 실행 시"){
+        every { stepRepository.findByIdOrNull(any()) } returns step
+        When("해당 step 이 속해있는 test 의 작성자가 아닐 경우"){
+            Then("NoPermissionException 예외를 던진다"){
+                shouldThrow<NoPermissionException> {
+                    stepService.getStepOverview(2L, STEP_ID)
+                }
+            }
+        }
+    }
+
+
 }) {
     companion object {
         private const val TEST_ID = 1L
