@@ -1,6 +1,7 @@
 package com.team1.mvp_test.domain.mvptest.controller
 
 import com.team1.mvp_test.domain.mvptest.dto.CreateMvpTestRequest
+import com.team1.mvp_test.domain.mvptest.dto.MemberInfoResponse
 import com.team1.mvp_test.domain.mvptest.dto.MvpTestResponse
 import com.team1.mvp_test.domain.mvptest.dto.UpdateMvpTestRequest
 import com.team1.mvp_test.domain.mvptest.service.MvpTestService
@@ -81,5 +82,24 @@ class MvpTestController(
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(mvpTestService.applyToMvpTest(userPrincipal.id, testId))
+    }
+
+    @GetMapping("/{testId}/member")
+    @PreAuthorize("hasRole('ENTERPRISE')")
+    fun getTestMemberList(
+        @PathVariable("testId") testId: Long,
+        @AuthenticationPrincipal userPrincipal: UserPrincipal,
+    ): List<MemberInfoResponse> {
+        val enterpriseId = userPrincipal.id
+        return mvpTestService.getMemberList(testId, enterpriseId)
+    }
+
+    @GetMapping("/{testId}/enterprise")
+    @PreAuthorize("hasRole('ENTERPRISE')")
+    fun getMvpTestsByEnterprise(
+        @AuthenticationPrincipal userPrincipal: UserPrincipal,
+    ): List<MvpTestResponse> {
+        val enterpriseId = userPrincipal.id
+        return mvpTestService.getMvpTestsByEnterprise(enterpriseId)
     }
 }
