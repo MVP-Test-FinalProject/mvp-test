@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 interface MemberTestRepository : JpaRepository<MemberTest, Long> {
     fun findByMemberIdAndTestId(memberId: Long, testId: Long): MemberTest?
     fun countByTestIdAndState(testId: Long, state: MemberTestState): Long
-    fun findAllByTestId(testId: Long): List<MemberTest>
+    fun findAllByTestId(testId: Long?): List<MemberTest>
 }
