@@ -94,7 +94,7 @@ class MvpTestController(
         return mvpTestService.getMemberList(testId, enterpriseId)
     }
 
-    @GetMapping("/{testId}/enterprise")
+    @GetMapping("/enterprise")
     @PreAuthorize("hasRole('ENTERPRISE')")
     fun getMvpTestsByEnterprise(
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
