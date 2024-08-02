@@ -4,8 +4,8 @@ import com.team1.mvp_test.common.error.MvpTestErrorMessage
 import com.team1.mvp_test.common.error.StepErrorMessage
 import com.team1.mvp_test.common.exception.ModelNotFoundException
 import com.team1.mvp_test.common.exception.NoPermissionException
-import com.team1.mvp_test.domain.mvptest.model.MvpTestState
 import com.team1.mvp_test.domain.member.repository.MemberTestRepository
+import com.team1.mvp_test.domain.mvptest.model.MvpTestState
 import com.team1.mvp_test.domain.mvptest.repository.MvpTestRepository
 import com.team1.mvp_test.domain.report.model.ReportState
 import com.team1.mvp_test.domain.report.repository.ReportRepository
@@ -22,7 +22,6 @@ import org.springframework.web.multipart.MultipartFile
 class StepService(
     private val stepRepository: StepRepository,
     private val mvpTestRepository: MvpTestRepository,
-    private val s3Service: S3Service,
     private val s3Service: S3Service,
     private val memberTestRepository: MemberTestRepository,
     private val reportRepository: ReportRepository
@@ -99,7 +98,7 @@ class StepService(
         if(enterpriseId != step.mvpTest.enterpriseId)
             throw NoPermissionException(MvpTestErrorMessage.NOT_AUTHORIZED.message)
         //테스트 참여자, 해당 step의 리포트 한꺼번에 불러오기
-        val members = memberTestRepository.findAllByTestId(step.mvpTest.id)
+        val members = memberTestRepository.findAllByTestId(step.mvpTest.id!!)
         val reports = reportRepository.findAllByStepId(stepId)
         //각각의 참여자, 리포트를 memberId로 묶어주고 반환 형태 만들기
         val reportMap = reports.associateBy({ it.memberTest.member.id }, { it.state })
