@@ -95,10 +95,10 @@ class StepService(
     fun getStepOverview(enterpriseId: Long, stepId: Long): StepOverviewResponse {
         val step = stepRepository.findByIdOrNull(stepId)
             ?: throw ModelNotFoundException("Step", stepId)
-        if(enterpriseId != step.mvpTest.enterpriseId)
+        if (enterpriseId != step.mvpTest.enterpriseId)
             throw NoPermissionException(MvpTestErrorMessage.NOT_AUTHORIZED.message)
         //테스트 참여자, 해당 step의 리포트 한꺼번에 불러오기
-        val members = memberTestRepository.findAllByTestId(step.mvpTest.id!!)
+        val members = memberTestRepository.findAllAndMemberByTestId(step.mvpTest.id!!)
         val reports = reportRepository.findAllByStepId(stepId)
         //각각의 참여자, 리포트를 memberId로 묶어주고 반환 형태 만들기
         val reportMap = reports.associateBy({ it.memberTest.member.id }, { it.state })
