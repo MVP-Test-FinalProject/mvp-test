@@ -1,8 +1,10 @@
 package com.team1.mvp_test.domain.step.service
 
 import com.team1.mvp_test.common.error.MvpTestErrorMessage
+import com.team1.mvp_test.common.error.StepErrorMessage
 import com.team1.mvp_test.common.exception.ModelNotFoundException
 import com.team1.mvp_test.common.exception.NoPermissionException
+import com.team1.mvp_test.domain.mvptest.model.MvpTestState
 import com.team1.mvp_test.domain.member.repository.MemberTestRepository
 import com.team1.mvp_test.domain.mvptest.repository.MvpTestRepository
 import com.team1.mvp_test.domain.report.model.ReportState
@@ -20,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile
 class StepService(
     private val stepRepository: StepRepository,
     private val mvpTestRepository: MvpTestRepository,
+    private val s3Service: S3Service,
     private val s3Service: S3Service,
     private val memberTestRepository: MemberTestRepository,
     private val reportRepository: ReportRepository
@@ -40,6 +43,7 @@ class StepService(
     ): StepResponse {
         val mvpTest = mvpTestRepository.findByIdOrNull(testId)
             ?: throw ModelNotFoundException("MvpTest", testId)
+        if (mvpTest.state != MvpTestState.APPROVED) throw NoPermissionException(StepErrorMessage.NOT_APPROVED_TEST.message)
         if (mvpTest.enterpriseId != enterpriseId) throw NoPermissionException(MvpTestErrorMessage.NOT_AUTHORIZED.message)
         val maxOrder = stepRepository.findMaxOrderByTestId(testId)
         val file = guidelineFile?.let { s3Service.uploadStepFile(it) }
@@ -85,6 +89,7 @@ class StepService(
         val step = stepRepository.findByIdOrNull(stepId)
             ?: throw ModelNotFoundException("Step", stepId)
         if (step.mvpTest.enterpriseId != enterpriseId) throw NoPermissionException(MvpTestErrorMessage.NOT_AUTHORIZED.message)
+        step.guidelineUrl?.let { s3Service.deleteFile(it) }
         stepRepository.delete(step)
     }
 

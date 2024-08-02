@@ -62,8 +62,8 @@ class MvpTest(
     @Enumerated(EnumType.STRING)
     var state: MvpTestState,
 
-    @Column(name = "reject_reason")
-    var rejectReason: String? = null,
+    @Column(name = "reason")
+    var reason: String? = null,
 
     @Column(name = "settlement_date")
     var settlementDate: LocalDateTime? = null
@@ -84,5 +84,14 @@ class MvpTest(
         this.requirementSex = updateObject.requirementSex
         this.recruitType = updateObject.recruitType
         this.recruitNum = updateObject.recruitNum
+    }
+
+    fun approve() {
+        this.state = MvpTestState.APPROVED
+    }
+
+    fun reject(reason: String) {
+        this.state = MvpTestState.REJECTED
+        this.reason = reason
     }
 }

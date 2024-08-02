@@ -32,8 +32,8 @@ class StepController(
     @PreAuthorize("hasRole('ENTERPRISE')")
     fun createStep(
         @PathVariable testId: Long,
-        @Valid @RequestPart("request") request: CreateStepRequest,
-        @RequestPart("guidelineFile") guidelineFile :MultipartFile?,
+        @Valid request: CreateStepRequest,
+        guidelineFile: MultipartFile?,
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
     ): ResponseEntity<StepResponse> {
         return ResponseEntity
@@ -54,8 +54,8 @@ class StepController(
     @PreAuthorize("hasRole('ENTERPRISE')")
     fun updateStepById(
         @PathVariable stepId: Long,
-        @Valid @RequestPart("request") request: UpdateStepRequest,
-        @RequestPart("guidelineFile") guidelineFile :MultipartFile?,
+        @Valid request: UpdateStepRequest,
+        guidelineFile: MultipartFile?,
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
     ): ResponseEntity<StepResponse> {
         return ResponseEntity

@@ -40,6 +40,7 @@ class EnterpriseAuthService(
         val enterprise = enterpriseRepository.findByEmail(request.email)
             ?: throw ModelNotFoundException("Enterprise", request.email)
         if (!passwordEncoder.matches(request.password, enterprise.password)) throw PasswordIncorrectException()
+        if (enterprise.state == EnterpriseState.REJECTED) throw NoPermissionException(EnterpriseErrorMessage.REJECTED_STATE.message)
         if (enterprise.state == EnterpriseState.PENDING) throw NoPermissionException(EnterpriseErrorMessage.PENDING_STATE.message)
         return jwtHelper.generateAccessToken(
             subject = enterprise.id!!.toString(),
