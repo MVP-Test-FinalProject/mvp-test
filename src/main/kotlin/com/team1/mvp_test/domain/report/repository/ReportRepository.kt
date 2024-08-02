@@ -10,4 +10,5 @@ import org.springframework.stereotype.Repository
 interface ReportRepository : JpaRepository<Report, Long> {
     fun existsByStepAndMemberTest(step: Step, memberTest: MemberTest): Boolean
     fun findAllByMemberTest(memberTest: MemberTest): List<Report>
+    fun findAllByStepId(stepId: Long): List<Report>
 }

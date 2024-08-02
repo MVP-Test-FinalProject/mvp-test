@@ -1,9 +1,6 @@
 package com.team1.mvp_test.domain.step.controller
 
-import com.team1.mvp_test.domain.step.dto.CreateStepRequest
-import com.team1.mvp_test.domain.step.dto.StepListResponse
-import com.team1.mvp_test.domain.step.dto.StepResponse
-import com.team1.mvp_test.domain.step.dto.UpdateStepRequest
+import com.team1.mvp_test.domain.step.dto.*
 import com.team1.mvp_test.domain.step.service.StepService
 import com.team1.mvp_test.infra.security.UserPrincipal
 import jakarta.validation.Valid
@@ -75,6 +72,17 @@ class StepController(
         return ResponseEntity
             .status(HttpStatus.NO_CONTENT)
             .body(stepService.deleteStep(userPrincipal.id, stepId))
+    }
+
+    @GetMapping("steps/{stepId}/overview")
+    @PreAuthorize("hasRole('ENTERPRISE')")
+    fun getStepOverview(
+        @PathVariable stepId: Long,
+        @AuthenticationPrincipal userPrincipal: UserPrincipal
+    ): ResponseEntity<StepOverviewResponse> {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(stepService.getStepOverview(userPrincipal.id, stepId))
     }
 
 }

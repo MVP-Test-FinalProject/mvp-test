@@ -3,10 +3,12 @@ package com.team1.mvp_test.domain.step.service
 import com.team1.mvp_test.common.exception.ModelNotFoundException
 import com.team1.mvp_test.common.exception.NoPermissionException
 import com.team1.mvp_test.domain.member.model.Sex
+import com.team1.mvp_test.domain.member.repository.MemberTestRepository
 import com.team1.mvp_test.domain.mvptest.model.MvpTest
 import com.team1.mvp_test.domain.mvptest.model.MvpTestState
 import com.team1.mvp_test.domain.mvptest.model.RecruitType
 import com.team1.mvp_test.domain.mvptest.repository.MvpTestRepository
+import com.team1.mvp_test.domain.report.repository.ReportRepository
 import com.team1.mvp_test.domain.step.dto.CreateStepRequest
 import com.team1.mvp_test.domain.step.dto.UpdateStepRequest
 import com.team1.mvp_test.domain.step.model.Step
@@ -14,7 +16,8 @@ import com.team1.mvp_test.domain.step.repository.StepRepository
 import com.team1.mvp_test.infra.s3.s3service.S3Service
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
-import io.mockk.*
+import io.mockk.every
+import io.mockk.mockk
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.mock.web.MockMultipartFile
 import java.time.LocalDateTime
@@ -24,11 +27,15 @@ class StepServiceTest : BehaviorSpec({
 
     val stepRepository = mockk<StepRepository>()
     val mvpTestRepository = mockk<MvpTestRepository>()
+    val memberTestRepository = mockk<MemberTestRepository>()
+    val reportRepository = mockk<ReportRepository>()
     val s3Service = mockk<S3Service>()
     val stepService = StepService(
         stepRepository = stepRepository,
         mvpTestRepository = mvpTestRepository,
-        s3Service = s3Service
+        s3Service = s3Service,
+        memberTestRepository = memberTestRepository,
+        reportRepository = reportRepository,
     )
     Given("createStep 실행 시"){
         every { mvpTestRepository.findByIdOrNull(TEST_ID) } returns mvpTest
