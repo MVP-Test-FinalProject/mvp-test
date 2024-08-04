@@ -88,6 +88,9 @@ jobs:
     
 
     steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    
     - name: Transfer docker-compose.yml to EC2
       uses: appleboy/scp-action@master
       with:
@@ -97,7 +100,6 @@ jobs:
         source: 'docker-compose.yaml'
         target: '~/docker-compose.yaml'
 
-    
     - name: Deploy to EC2
       uses: appleboy/ssh-action@v0.1.6
       with:
