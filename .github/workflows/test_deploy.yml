@@ -94,8 +94,8 @@ jobs:
         host: ${{ secrets.SH_SSH_HOST }}
         username: ec2-user
         key: ${{ secrets.SH_SSH_KEY }}
-        source: 'docker-compose.yml'
-        target: '~/docker-compose.yml'
+        source: 'docker-compose.yaml'
+        target: '~/docker-compose.yaml'
 
     
     - name: Deploy to EC2
