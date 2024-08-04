@@ -4,7 +4,7 @@ on:
   push:
     branches: 
       - "master" 
-      - "feat#55-continuous-deploy"
+      #- "feat#55-continuous-deploy"
   pull_request:
     branches: 
       - "master" 
@@ -89,9 +89,9 @@ jobs:
     - name: Deploy to EC2
       uses: appleboy/ssh-action@v0.1.6
       with:
-        host: ${{ secrets.SH_SSH_HOST }}
-        username: ec2-user
-        key: ${{ secrets.SH_SSH_KEY }}
+        host: ${{ secrets.SSH_HOST }}
+        username: ubuntu
+        key: ${{ secrets.SSH_KEY }}
         script: |
           sudo apt-get update
           sudo apt-get install -y docker.io
