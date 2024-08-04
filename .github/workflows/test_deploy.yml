@@ -101,6 +101,8 @@ jobs:
           sudo chmod 666 /var/run/docker.sock
           docker --version 
           
+          docker run -d --name redis -p 6379:6379 redis
+          
           docker pull seungheyon/myfirsthub:latest
           docker stop myapp || true
           docker rm myapp || true
@@ -129,5 +131,4 @@ jobs:
           -e COOLSMS_FROMNUMBER=${{secrets.COOLSMS_FROMNUMBER}} \
           -e DATA_REDIS_HOST=${{secrets.DATA_REDIS_HOST}} \
           -e DATA_REDIS_PORT=${{secrets.DATA_REDIS_PORT}} \
-          -e SINGLESERVERCONFIG_ADDRESS=${{secrets.SINGLESERVERCONFIG_ADDRESS}} \
           seungheyon/myfirsthub:latest
