@@ -101,7 +101,7 @@ jobs:
           sudo chmod 666 /var/run/docker.sock
           docker --version 
           
-          
+          docker run -d --name redis -p 6379:6379 redis
           
           docker pull seungheyon/myfirsthub:latest
           docker stop myapp || true
