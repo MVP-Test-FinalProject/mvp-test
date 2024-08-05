@@ -105,4 +105,5 @@ jobs:
         username: ec2-user
         key: ${{ secrets.SH_SSH_KEY }}
         script: |
-            docker-compose -f ~/docker-compose.yml up -d
+            docker-compose -f /home/ec2-user/docker-compose.yaml up -d
+            
