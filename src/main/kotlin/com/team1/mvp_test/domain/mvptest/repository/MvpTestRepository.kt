@@ -67,11 +67,10 @@ class MvpTestQueryDslRepositoryImpl(
 
     override fun findAvailableTests(member: Member, pageable: Pageable): List<MvpTest> {
         val builder = BooleanBuilder()
-            .and(mvpTest.recruitNum.gt(0))
             .and(mvpTest.state.eq(MvpTestState.APPROVED))
             .and(mvpTest.recruitEndDate.after(LocalDateTime.now()))
-            .and(mvpTest.requirementMinAge.loe(member.age))
-            .and(mvpTest.requirementMaxAge.goe(member.age))
+            .and(mvpTest.requirementMinAge.isNull.or(mvpTest.requirementMinAge.loe(member.age)))
+            .and(mvpTest.requirementMaxAge.isNull.or(mvpTest.requirementMaxAge.goe(member.age)))
             .and(mvpTest.requirementSex.isNull.or(mvpTest.requirementSex.eq(member.sex)))
 
         return queryFactory.selectFrom(mvpTest)
