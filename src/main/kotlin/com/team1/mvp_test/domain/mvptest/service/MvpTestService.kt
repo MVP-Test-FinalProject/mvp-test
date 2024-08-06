@@ -1,6 +1,7 @@
 package com.team1.mvp_test.domain.mvptest.service
 
 import com.team1.mvp_test.common.error.CategoryErrorMessage
+import com.team1.mvp_test.common.error.MemberErrorMessage
 import com.team1.mvp_test.common.error.MvpTestErrorMessage
 import com.team1.mvp_test.common.exception.ModelNotFoundException
 import com.team1.mvp_test.common.exception.NoPermissionException
@@ -25,6 +26,7 @@ import com.team1.mvp_test.domain.mvptest.repository.MvpTestCategoryMapRepository
 import com.team1.mvp_test.domain.mvptest.repository.MvpTestRepository
 import com.team1.mvp_test.infra.redisson.RedissonService
 import com.team1.mvp_test.infra.s3.s3service.S3Service
+import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -182,6 +184,18 @@ class MvpTestService(
         }
     }
 
+    fun getAvailableTests(memberId: Long, pageable: Pageable): List<MvpTestResponse> {
+        val member = memberRepository.findByIdOrNull(memberId)
+            ?: throw ModelNotFoundException("Member", memberId)
+        checkMemberActive(member)
+        val availableTests = mvpTestRepository.findAvailableTests(member, pageable)
+        return availableTests.map { mvpTest ->
+            val categories = mvpTestCategoryMapRepository.findAllByMvpTestId(mvpTest.id!!).map { it.category.name }
+            MvpTestResponse.from(mvpTest, categories)
+        }
+    }
+
+
     private fun checkRequirement(
         recruitStartDate: LocalDateTime,
         recruitEndDate: LocalDateTime,
@@ -240,4 +254,9 @@ class MvpTestService(
             throw IllegalStateException(MvpTestErrorMessage.AGE_RULE_INVALID.message)
         }
     }
+
+    private fun checkMemberActive(member: Member) {
+        if (member.state != MemberState.ACTIVE) throw NoPermissionException(MemberErrorMessage.NOT_ACTIVE.message)
+    }
+
 }
