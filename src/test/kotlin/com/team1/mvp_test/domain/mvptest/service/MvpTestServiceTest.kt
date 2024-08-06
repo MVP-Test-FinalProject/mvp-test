@@ -51,10 +51,10 @@ class MvpTestServiceTest : BehaviorSpec({
         enterpriseRepository = enterpriseRepository,
     )
 
-    Given("createMvpTest 실행 ") {
+    Given("파일 형식이 jpg, jpeg, png 이 아니면 ") {
         every { enterpriseRepository.findByIdOrNull(any()) } returns enterprise
-        every { s3Service.uploadMvpTestFile(invalidFile) } throws IllegalArgumentException("Invalid file type. Only JPEG and PNG are allowed.")
-        When("파일 형식이 jpg, jpeg, png 이 아니면") {
+        every { s3Service.uploadMvpTestFile(invalidFile) } throws IllegalArgumentException()
+        When("createMvpTest 실행") {
             Then("IllegalArgumentException 예외 발생") {
                 shouldThrow<IllegalArgumentException> {
                     mvpTestService.createMvpTest(ENTERPRISE_ID, createMvpTestRequest, invalidFile)
@@ -62,10 +62,10 @@ class MvpTestServiceTest : BehaviorSpec({
             }
         }
     }
-    Given("createMvpTest 실행 시 ") {
+    Given("파일이 없으면 ") {
         every { enterpriseRepository.findByIdOrNull(any()) } returns enterprise
-        every { s3Service.uploadMvpTestFile(emptyFile) } throws IllegalArgumentException("Invalid file type. Only JPEG and PNG are allowed.")
-        When("파일이 없으면 ") {
+        every { s3Service.uploadMvpTestFile(emptyFile) } throws IllegalArgumentException()
+        When("createMvpTest 실행 ") {
             Then("IllegalArgumentException 예외 발생") {
                 shouldThrow<IllegalArgumentException> {
                     mvpTestService.createMvpTest(ENTERPRISE_ID, createMvpTestRequest, emptyFile)
@@ -73,13 +73,26 @@ class MvpTestServiceTest : BehaviorSpec({
             }
         }
     }
-    Given("updateMvpTest 실행 시") {
-        every { s3Service.uploadMvpTestFile(invalidFile) } throws IllegalArgumentException("Invalid file type. Only JPEG and PNG are allowed.")
+
+    Given("업로드 파일 용량이 10MB 이상일때") {
+        every { enterpriseRepository.findByIdOrNull(any()) } returns enterprise
+        every { s3Service.uploadMvpTestFile(exceedMaxSizeFile) } throws IllegalArgumentException()
+        When("createMvpTest 실행 시") {
+            Then("IllegalArgumentException 예외 발생") {
+                shouldThrow<IllegalArgumentException> {
+                    mvpTestService.createMvpTest(ENTERPRISE_ID, createMvpTestRequest, exceedMaxSizeFile)
+                }
+            }
+        }
+    }
+
+    Given("파일 형식이 jpg, jpeg, png 이 아니면") {
+        every { s3Service.uploadMvpTestFile(invalidFile) } throws IllegalArgumentException()
         every { mvpTestRepository.findByIdOrNull(TEST_ID) } returns mvpTest
         every { s3Service.deleteFile(any()) } returns Unit
         every { mvpTestCategoryMapRepository.findAllByMvpTestId(TEST_ID) } returns emptyList()
         every { mvpTestCategoryMapRepository.deleteAll(any()) } returns Unit
-        When("파일 형식이 jpg, jpeg, png 이 아니면") {
+        When("updateMvpTest 실행") {
             Then("IllegalArgumentException 예외 발생") {
                 shouldThrow<IllegalArgumentException> {
                     mvpTestService.updateMvpTest(ENTERPRISE_ID, TEST_ID, updateMvpTestRequest, invalidFile)
@@ -87,16 +100,31 @@ class MvpTestServiceTest : BehaviorSpec({
             }
         }
     }
-    Given("updateMvpTest 실행") {
+    Given("파일이 없으면") {
         every { s3Service.uploadMvpTestFile(emptyFile) } throws IllegalArgumentException("Invalid file type. Only JPEG and PNG are allowed.")
         every { mvpTestRepository.findByIdOrNull(TEST_ID) } returns mvpTest
         every { s3Service.deleteFile(any()) } returns Unit
         every { mvpTestCategoryMapRepository.findAllByMvpTestId(TEST_ID) } returns emptyList()
         every { mvpTestCategoryMapRepository.deleteAll(any()) } returns Unit
-        When("파일이 없으면") {
+        When("updateMvpTest 실행") {
             Then("IllegalArgumentException 예외 발생") {
                 shouldThrow<IllegalArgumentException> {
                     mvpTestService.updateMvpTest(ENTERPRISE_ID, TEST_ID, updateMvpTestRequest, emptyFile)
+                }
+            }
+        }
+    }
+
+    Given("업로드 파일 용량이 10MB 이상이라면") {
+        every { mvpTestRepository.findByIdOrNull(TEST_ID) } returns mvpTest
+        every { s3Service.deleteFile(any()) } returns Unit
+        every { mvpTestCategoryMapRepository.findAllByMvpTestId(TEST_ID) } returns emptyList()
+        every { mvpTestCategoryMapRepository.deleteAll(any()) } returns Unit
+        every { s3Service.uploadMvpTestFile(exceedMaxSizeFile) } throws IllegalArgumentException()
+        When("createMvpTest 실행 시") {
+            Then("IllegalArgumentException 예외 발생") {
+                shouldThrow<IllegalArgumentException> {
+                    mvpTestService.updateMvpTest(ENTERPRISE_ID, TEST_ID, updateMvpTestRequest, exceedMaxSizeFile)
                 }
             }
         }
@@ -232,6 +260,13 @@ class MvpTestServiceTest : BehaviorSpec({
             "test.pdf",
             "pdf",
             ByteArray(1)
+        )
+
+        private val exceedMaxSizeFile = MockMultipartFile(
+            "exceedMaxSizeFile",
+            "exceedMaxSize.jpg",
+            "jpg",
+            ByteArray(15)
         )
     }
 
