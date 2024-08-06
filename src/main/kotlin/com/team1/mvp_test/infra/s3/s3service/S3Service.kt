@@ -1,10 +1,8 @@
 package com.team1.mvp_test.infra.s3.s3service
 
 import com.amazonaws.services.s3.AmazonS3
-import com.amazonaws.services.s3.model.CannedAccessControlList
 import com.amazonaws.services.s3.model.DeleteObjectRequest
 import com.amazonaws.services.s3.model.ObjectMetadata
-import com.amazonaws.services.s3.model.PutObjectRequest
 import com.amazonaws.util.IOUtils
 import com.team1.mvp_test.common.error.S3ErrorMessage
 import org.springframework.beans.factory.annotation.Value
@@ -20,6 +18,7 @@ import java.util.*
 class S3Service(
     private val amazonS3: AmazonS3,
     @Value("\${cloud.aws.s3.bucket}") val bucket: String,
+    @Value("\${cloud.aws.s3.baseurl}") val s3BaseUrl: String,
 ) {
 
     fun uploadMvpTestFile(file: MultipartFile): String {
@@ -42,6 +41,10 @@ class S3Service(
     }
 
     private fun upload(file: MultipartFile, dir: String, allowedExtensions: Array<String>): String {
+        val maxFileSize = 10 * 1024 * 1024
+
+        if (file.size > maxFileSize) throw IllegalArgumentException(S3ErrorMessage.EXCEED_FILE_SIZE.message)
+
         val extension = file.originalFilename?.let { validateFileExtension(it, allowedExtensions) }
             ?: throw IllegalArgumentException(S3ErrorMessage.FILE_TYPE_NOT_VALID.message)
 
@@ -57,10 +60,7 @@ class S3Service(
         val byteArrayIs = ByteArrayInputStream(bytes)
         val s3Key = "$dir$fileName"
 
-        amazonS3.putObject(
-            PutObjectRequest(bucket, s3Key, byteArrayIs, objMeta)
-                .withCannedAcl(CannedAccessControlList.PublicRead)
-        )
+        amazonS3.putObject(bucket, s3Key, byteArrayIs, objMeta)
 
         return amazonS3.getUrl(bucket, s3Key).toString()
     }
@@ -90,23 +90,17 @@ class S3Service(
     }
 
     fun deleteFile(fileUrl: String) {
-        val baseUrl = "https://mvptest-bucket.s3.ap-northeast-2.amazonaws.com/"
+        val baseUrl = s3BaseUrl
         val filePath = URLDecoder.decode(fileUrl.removePrefix(baseUrl), StandardCharsets.UTF_8.name())
-
         amazonS3.deleteObject(DeleteObjectRequest(bucket, filePath))
     }
 
     fun deleteReportFiles(fileUrls: List<String>?) {
-        val baseUrl = "https://mvptest-bucket.s3.ap-northeast-2.amazonaws.com/"
-
+        val baseUrl = s3BaseUrl
         fileUrls?.forEach { fileUrl ->
             val filePath = URLDecoder.decode(fileUrl.removePrefix(baseUrl), StandardCharsets.UTF_8.name())
-
             amazonS3.deleteObject(DeleteObjectRequest(bucket, filePath))
-
         }
     }
-
 }
-
 
