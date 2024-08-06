@@ -24,6 +24,7 @@ class Enterprise(
     @Column(name = "phone_number")
     var phoneNumber: String,
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "state")
     var state: EnterpriseState = EnterpriseState.PENDING,
 
