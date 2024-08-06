@@ -3,12 +3,10 @@ package com.team1.mvp_test.domain.step.service
 import com.team1.mvp_test.common.exception.ModelNotFoundException
 import com.team1.mvp_test.common.exception.NoPermissionException
 import com.team1.mvp_test.domain.member.model.Sex
-import com.team1.mvp_test.domain.member.repository.MemberTestRepository
 import com.team1.mvp_test.domain.mvptest.model.MvpTest
 import com.team1.mvp_test.domain.mvptest.model.MvpTestState
 import com.team1.mvp_test.domain.mvptest.model.RecruitType
 import com.team1.mvp_test.domain.mvptest.repository.MvpTestRepository
-import com.team1.mvp_test.domain.report.repository.ReportRepository
 import com.team1.mvp_test.domain.step.dto.CreateStepRequest
 import com.team1.mvp_test.domain.step.dto.UpdateStepRequest
 import com.team1.mvp_test.domain.step.model.Step
@@ -27,15 +25,13 @@ class StepServiceTest : BehaviorSpec({
 
     val stepRepository = mockk<StepRepository>()
     val mvpTestRepository = mockk<MvpTestRepository>()
-    val memberTestRepository = mockk<MemberTestRepository>()
-    val reportRepository = mockk<ReportRepository>()
     val s3Service = mockk<S3Service>()
+    val memberReportService = mockk<MemberReportService>()
     val stepService = StepService(
         stepRepository = stepRepository,
         mvpTestRepository = mvpTestRepository,
         s3Service = s3Service,
-        memberTestRepository = memberTestRepository,
-        reportRepository = reportRepository,
+        memberReportService = memberReportService
     )
     Given("createStep 실행 시"){
         every { mvpTestRepository.findByIdOrNull(TEST_ID) } returns mvpTest
@@ -120,6 +116,18 @@ class StepServiceTest : BehaviorSpec({
             }
         }
     }
+
+    Given("getStepOverview 실행 시"){
+        every { stepRepository.findByIdOrNull(any()) } returns step
+        When("해당 step 이 속해있는 test 의 작성자가 아닐 경우"){
+            Then("NoPermissionException 예외를 던진다"){
+                shouldThrow<NoPermissionException> {
+                    stepService.getStepOverview(2L, STEP_ID)
+                }
+            }
+        }
+    }
+
 
 }) {
     companion object {

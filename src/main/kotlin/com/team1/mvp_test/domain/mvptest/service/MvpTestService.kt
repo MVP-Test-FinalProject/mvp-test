@@ -154,7 +154,6 @@ class MvpTestService(
 
         if (test.recruitType == RecruitType.FIRST_COME) {
             val lock = redissonService.getLock("applyToMvpTest:$testId", 2000, 6000)
-
             val recruitCount = memberTestRepository.countByTestIdAndState(testId, MemberTestState.APPROVED)
             check(recruitCount < test.recruitNum) { MvpTestErrorMessage.TEST_ALREADY_FULL.message }
             MemberTest(
