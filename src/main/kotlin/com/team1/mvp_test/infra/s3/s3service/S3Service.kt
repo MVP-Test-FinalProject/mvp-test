@@ -1,10 +1,8 @@
 package com.team1.mvp_test.infra.s3.s3service
 
 import com.amazonaws.services.s3.AmazonS3
-import com.amazonaws.services.s3.model.CannedAccessControlList
 import com.amazonaws.services.s3.model.DeleteObjectRequest
 import com.amazonaws.services.s3.model.ObjectMetadata
-import com.amazonaws.services.s3.model.PutObjectRequest
 import com.amazonaws.util.IOUtils
 import com.team1.mvp_test.common.error.S3ErrorMessage
 import org.springframework.beans.factory.annotation.Value
@@ -61,10 +59,7 @@ class S3Service(
         val byteArrayIs = ByteArrayInputStream(bytes)
         val s3Key = "$dir$fileName"
 
-        amazonS3.putObject(
-            PutObjectRequest(bucket, s3Key, byteArrayIs, objMeta)
-                .withCannedAcl(CannedAccessControlList.PublicRead)
-        )
+        amazonS3.putObject(bucket, s3Key, byteArrayIs, objMeta)
 
         return amazonS3.getUrl(bucket, s3Key).toString()
     }
