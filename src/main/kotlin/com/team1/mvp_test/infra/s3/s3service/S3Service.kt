@@ -20,6 +20,7 @@ import java.util.*
 class S3Service(
     private val amazonS3: AmazonS3,
     @Value("\${cloud.aws.s3.bucket}") val bucket: String,
+    @Value("\${cloud.aws.s3.baseurl}") val s3BaseUrl: String,
 ) {
 
     fun uploadMvpTestFile(file: MultipartFile): String {
@@ -42,6 +43,9 @@ class S3Service(
     }
 
     private fun upload(file: MultipartFile, dir: String, allowedExtensions: Array<String>): String {
+        val maxFileSize = 10 * 1024 * 1024
+        if (file.size >= maxFileSize) throw IllegalArgumentException(S3ErrorMessage.EXCEED_MAX_FILE_SIZE.message)
+
         val extension = file.originalFilename?.let { validateFileExtension(it, allowedExtensions) }
             ?: throw IllegalArgumentException(S3ErrorMessage.FILE_TYPE_NOT_VALID.message)
 
@@ -90,14 +94,14 @@ class S3Service(
     }
 
     fun deleteFile(fileUrl: String) {
-        val baseUrl = "https://mvptest-bucket.s3.ap-northeast-2.amazonaws.com/"
+        val baseUrl = s3BaseUrl
         val filePath = URLDecoder.decode(fileUrl.removePrefix(baseUrl), StandardCharsets.UTF_8.name())
 
         amazonS3.deleteObject(DeleteObjectRequest(bucket, filePath))
     }
 
     fun deleteReportFiles(fileUrls: List<String>?) {
-        val baseUrl = "https://mvptest-bucket.s3.ap-northeast-2.amazonaws.com/"
+        val baseUrl = s3BaseUrl
 
         fileUrls?.forEach { fileUrl ->
             val filePath = URLDecoder.decode(fileUrl.removePrefix(baseUrl), StandardCharsets.UTF_8.name())
