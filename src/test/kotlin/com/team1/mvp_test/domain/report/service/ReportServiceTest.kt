@@ -44,11 +44,11 @@ class ReportServiceTest : BehaviorSpec({
         memberTestRepository = memberTestRepository,
         s3Service = s3Service
     )
-    Given("createReport 실행 시") {
+    Given("파일 형식이 jpg, jpeg, png 이 아니면") {
         every { memberTestRepository.findByIdOrNull(any()) } returns memberTest
         every { stepRepository.findByIdOrNull(any()) } returns step
-        every { s3Service.uploadReportFile(invalidMediaFileList) } throws IllegalArgumentException("Invalid file type. Only JPEG and PNG are allowed.")
-        When("파일 형식이 jpg, jpeg, png 이 아니면") {
+        every { s3Service.uploadReportFile(invalidMediaFileList) } throws IllegalArgumentException()
+        When("createReport 실행 시") {
             Then("IllegalArgumentException 예외 발생") {
                 shouldThrow<IllegalArgumentException> {
                     reportService.createReport(MEMBER_ID, STEP_ID, request, invalidMediaFileList)
@@ -57,11 +57,11 @@ class ReportServiceTest : BehaviorSpec({
         }
     }
 
-    Given("createReport 실행 시 ") {
+    Given("파일이 없으면 ") {
         every { memberTestRepository.findByIdOrNull(any()) } returns memberTest
         every { stepRepository.findByIdOrNull(any()) } returns step
-        every { s3Service.uploadReportFile(emptyMediaFileList) } throws IllegalArgumentException("Invalid file type. Only JPEG and PNG are allowed.")
-        When("파일이 없으면 ") {
+        every { s3Service.uploadReportFile(emptyMediaFileList) } throws IllegalArgumentException()
+        When("createReport 실행 시 ") {
             Then("IllegalArgumentException 예외 발생") {
                 shouldThrowExactly<IllegalArgumentException> {
                     reportService.createReport(MEMBER_ID, STEP_ID, request, emptyMediaFileList)
@@ -70,14 +70,27 @@ class ReportServiceTest : BehaviorSpec({
         }
     }
 
-    Given("updateReport 실행 ") {
+    Given("업로드 파일이 10MB 초과라면") {
+        every { memberTestRepository.findByIdOrNull(any()) } returns memberTest
+        every { stepRepository.findByIdOrNull(any()) } returns step
+        every { s3Service.uploadReportFile(exceedMaxSizeFileList) } throws IllegalArgumentException()
+        When("createReport 실행 시") {
+            Then("IllegalArgumentException 예외 발생") {
+                shouldThrowExactly<IllegalArgumentException> {
+                    reportService.createReport(MEMBER_ID, STEP_ID, request, exceedMaxSizeFileList)
+                }
+            }
+        }
+    }
+
+    Given("파일 형식이 jpg, jpeg, png 이 아니면 ") {
         every { memberTestRepository.findByIdOrNull(any()) } returns memberTest
         every { stepRepository.findByIdOrNull(any()) } returns step
         every { reportRepository.findByIdOrNull(any()) } returns report
         every { reportMediaRepository.deleteAll(any()) } returns Unit
         every { s3Service.deleteReportFiles(any()) } returns Unit
         every { s3Service.uploadReportFile(invalidMediaFileList) } returns emptyList()
-        When("파일 형식이 jpg, jpeg, png 이 아니면") {
+        When("updateReport 실행") {
             Then("IllegalArgumentException 예외 발생") {
                 shouldThrowExactly<IllegalArgumentException> {
                     reportService.updateReport(MEMBER_ID, REPORT_ID, request, invalidMediaFileList)
@@ -86,14 +99,30 @@ class ReportServiceTest : BehaviorSpec({
         }
     }
 
-    Given("updateReport 실행") {
+    Given("파일이 없으면") {
         every { memberTestRepository.findByIdOrNull(any()) } returns memberTest
         every { stepRepository.findByIdOrNull(any()) } returns step
         every { reportRepository.findByIdOrNull(any()) } returns report
         every { reportMediaRepository.deleteAll(any()) } returns Unit
         every { s3Service.deleteReportFiles(any()) } returns Unit
         every { s3Service.uploadReportFile(emptyMediaFileList) } returns emptyList()
-        When("파일이 없으면 ") {
+        When("updateReport 실행 ") {
+            Then("IllegalArgumentException 예외 발생") {
+                shouldThrowExactly<IllegalArgumentException> {
+                    reportService.updateReport(MEMBER_ID, REPORT_ID, request, emptyMediaFileList)
+                }
+            }
+        }
+    }
+
+    Given("업로드 파일이 10MB 초과일때") {
+        every { memberTestRepository.findByIdOrNull(any()) } returns memberTest
+        every { stepRepository.findByIdOrNull(any()) } returns step
+        every { reportRepository.findByIdOrNull(any()) } returns report
+        every { reportMediaRepository.deleteAll(any()) } returns Unit
+        every { s3Service.deleteReportFiles(any()) } returns Unit
+        every { s3Service.uploadReportFile(exceedMaxSizeFileList) } returns emptyList()
+        When("updateReport 실행") {
             Then("IllegalArgumentException 예외 발생") {
                 shouldThrowExactly<IllegalArgumentException> {
                     reportService.updateReport(MEMBER_ID, REPORT_ID, request, emptyMediaFileList)
@@ -293,9 +322,23 @@ class ReportServiceTest : BehaviorSpec({
             "jpg",
             ByteArray(0)
         )
+        private val exceedMaxSizeFile1 = MockMultipartFile(
+            "exceedMaxSizeFile",
+            "exceedMaxSize.jpg",
+            "jpg",
+            ByteArray(5)
+        )
+        private val exceedMaxSizeFile2 = MockMultipartFile(
+            "exceedMaxSizeFile",
+            "exceedMaxSize.jpg",
+            "jpg",
+            ByteArray(6)
+        )
 
         private val validMediaFileList: MutableList<MultipartFile> = mutableListOf(validFile1, validFile2)
         private val invalidMediaFileList: MutableList<MultipartFile> = mutableListOf(validFile1, invalidFile)
         private val emptyMediaFileList: MutableList<MultipartFile> = mutableListOf(emptyFile)
+        private val exceedMaxSizeFileList: MutableList<MultipartFile> =
+            mutableListOf(exceedMaxSizeFile1, exceedMaxSizeFile2)
     }
 }

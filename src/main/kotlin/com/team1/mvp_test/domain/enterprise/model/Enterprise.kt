@@ -47,6 +47,7 @@ class Enterprise(
     }
 
     fun block(reason: String) {
+        this.state = EnterpriseState.BLOCKED
         this.reason = reason
     }
 }
