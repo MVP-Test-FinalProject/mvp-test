@@ -169,6 +169,7 @@ class MemberServiceUnitTest: BehaviorSpec({
             id = 2L,
             name = "test2",
             email = "test2@test.com",
+            state = MemberState.PENDING
         )
         private val AlreadySignUpInfoRequest = SignUpInfoRequest(
             age = 30,
