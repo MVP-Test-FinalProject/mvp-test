@@ -41,8 +41,6 @@ class S3Service(
     }
 
     private fun upload(file: MultipartFile, dir: String, allowedExtensions: Array<String>): String {
-        val maxFileSize = 10 * 1024 * 1024
-        if (file.size >= maxFileSize) throw IllegalArgumentException(S3ErrorMessage.EXCEED_MAX_FILE_SIZE.message)
 
         val extension = file.originalFilename?.let { validateFileExtension(it, allowedExtensions) }
             ?: throw IllegalArgumentException(S3ErrorMessage.FILE_TYPE_NOT_VALID.message)
