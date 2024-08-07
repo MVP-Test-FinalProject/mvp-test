@@ -1,5 +1,7 @@
 package com.team1.mvp_test.domain.mvptest.service
 
+import com.team1.mvp_test.common.exception.ModelNotFoundException
+import com.team1.mvp_test.common.exception.NoPermissionException
 import com.team1.mvp_test.domain.category.repository.CategoryRepository
 import com.team1.mvp_test.domain.enterprise.model.Enterprise
 import com.team1.mvp_test.domain.enterprise.model.EnterpriseState
@@ -180,10 +182,75 @@ class MvpTestServiceTest : BehaviorSpec({
         }
     }
 
+    Given("기업이 존재하지 않는 경우") {
+        every { enterpriseRepository.findByIdOrNull(any()) } returns null
+        When("createMvpTest 실행 시") {
+            Then("ModelNotFoundException 발생") {
+                shouldThrow<ModelNotFoundException> {
+                    mvpTestService.createMvpTest(1L, createMvpTestRequest, invalidFile)
+                }
+            }
+        }
+    }
+    Given("기업이 BLOCKED 상태인 경우") {
+        every { enterpriseRepository.findByIdOrNull(any()) } returns blockedEnterprise
+        When("createMvpTest 실행 시") {
+            Then("NoPermissionException 발생") {
+                shouldThrow<NoPermissionException> {
+                    mvpTestService.createMvpTest(2L, createMvpTestRequest, invalidFile)
+                }
+            }
+        }
+    }
+    Given("날짜 조건을 만족하지 않는 경우") {
+        every { enterpriseRepository.findByIdOrNull(any()) } returns enterprise
+        When("createMvpTest 실행 시") {
+            Then("IllegalArgumentException 발생") {
+                shouldThrow<IllegalArgumentException> {
+                    mvpTestService.createMvpTest(1L, invalidCreateMvpTestRequest1, invalidFile)
+                    mvpTestService.createMvpTest(1L, invalidCreateMvpTestRequest2, invalidFile)
+                    mvpTestService.createMvpTest(1L, invalidCreateMvpTestRequest3, invalidFile)
+                    mvpTestService.createMvpTest(1L, invalidCreateMvpTestRequest4, invalidFile)
+                }
+            }
+        }
+    }
+
+    Given("테스트가 존재하지 않는 경우") {
+        every { mvpTestRepository.findByIdOrNull(any()) } returns null
+        When("deleteMvpTest 실행 시") {
+            Then("ModelNotFoundException 발생") {
+                shouldThrow<ModelNotFoundException> {
+                    mvpTestService.deleteMvpTest(1L, 1L)
+                }
+            }
+        }
+        When("getMvpTest 실행 시") {
+            Then("ModelNotFoundException 발생") {
+                shouldThrow<ModelNotFoundException> {
+                    mvpTestService.getMvpTest(1L)
+                }
+            }
+        }
+    }
+
+    Given("권한이 없는 기업인 경우") {
+        every { mvpTestRepository.findByIdOrNull(any()) } returns mvpTest
+        When("deleteMvpTest 실행 시") {
+            Then("NoPermissionException 발생") {
+                shouldThrow<NoPermissionException> {
+                    mvpTestService.deleteMvpTest(BLOCKED_ENTERPRISE_ID, 1L)
+                }
+            }
+        }
+    }
+
+
 }) {
     companion object {
         private const val TEST_ID = 1L
         private const val ENTERPRISE_ID = 1L
+        private const val BLOCKED_ENTERPRISE_ID = 2L
         private val mvpTest = MvpTest(
             id = TEST_ID,
             enterpriseId = ENTERPRISE_ID,
@@ -214,6 +281,18 @@ class MvpTestServiceTest : BehaviorSpec({
             reason = null
         )
 
+        private val blockedEnterprise = Enterprise(
+            id = BLOCKED_ENTERPRISE_ID,
+            email = "test@test.com",
+            name = "testName",
+            ceoName = "testCeoName",
+            password = "pWdjH0wrRuybq9ccRSDug2Z",
+            phoneNumber = "01012345678",
+            state = EnterpriseState.BLOCKED,
+            reason = null
+        )
+
+
         private val createMvpTestRequest = CreateMvpTestRequest(
             mvpName = "Valid MVP",
             recruitStartDate = LocalDateTime.of(2025, 7, 24, 0, 0),
@@ -230,7 +309,70 @@ class MvpTestServiceTest : BehaviorSpec({
             recruitNum = 10,
             categories = listOf("ValidCategory")
         )
-
+        private val invalidCreateMvpTestRequest1 = CreateMvpTestRequest(
+            mvpName = "Valid MVP",
+            recruitStartDate = LocalDateTime.of(2025, 7, 26, 0, 0),
+            recruitEndDate = LocalDateTime.of(2025, 7, 24, 0, 0),
+            testStartDate = LocalDateTime.of(2025, 8, 1, 0, 0),
+            testEndDate = LocalDateTime.of(2025, 8, 2, 0, 0),
+            mvpInfo = "Valid info",
+            mvpUrl = "https://mvp.casd",
+            rewardBudget = 10000,
+            requirementMinAge = 15,
+            requirementMaxAge = 20,
+            requirementSex = Sex.FEMALE,
+            recruitType = RecruitType.FIRST_COME,
+            recruitNum = 10,
+            categories = listOf("ValidCategory")
+        )
+        private val invalidCreateMvpTestRequest2 = CreateMvpTestRequest(
+            mvpName = "Valid MVP",
+            recruitStartDate = LocalDateTime.of(2025, 7, 24, 0, 0),
+            recruitEndDate = LocalDateTime.of(2025, 7, 26, 0, 0),
+            testStartDate = LocalDateTime.of(2025, 7, 25, 0, 0),
+            testEndDate = LocalDateTime.of(2025, 7, 27, 0, 0),
+            mvpInfo = "Valid info",
+            mvpUrl = "https://mvp.casd",
+            rewardBudget = 10000,
+            requirementMinAge = 15,
+            requirementMaxAge = 20,
+            requirementSex = Sex.FEMALE,
+            recruitType = RecruitType.FIRST_COME,
+            recruitNum = 10,
+            categories = listOf("ValidCategory")
+        )
+        private val invalidCreateMvpTestRequest3 = CreateMvpTestRequest(
+            mvpName = "Valid MVP",
+            recruitStartDate = LocalDateTime.of(2025, 7, 24, 0, 0),
+            recruitEndDate = LocalDateTime.of(2025, 7, 26, 0, 0),
+            testStartDate = LocalDateTime.of(2025, 7, 27, 0, 0),
+            testEndDate = LocalDateTime.of(2025, 7, 26, 0, 0),
+            mvpInfo = "Valid info",
+            mvpUrl = "https://mvp.casd",
+            rewardBudget = 10000,
+            requirementMinAge = 15,
+            requirementMaxAge = 20,
+            requirementSex = Sex.FEMALE,
+            recruitType = RecruitType.FIRST_COME,
+            recruitNum = 10,
+            categories = listOf("ValidCategory")
+        )
+        private val invalidCreateMvpTestRequest4 = CreateMvpTestRequest(
+            mvpName = "Valid MVP",
+            recruitStartDate = LocalDateTime.of(2025, 7, 24, 0, 0),
+            recruitEndDate = LocalDateTime.of(2025, 7, 26, 0, 0),
+            testStartDate = LocalDateTime.of(2025, 7, 27, 0, 0),
+            testEndDate = LocalDateTime.of(2025, 7, 28, 0, 0),
+            mvpInfo = "Valid info",
+            mvpUrl = "https://mvp.casd",
+            rewardBudget = 10000,
+            requirementMinAge = 20,
+            requirementMaxAge = 15,
+            requirementSex = Sex.FEMALE,
+            recruitType = RecruitType.FIRST_COME,
+            recruitNum = 10,
+            categories = listOf("ValidCategory")
+        )
         private val updateMvpTestRequest = UpdateMvpTestRequest(
             mvpName = "Valid MVP Name",
             recruitStartDate = LocalDateTime.of(2025, 9, 1, 12, 0),
