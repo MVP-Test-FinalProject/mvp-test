@@ -74,7 +74,7 @@ class StepServiceTest : BehaviorSpec({
         }
     }
 
-    Given("업로드 파일이 10MB 이상이라면") {
+    Given("업로드 파일이 10MB 초과라면") {
         every { s3Service.uploadStepFile(exceedMaxSizeFile) } throws IllegalArgumentException()
         every { stepRepository.findByIdOrNull(STEP_ID) } returns step
         every { stepRepository.findMaxOrderByTestId(TEST_ID) } returns MAX_ORDER
