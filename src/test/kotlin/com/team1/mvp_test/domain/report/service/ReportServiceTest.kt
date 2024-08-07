@@ -70,7 +70,7 @@ class ReportServiceTest : BehaviorSpec({
         }
     }
 
-    Given("업로드 파일이 10MB 이상이라면") {
+    Given("업로드 파일이 10MB 초과라면") {
         every { memberTestRepository.findByIdOrNull(any()) } returns memberTest
         every { stepRepository.findByIdOrNull(any()) } returns step
         every { s3Service.uploadReportFile(exceedMaxSizeFileList) } throws IllegalArgumentException()
@@ -115,7 +115,7 @@ class ReportServiceTest : BehaviorSpec({
         }
     }
 
-    Given("업로드 파일이 10MB 일때") {
+    Given("업로드 파일이 10MB 초과일때") {
         every { memberTestRepository.findByIdOrNull(any()) } returns memberTest
         every { stepRepository.findByIdOrNull(any()) } returns step
         every { reportRepository.findByIdOrNull(any()) } returns report
