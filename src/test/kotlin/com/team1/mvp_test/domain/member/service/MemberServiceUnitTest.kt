@@ -24,8 +24,15 @@ class MemberServiceUnitTest: BehaviorSpec({
     val redisService = mockk<RedisService>()
     val memberService = MemberService(memberRepository, redisService)
 
-    Given("member state가 active 라면") {
-        every { memberRepository.findByIdOrNull(any())} returns activeMember
+    lateinit var activeMember: Member
+    lateinit var pendingMember: Member
+    beforeTest {
+        activeMember = createActiveMember()
+        pendingMember = createPendingMember()
+    }
+
+    Given("member state 가 active 라면") {
+        every { memberRepository.findByIdOrNull(1L)} returns activeMember
 
         When("updateSignUpInfo 실행 시") {
             Then("IllegalStateException") {
@@ -65,7 +72,7 @@ class MemberServiceUnitTest: BehaviorSpec({
     }
 
     Given("핸드폰 인증까지 성공했다면") {
-        every { memberRepository.findByIdOrNull(any()) } returns pendingMember
+        every { memberRepository.findByIdOrNull(2L) } returns pendingMember
         every { redisService.getVerifiedPhoneNumber(any()) } returns "00123456789"
         every { memberRepository.existsByPhoneNumber(any()) } returns false
         When("updateSignUpInfo 실행 시") {
@@ -80,7 +87,7 @@ class MemberServiceUnitTest: BehaviorSpec({
     }
 
     Given("member state가 active 가 아니라면") {
-        every { memberRepository.findByIdOrNull(any())} returns pendingMember
+        every { memberRepository.findByIdOrNull(2L)} returns pendingMember
         When("updateMember 실행 시") {
             Then("NoPermissionException") {
                 val exception = shouldThrow<NoPermissionException> {
@@ -92,10 +99,10 @@ class MemberServiceUnitTest: BehaviorSpec({
     }
 
     Given("member state가 active 인 상태라면") {
-        every { memberRepository.findByIdOrNull(any())} returns activeMember
+        every { memberRepository.findByIdOrNull(1L)} returns activeMember
         When("updateMember 실행 시") {
             Then("member 정보가 바뀌고 반환된다") {
-                val memberInfo = memberService.updateMember(2L, memberUpdateRequest)
+                val memberInfo = memberService.updateMember(1L, memberUpdateRequest)
                 memberInfo.info shouldBe  memberUpdateRequest.info
                 memberInfo.name shouldBe  memberUpdateRequest.name
             }
@@ -146,7 +153,11 @@ class MemberServiceUnitTest: BehaviorSpec({
         When("registerIfAbsent 실행 시") {
             Then("해당 id로 로그인이 요청된다") {
                 val member = memberService.registerIfAbsent(oAuthLoginUserInfo)
-                member shouldBe activeMember
+                member.id shouldBe activeMember.id
+                member.email shouldBe activeMember.email
+                member.providerName shouldBe activeMember.providerName
+                member.providerId shouldBe activeMember.providerId
+                member.state shouldBe activeMember.state
             }
         }
     }
@@ -154,7 +165,7 @@ class MemberServiceUnitTest: BehaviorSpec({
 
 }) {
     companion object {
-        private val activeMember = Member(
+        fun createActiveMember() = Member(
             id = 1L,
             name = "test",
             email = "test@test.com",
@@ -165,7 +176,8 @@ class MemberServiceUnitTest: BehaviorSpec({
             providerId = "test provider id",
             state = MemberState.ACTIVE
         )
-        private val pendingMember = Member(
+
+        fun createPendingMember() = Member(
             id = 2L,
             name = "test2",
             email = "test2@test.com",
