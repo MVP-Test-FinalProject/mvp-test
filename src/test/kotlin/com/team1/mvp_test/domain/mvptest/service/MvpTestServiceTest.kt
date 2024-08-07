@@ -74,7 +74,7 @@ class MvpTestServiceTest : BehaviorSpec({
         }
     }
 
-    Given("업로드 파일 용량이 10MB 이상일때") {
+    Given("업로드 파일 용량이 10MB 초과일때") {
         every { enterpriseRepository.findByIdOrNull(any()) } returns enterprise
         every { s3Service.uploadMvpTestFile(exceedMaxSizeFile) } throws IllegalArgumentException()
         When("createMvpTest 실행 시") {
@@ -115,7 +115,7 @@ class MvpTestServiceTest : BehaviorSpec({
         }
     }
 
-    Given("업로드 파일 용량이 10MB 이상이라면") {
+    Given("업로드 파일 용량이 10MB 초과라면") {
         every { mvpTestRepository.findByIdOrNull(TEST_ID) } returns mvpTest
         every { s3Service.deleteFile(any()) } returns Unit
         every { mvpTestCategoryMapRepository.findAllByMvpTestId(TEST_ID) } returns emptyList()
