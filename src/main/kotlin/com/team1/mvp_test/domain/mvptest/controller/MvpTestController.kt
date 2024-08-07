@@ -7,6 +7,7 @@ import com.team1.mvp_test.domain.mvptest.dto.UpdateMvpTestRequest
 import com.team1.mvp_test.domain.mvptest.service.MvpTestService
 import com.team1.mvp_test.infra.security.UserPrincipal
 import jakarta.validation.Valid
+import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
@@ -101,5 +102,16 @@ class MvpTestController(
     ): List<MvpTestResponse> {
         val enterpriseId = userPrincipal.id
         return mvpTestService.getMvpTestsByEnterprise(enterpriseId)
+    }
+
+    @GetMapping("/available-tests")
+    @PreAuthorize("hasRole('MEMBER')")
+    fun getAvailableTests(
+        @AuthenticationPrincipal userPrincipal: UserPrincipal,
+        pageable: Pageable
+    ): ResponseEntity<List<MvpTestResponse>> {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(mvpTestService.getAvailableTests(userPrincipal.id, pageable))
     }
 }
