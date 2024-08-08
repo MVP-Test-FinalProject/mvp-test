@@ -27,9 +27,9 @@ class MemberService(
         check(member.state != MemberState.ACTIVE) { MemberErrorMessage.SIGN_UP_ALREADY_DONE.message }
         val verifiedPhoneNumber = redisService.getVerifiedPhoneNumber(request.phoneNumber)
         check(verifiedPhoneNumber != null && verifiedPhoneNumber == request.phoneNumber)
-        { MemberErrorMessage.PHONE_NUMBER_VERIFY_FAILED }
+        { MemberErrorMessage.PHONE_NUMBER_VERIFY_FAILED.message }
         check(!memberRepository.existsByPhoneNumber(request.phoneNumber))
-        { MemberErrorMessage.PHONE_NUMBER_ALREADY_IN_USE }
+        { MemberErrorMessage.PHONE_NUMBER_ALREADY_IN_USE.message }
 
         member.updateSignUpInfo(
             name = request.name,
