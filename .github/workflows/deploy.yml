@@ -4,7 +4,6 @@ on:
   push:
     branches: 
       - "master" 
-      #- "feat#55-continuous-deploy"
   pull_request:
     branches: 
       - "master" 
@@ -86,6 +85,9 @@ jobs:
     needs: build
 
     steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
     - name: Deploy to EC2
       uses: appleboy/ssh-action@v0.1.6
       with:
@@ -93,16 +95,6 @@ jobs:
         username: ubuntu
         key: ${{ secrets.SSH_KEY }}
         script: |
-          sudo apt-get update
-          sudo apt-get install -y docker.io
-          sudo systemctl start docker
-          sudo systemctl enable docker
-          sudo usermod -aG docker ubuntu
-          sudo chmod 666 /var/run/docker.sock
-          docker --version 
+          docker-compose -f /home/ubuntu/docker-compose.yaml up -d
+
           
-          
-          docker pull seungheyon/myfirsthub:latest
-          docker stop myapp || true
-          docker rm myapp || true
-          docker run -d --name myapp -p 8080:8080 seungheyon/myfirsthub:latest
