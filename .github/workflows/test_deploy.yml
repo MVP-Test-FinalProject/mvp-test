@@ -89,14 +89,14 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
     
-    - name: Transfer docker-compose.yml to EC2
-      uses: appleboy/scp-action@master
-      with:
-        host: ${{ secrets.SSH_HOST }}
-        username: ubuntu
-        key: ${{ secrets.SSH_KEY }}
-        source: 'docker-compose.yaml'
-        target: '~/'
+    # - name: Transfer docker-compose.yml to EC2
+    #   uses: appleboy/scp-action@master
+    #   with:
+    #     host: ${{ secrets.SSH_HOST }}
+    #     username: ubuntu
+    #     key: ${{ secrets.SSH_KEY }}
+    #     source: 'docker-compose.yaml'
+    #     target: '~/'
 
     - name: Deploy to EC2
       uses: appleboy/ssh-action@v0.1.6
@@ -105,14 +105,6 @@ jobs:
         username: ubuntu
         key: ${{ secrets.SSH_KEY }}
         script: |
-          sudo apt-get update -y
-          sudo apt-get install -y docker.io
-          sudo systemctl start docker
-          sudo systemctl enable docker
-          sudo usermod -aG docker $USER
-          sudo chmod 666 /var/run/docker.sock
-          docker --version
-
           docker-compose -f /home/ubuntu/docker-compose.yaml up -d
 
            
