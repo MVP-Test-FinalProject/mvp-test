@@ -1,8 +1,6 @@
 package com.team1.mvp_test.batch
 
 import com.team1.mvp_test.batch.model.BatchStatus
-import com.team1.mvp_test.batch.repository.BatchDataRepository
-import com.team1.mvp_test.batch.repository.BatchJobDataRepository
 import com.team1.mvp_test.batch.service.BatchService
 import com.team1.mvp_test.domain.enterprise.model.Enterprise
 import com.team1.mvp_test.domain.enterprise.model.EnterpriseState
