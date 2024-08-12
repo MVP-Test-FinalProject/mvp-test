@@ -18,6 +18,7 @@ class BatchJobExecution(
     @Column(name = "end_time")
     var endTime: LocalDateTime? = null,
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status")
     var status: BatchJobStatus,
 
