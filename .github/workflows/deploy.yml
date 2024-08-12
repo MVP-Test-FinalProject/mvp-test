@@ -111,6 +111,11 @@ jobs:
               TARGET_CONTAINER=myapp1
             fi
 
+            if lsof -Pi :$TARGET_PORT -sTCP:LISTEN -t >/dev/null ; then
+                echo "Port $TARGET_PORT is already in use, stopping the process."
+                sudo fuser -k $TARGET_PORT/tcp
+            fi
+
             echo "Deploying to port $TARGET_PORT..."
             docker-compose -f /home/ubuntu/docker-compose.yaml up -d $TARGET_CONTAINER
 
