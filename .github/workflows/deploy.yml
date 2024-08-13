@@ -98,42 +98,7 @@ jobs:
         key: ${{ secrets.SSH_KEY }}
         script: |
             
-            BLUE_PORT=8081
-            GREEN_PORT=8082
             
-            CURRENT_PORT=$(sudo grep -Po 'proxy_pass http://myapp\K[12]' /etc/nginx/sites-enabled/myapp | head -1)
 
-            if [ "$CURRENT_PORT" == "1" ]; then
-              TARGET_PORT=$GREEN_PORT
-              TARGET_CONTAINER=myapp2
-            else
-              TARGET_PORT=$BLUE_PORT
-              TARGET_CONTAINER=myapp1
-            fi
-
-            if lsof -Pi :$TARGET_PORT -sTCP:LISTEN -t >/dev/null ; then
-                echo "Port $TARGET_PORT is already in use, stopping the process."
-                docker-compose -f /home/ubuntu/docker-compose.yaml stop $TARGET_CONTAINER
-                sudo fuser -k $TARGET_PORT/tcp
-            fi
-
-            echo "Deploying to port $TARGET_PORT..."
-            docker-compose -f /home/ubuntu/docker-compose.yaml up -d $TARGET_CONTAINER
-
-            echo "Waiting for the application on port $TARGET_PORT to be ready..."
-            until $(curl --output /dev/null --silent --head --fail http://localhost:$TARGET_PORT/health); do
-                printf '.'
-                sleep 5 
-            done
-
-            echo "Application on port $TARGET_PORT is ready."
-
-            sudo sed -i "s/proxy_pass http:\/\/myapp[12]/proxy_pass http:\/\/myapp${TARGET_PORT: -1}/" /etc/nginx/sites-enabled/myapp
-
-            sudo nginx -t
-
-            sudo systemctl reload nginx
-
-            echo "Deployment to port $TARGET_PORT completed."
-
+            docker-compose -f /home/ubuntu/docker-compose.yaml up -d
 
