@@ -36,12 +36,5 @@ class AdminController(
             .status(HttpStatus.OK)
             .body(adminAuthService.login(request))
     }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/rewards/settle")
-    fun settleReward(): ResponseEntity<Unit> {
-        return ResponseEntity
-            .status(HttpStatus.NO_CONTENT)
-            .body(batchService.provideRewardAllTests(LocalDateTime.now()))
-    }
+    
 }
