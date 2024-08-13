@@ -20,8 +20,10 @@ class CustomAuthenticationEntryPoint : AuthenticationEntryPoint {
         response.contentType = MediaType.APPLICATION_JSON_VALUE
         response.characterEncoding = "UTF-8"
 
+        println(authException.stackTrace)
         val objectMapper = ObjectMapper()
-        val jsonString = objectMapper.writeValueAsString(ErrorResponse("JWT Verification failed"))
+        val jsonString = objectMapper.writeValueAsString(ErrorResponse("JWT Ver" +
+            "ification failed"))
         response.writer.write(jsonString)
     }
 }
