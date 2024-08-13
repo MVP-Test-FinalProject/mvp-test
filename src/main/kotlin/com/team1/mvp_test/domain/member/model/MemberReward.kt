@@ -16,9 +16,7 @@ class MemberReward(
 
     @Column(name = "message")
     val message: String,
-
-
-    )
+)
 
 
 

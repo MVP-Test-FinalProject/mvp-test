@@ -22,10 +22,13 @@ abstract class Step {
             execute(date)
         }.onSuccess {
             stepExecution.setStatusOnSuccess(LocalDateTime.now())
+            batchStepExecutionRepository.save(stepExecution)
         }.onFailure { error ->
             stepExecution.setStatusOnError(LocalDateTime.now(), error.message)
+            batchStepExecutionRepository.save(stepExecution)
+            throw error
         }
-        batchStepExecutionRepository.save(stepExecution)
+
     }
 
     abstract val name: String

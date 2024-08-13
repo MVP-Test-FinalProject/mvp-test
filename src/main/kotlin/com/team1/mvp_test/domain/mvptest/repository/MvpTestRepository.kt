@@ -16,6 +16,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 
 @Repository
 interface MvpTestRepository : JpaRepository<MvpTest, Long>, MvpTestQueryDslRepository {
@@ -38,7 +39,7 @@ class MvpTestQueryDslRepositoryImpl(
 
     override fun findAllUnsettledMvpTests(date: LocalDate): List<MvpTest> {
         val builder = BooleanBuilder()
-            .and(mvpTest.testEndDate.before(LocalDateTime.from(date)))
+            .and(mvpTest.testEndDate.before(date.atTime(LocalTime.MAX)))
             .and(mvpTest.settlementDate.isNull)
         return queryFactory.selectFrom(mvpTest)
             .where(builder)

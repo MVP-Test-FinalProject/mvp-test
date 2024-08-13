@@ -44,6 +44,7 @@ class PayMemberRewardStep(
                     settlement.addRewardAmount(reward)
                 }
             }
+            settlement.test.settlementDate = date
         }
     }
 
