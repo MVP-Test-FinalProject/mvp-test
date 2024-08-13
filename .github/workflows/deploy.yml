@@ -120,7 +120,7 @@ jobs:
             docker-compose -f /home/ubuntu/docker-compose.yaml up -d $TARGET_CONTAINER
 
             echo "Waiting for the application on port $TARGET_PORT to be ready..."
-            until $(curl --output /dev/null --silent --head --fail http://localhost:$TARGET_PORT); do
+            until $(curl --output /dev/null --silent --head --fail http://localhost:$TARGET_PORT/health); do
                 printf '.'
                 sleep 5 
             done
