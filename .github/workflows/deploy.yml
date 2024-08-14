@@ -135,4 +135,4 @@ jobs:
 
           sudo systemctl reload nginx
 
-          echo "Deployment to port $TARGET_PORT completed."
+          echo "Deployment to port $TARGET_PORT completed." 
