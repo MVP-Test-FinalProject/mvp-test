@@ -18,12 +18,12 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.every
 import io.mockk.mockk
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.context.annotation.Import
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.test.context.ActiveProfiles
 import java.time.LocalDate
 
@@ -62,6 +62,14 @@ class RewardSettlementJobFailTest @Autowired constructor(
         createSettlementDataStep = createSettlementDataStep
     )
 
+    @AfterEach
+    fun cleanUp() {
+        batchJobInstanceRepository.deleteAll()
+        batchJobExecutionRepository.deleteAll()
+        batchStepExecutionRepository.deleteAll()
+
+    }
+
     @Test
     fun `첫 번째 Step에서 오류가 발생한 경우 JobExecution 및 stepExecution 상태 확인`() {
         // given
@@ -71,9 +79,9 @@ class RewardSettlementJobFailTest @Autowired constructor(
         rewardSettlementJob.run(date)
 
         // then
-        val jobInstance = batchJobInstanceRepository.findByIdOrNull(1L)
-        val jobExecution = batchJobExecutionRepository.findByJobInstanceId(1L)
-        val stepExecution = batchStepExecutionRepository.findByIdOrNull(1L)
+        val jobInstance = batchJobInstanceRepository.findAll().first()
+        val jobExecution = batchJobExecutionRepository.findAll().first()
+        val stepExecution = batchStepExecutionRepository.findAll().first()
 
         jobInstance shouldNotBe null
         jobInstance!!.jobName shouldBe rewardSettlementJob.name
@@ -103,10 +111,11 @@ class RewardSettlementJobFailTest @Autowired constructor(
         rewardSettlementJob.run(date)
 
         // then
-        val jobInstance = batchJobInstanceRepository.findByIdOrNull(1L)
-        val jobExecution = batchJobExecutionRepository.findByJobInstanceId(1L)
-        val stepExecution1 = batchStepExecutionRepository.findByIdOrNull(1L)
-        val stepExecution2 = batchStepExecutionRepository.findByIdOrNull(2L)
+        val jobInstance = batchJobInstanceRepository.findAll().first()
+        val jobExecution = batchJobExecutionRepository.findAll().first()
+        val stepExecutions = batchStepExecutionRepository.findAll()
+        val stepExecution1 = stepExecutions.first()
+        val stepExecution2 = stepExecutions.last()
 
 
         jobInstance shouldNotBe null

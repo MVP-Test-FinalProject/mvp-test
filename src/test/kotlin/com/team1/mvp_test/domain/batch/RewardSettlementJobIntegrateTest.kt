@@ -103,10 +103,11 @@ class RewardSettlementJobIntegrateTest @Autowired constructor(
         // Then : 성공된 데이터 저장 여부 확인
 
         // Batch Meta Data가 올바르게 저장되었는지 확인
-        val jobInstance = batchJobInstanceRepository.findByIdOrNull(1L)
-        val jobExecution = batchJobExecutionRepository.findByJobInstanceId(1L)
-        val stepExecution1 = batchStepExecutionRepository.findByIdOrNull(1L)
-        val stepExecution2 = batchStepExecutionRepository.findByIdOrNull(2L)
+        val jobInstance = batchJobInstanceRepository.findAll().first()
+        val jobExecution = batchJobExecutionRepository.findAll().first()
+        val stepExecutions = batchStepExecutionRepository.findAll()
+        val stepExecution1 = stepExecutions.first()
+        val stepExecution2 = stepExecutions.last()
 
         jobInstance shouldNotBe null
         jobInstance!!.jobName shouldBe rewardSettlementJob.name
