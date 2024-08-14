@@ -97,6 +97,6 @@ jobs:
         username: ubuntu
         key: ${{ secrets.SSH_KEY }}
         script: |
-          
+        
           
           docker-compose -f /home/ubuntu/docker-compose.yaml up -d myapp1
