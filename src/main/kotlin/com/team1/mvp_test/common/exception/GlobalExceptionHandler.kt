@@ -39,7 +39,7 @@ class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handleMethodArgumentNotValid(e: MethodArgumentNotValidException): ResponseEntity<ErrorResponse> {
         val fieldError = e.fieldError
-        val message = "${fieldError?.field}의 입력 값 [${fieldError?.rejectedValue}] 이 유효하지 않습니둥당"
+        val message = "${fieldError?.field}의 입력 값 [${fieldError?.rejectedValue}] 이 유효하지 않습니동당"
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ErrorResponse(message))
     }
 
