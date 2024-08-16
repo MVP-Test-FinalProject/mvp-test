@@ -32,6 +32,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("com.amazonaws:aws-java-sdk-s3:1.12.741")
     implementation("org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE")
+    implementation("org.apache.tika:tika-core:2.7.0")
+
 
     //queryDsl
     implementation("com.querydsl:querydsl-jpa:$queryDslVersion:jakarta")
@@ -55,7 +57,7 @@ dependencies {
     implementation("jakarta.validation:jakarta.validation-api:3.0.0")
     implementation("org.glassfish:jakarta.el:4.0.2") // Required for EL expression support
 
-    implementation ("org.redisson:redisson-spring-boot-starter:3.33.0")
+    implementation("org.redisson:redisson-spring-boot-starter:3.33.0")
     //embedded redis for redisson test
     testImplementation("it.ozimov:embedded-redis:0.7.2")
 }
