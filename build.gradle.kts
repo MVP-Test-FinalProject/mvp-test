@@ -26,6 +26,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    runtimeOnly("com.mysql:mysql-connector-j")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
     implementation("io.jsonwebtoken:jjwt:0.12.3")
     implementation("org.springframework.boot:spring-boot-starter-security")
@@ -33,6 +34,7 @@ dependencies {
     implementation("com.amazonaws:aws-java-sdk-s3:1.12.741")
     implementation("org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE")
     implementation("org.springframework.boot:spring-boot-starter-mail")
+    implementation("org.apache.tika:tika-core:2.7.0")
 
     //queryDsl
     implementation("com.querydsl:querydsl-jpa:$queryDslVersion:jakarta")

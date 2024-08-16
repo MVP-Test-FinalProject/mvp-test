@@ -31,7 +31,8 @@ class SecurityConfig(
                     "api/v1/enterprise/sign-up",
                     "/member/oauth/**",
                     "/message/**",
-                    "/admin/**"
+                    "/admin/**",
+                    "/health"
                 )
                     .permitAll()
                     .anyRequest().authenticated()

@@ -33,10 +33,10 @@ class StepServiceTest : BehaviorSpec({
         s3Service = s3Service,
         memberReportService = memberReportService
     )
-    Given("파일 형식이 ppt, pdf가 아니면") {
-        every { mvpTestRepository.findByIdOrNull(TEST_ID) } returns mvpTest
-        every { s3Service.uploadStepFile(invalidFile) } throws IllegalArgumentException()
-        every { stepRepository.findMaxOrderByTestId(TEST_ID) } returns 1
+    Given("파일 형식이  pdf가 아니면") {
+        every { mvpTestRepository.findByIdOrNull(any()) } returns mvpTest
+        every { s3Service.uploadStepFile(any()) } throws IllegalArgumentException()
+        every { stepRepository.findMaxOrderByTestId(any()) } returns 1
         When("createStep 실행 시") {
             Then("IllegalArgumentException 예외 발생") {
                 shouldThrow<IllegalArgumentException> {
@@ -46,10 +46,24 @@ class StepServiceTest : BehaviorSpec({
         }
     }
 
+    Given("파일 확장자가 pdf이면서 파일 내용은 pdf가 아닐 때") {
+        every { mvpTestRepository.findByIdOrNull(any()) } returns mvpTest
+        every { s3Service.uploadStepFile(any()) } throws IllegalArgumentException()
+        every { stepRepository.findMaxOrderByTestId(any()) } returns 1
+        When("createStep 실행 시") {
+            Then("IllegalArgumentException 예외 발생") {
+                shouldThrow<IllegalArgumentException> {
+                    stepService.createStep(ENTERPRISE_ID, TEST_ID, createStepRequest, incorrectContentFile)
+                }
+            }
+        }
+    }
+
+
     Given("업로드 파일이 10MB 초과일때") {
-        every { mvpTestRepository.findByIdOrNull(TEST_ID) } returns mvpTest
-        every { s3Service.uploadStepFile(exceedMaxSizeFile) } throws IllegalArgumentException()
-        every { stepRepository.findMaxOrderByTestId(TEST_ID) } returns 1
+        every { mvpTestRepository.findByIdOrNull(any()) } returns mvpTest
+        every { s3Service.uploadStepFile(any()) } throws IllegalArgumentException()
+        every { stepRepository.findMaxOrderByTestId(any()) } returns 1
         When("createStep 실행 시") {
             Then("IllegalArgumentException 예외 발생") {
                 shouldThrow<IllegalArgumentException> {
@@ -59,10 +73,10 @@ class StepServiceTest : BehaviorSpec({
         }
     }
 
-    Given("파일 형식이 ppt, pdf가 아닐때") {
-        every { s3Service.uploadStepFile(invalidFile) } throws IllegalArgumentException()
-        every { stepRepository.findByIdOrNull(STEP_ID) } returns step
-        every { stepRepository.findMaxOrderByTestId(TEST_ID) } returns MAX_ORDER
+    Given("파일 형식이 pdf가 아닐때") {
+        every { s3Service.uploadStepFile(any()) } throws IllegalArgumentException()
+        every { stepRepository.findByIdOrNull(any()) } returns step
+        every { stepRepository.findMaxOrderByTestId(any()) } returns MAX_ORDER
         every { s3Service.deleteFile(any()) } returns Unit
         When("updateStep 실행 시") {
             Then("IllegalArgumentException 예외 발생") {
@@ -74,10 +88,24 @@ class StepServiceTest : BehaviorSpec({
         }
     }
 
+    Given("파일 확장자가 pdf이면서 파일 내용은 pdf가 아니라면") {
+        every { mvpTestRepository.findByIdOrNull(any()) } returns mvpTest
+        every { s3Service.uploadStepFile(any()) } throws IllegalArgumentException()
+        every { stepRepository.findMaxOrderByTestId(any()) } returns 1
+        When("updateStep 실행 시") {
+            Then("IllegalArgumentException 예외 발생") {
+                shouldThrow<IllegalArgumentException> {
+                    stepService.updateStep(ENTERPRISE_ID, TEST_ID, updateStepRequest, incorrectContentFile)
+                }
+            }
+        }
+    }
+
+
     Given("업로드 파일이 10MB 초과라면") {
-        every { s3Service.uploadStepFile(exceedMaxSizeFile) } throws IllegalArgumentException()
-        every { stepRepository.findByIdOrNull(STEP_ID) } returns step
-        every { stepRepository.findMaxOrderByTestId(TEST_ID) } returns MAX_ORDER
+        every { s3Service.uploadStepFile(any()) } throws IllegalArgumentException()
+        every { stepRepository.findByIdOrNull(any()) } returns step
+        every { stepRepository.findMaxOrderByTestId(any()) } returns MAX_ORDER
         every { s3Service.deleteFile(any()) } returns Unit
         When("updateStep 실행 시") {
             Then("IllegalArgumentException 예외 발생") {
@@ -219,6 +247,13 @@ class StepServiceTest : BehaviorSpec({
             "exceedMaxSize.jpg",
             "jpg",
             ByteArray(15)
+        )
+
+        private val incorrectContentFile = MockMultipartFile(
+            "incorrectContentFile",
+            "incorrect.pdf",
+            "jpg",
+            ByteArray(1)
         )
 
     }
