@@ -23,8 +23,10 @@ class RedissonTestConfig {
     //embedded redis 서버를 테스트 실행 이전에 열고, 끝나기 전에 닫는 로직
     @PostConstruct
     fun startRedis() {
+        redisServer.stop()
         redisServer.start()
     }
+
     @PreDestroy
     fun stopRedis() {
         redisServer.stop()
