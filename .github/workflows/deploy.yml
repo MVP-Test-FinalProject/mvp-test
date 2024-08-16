@@ -4,7 +4,6 @@ on:
   push:
     branches: 
       - "master" 
-      - "feat#55-continuous-deploy"
   pull_request:
     branches: 
       - "master" 
