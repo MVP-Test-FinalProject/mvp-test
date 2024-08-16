@@ -14,7 +14,9 @@ import com.team1.mvp_test.domain.mvptest.model.QMvpTest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 
 @Repository
 interface MvpTestRepository : JpaRepository<MvpTest, Long>, MvpTestQueryDslRepository {
@@ -22,7 +24,7 @@ interface MvpTestRepository : JpaRepository<MvpTest, Long>, MvpTestQueryDslRepos
 }
 
 interface MvpTestQueryDslRepository {
-    fun findAllUnsettledMvpTests(todayDate: LocalDateTime): List<MvpTest>
+    fun findAllUnsettledMvpTests(date: LocalDate): List<MvpTest>
     fun findMemberList(testId: Long, enterpriseId: Long): List<MemberInfoResponse>
     fun findAvailableTests(member: Member, pageable: Pageable): List<MvpTest>
 }
@@ -35,9 +37,9 @@ class MvpTestQueryDslRepositoryImpl(
     private val memberTest: QMemberTest = QMemberTest.memberTest
     private val member: QMember = QMember.member
 
-    override fun findAllUnsettledMvpTests(todayDate: LocalDateTime): List<MvpTest> {
+    override fun findAllUnsettledMvpTests(date: LocalDate): List<MvpTest> {
         val builder = BooleanBuilder()
-            .and(mvpTest.testEndDate.before(todayDate))
+            .and(mvpTest.testEndDate.before(date.atTime(LocalTime.MAX)))
             .and(mvpTest.settlementDate.isNull)
         return queryFactory.selectFrom(mvpTest)
             .where(builder)

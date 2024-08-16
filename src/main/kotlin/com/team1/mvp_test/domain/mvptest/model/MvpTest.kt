@@ -2,6 +2,7 @@ package com.team1.mvp_test.domain.mvptest.model
 
 import com.team1.mvp_test.domain.member.model.Sex
 import jakarta.persistence.*
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Table(name = "mvp_test")
@@ -66,7 +67,7 @@ class MvpTest(
     var reason: String? = null,
 
     @Column(name = "settlement_date")
-    var settlementDate: LocalDateTime? = null
+    var settlementDate: LocalDate? = null
 ) {
 
     fun update(updateObject: UpdateMvpTestObject) {

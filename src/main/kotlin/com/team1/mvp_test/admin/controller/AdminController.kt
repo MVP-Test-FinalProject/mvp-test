@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 @RestController
 @RequestMapping("/admin")
@@ -38,10 +38,13 @@ class AdminController(
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/rewards/settle")
-    fun settleReward(): ResponseEntity<Unit> {
+    @PostMapping("/reward-settle")
+    fun settleReward(
+        @RequestBody date: LocalDate
+    ): ResponseEntity<Unit> {
         return ResponseEntity
             .status(HttpStatus.NO_CONTENT)
-            .body(batchService.provideRewardAllTests(LocalDateTime.now()))
+            .body(batchService.settleReward(date))
     }
+
 }
