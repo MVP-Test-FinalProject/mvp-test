@@ -43,6 +43,16 @@ class MemberController(
             .body(memberService.updateMember(userPrincipal.id, request))
     }
 
+    @GetMapping("/profile")
+    @PreAuthorize("hasRole('MEMBER')")
+    fun getMemberProfile(
+        @AuthenticationPrincipal userPrincipal: UserPrincipal
+    ): ResponseEntity<MemberResponse> {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(memberService.getMemberById(userPrincipal.id))
+    }
+
     @GetMapping("/{memberId}")
     fun getMemberById(
         @PathVariable memberId: Long,
