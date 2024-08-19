@@ -77,7 +77,7 @@ class MvpTestService(
                 category = category
             ).let { map -> mvpTestCategoryMapRepository.save(map) }
         }
-        return MvpTestResponse.from(mvpTest, request.categories)
+        return MvpTestResponse.from(mvpTest, enterprise, request.categories)
     }
 
     @Transactional
@@ -98,7 +98,10 @@ class MvpTestService(
         val mvpTest = mvpTestRepository.findByIdOrNull(testId)
             ?: throw ModelNotFoundException("MvpTest", testId)
         if (mvpTest.enterpriseId != enterpriseId) throw NoPermissionException(MvpTestErrorMessage.NOT_AUTHORIZED.message)
-
+        val enterprise = enterpriseRepository.findByIdOrNull(mvpTest.enterpriseId) ?: throw ModelNotFoundException(
+            "enterprise",
+            mvpTest.enterpriseId
+        )
         mvpTestCategoryMapRepository.findAllByMvpTestId(testId)
             .let { mvpTestCategoryMapRepository.deleteAll(it) }
 
@@ -116,7 +119,7 @@ class MvpTestService(
         val file = mainImageFile.let { s3Service.uploadMvpTestFile(it) }
 
         mvpTest.update(request.toObject(file))
-        return MvpTestResponse.from(mvpTest, request.categories)
+        return MvpTestResponse.from(mvpTest, enterprise, request.categories)
     }
 
     @Transactional
@@ -131,17 +134,22 @@ class MvpTestService(
     fun getMvpTest(testId: Long): MvpTestResponse {
         val mvpTest = mvpTestRepository.findByIdOrNull(testId)
             ?: throw ModelNotFoundException("MvpTest", testId)
+        val enterprise = enterpriseRepository.findByIdOrNull(mvpTest.enterpriseId) ?: throw ModelNotFoundException(
+            "enterprise",
+            mvpTest.enterpriseId
+        )
         val categories = mvpTestCategoryMapRepository.findAllByMvpTestId(testId)
             .map { it.category.name }
-        return MvpTestResponse.from(mvpTest, categories)
+        return MvpTestResponse.from(mvpTest, enterprise, categories)
     }
 
     fun getMvpTestList(): List<MvpTestResponse> {
         return mvpTestRepository.findAll()
             .map { mvpTest ->
+                val enterprise = enterpriseRepository.findByIdOrNull(mvpTest.enterpriseId)
                 mvpTestCategoryMapRepository.findAllByMvpTestId(mvpTest.id!!)
                     .map { maps -> maps.category.name }
-                    .let { categories -> MvpTestResponse.from(mvpTest, categories) }
+                    .let { categories -> MvpTestResponse.from(mvpTest, enterprise!!, categories) }
             }
     }
 
@@ -177,10 +185,13 @@ class MvpTestService(
 
     fun getMvpTestsByEnterprise(enterpriseId: Long): List<MvpTestResponse> {
         val test = mvpTestRepository.findAllByEnterpriseId(enterpriseId)
-
+        val enterprise = enterpriseRepository.findByIdOrNull(enterpriseId) ?: throw ModelNotFoundException(
+            "enterprise",
+            enterpriseId
+        )
         return test.map { mvpTest ->
             val categories = mvpTestCategoryMapRepository.findAllByMvpTestId(mvpTest.id!!).map { it.category.name }
-            MvpTestResponse.from(mvpTest, categories)
+            MvpTestResponse.from(mvpTest, enterprise, categories)
         }
     }
 
@@ -191,7 +202,8 @@ class MvpTestService(
         val availableTests = mvpTestRepository.findAvailableTests(member, pageable)
         return availableTests.map { mvpTest ->
             val categories = mvpTestCategoryMapRepository.findAllByMvpTestId(mvpTest.id!!).map { it.category.name }
-            MvpTestResponse.from(mvpTest, categories)
+            val enterprise = enterpriseRepository.findByIdOrNull(memberId)
+            MvpTestResponse.from(mvpTest, enterprise!!, categories)
         }
     }
 
