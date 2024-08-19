@@ -18,14 +18,13 @@ class StepController(
 ) {
 
     @GetMapping("/mvp-tests/{testId}/steps")
-    @PreAuthorize("hasRole('ENTERPRISE')")
     fun getStepList(
         @PathVariable testId: Long,
         @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<List<StepListResponse>> {
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(stepService.getStepList(userPrincipal.id, testId))
+            .body(stepService.getStepList(testId))
     }
 
     @PostMapping("/mvp-tests/{testId}/steps")

@@ -23,10 +23,9 @@ class StepService(
     private val s3Service: S3Service,
     private val memberReportService: MemberReportService
 ) {
-    fun getStepList(enterpriseId: Long, testId: Long): List<StepListResponse> {
+    fun getStepList(testId: Long): List<StepListResponse> {
         val mvpTest = mvpTestRepository.findByIdOrNull(testId)
             ?: throw ModelNotFoundException("MvpTest", testId)
-        if (mvpTest.enterpriseId != enterpriseId) throw NoPermissionException(MvpTestErrorMessage.NOT_AUTHORIZED.message)
         return stepRepository.findAllByMvpTestIdOrderByStepOrder(testId).map { StepListResponse.from(it) }
     }
 
