@@ -3,10 +3,13 @@ package com.team1.mvp_test.domain.step.service
 import com.team1.mvp_test.common.exception.ModelNotFoundException
 import com.team1.mvp_test.common.exception.NoPermissionException
 import com.team1.mvp_test.domain.member.model.Sex
+import com.team1.mvp_test.domain.member.repository.MemberRepository
+import com.team1.mvp_test.domain.member.repository.MemberTestRepository
 import com.team1.mvp_test.domain.mvptest.model.MvpTest
 import com.team1.mvp_test.domain.mvptest.model.MvpTestState
 import com.team1.mvp_test.domain.mvptest.model.RecruitType
 import com.team1.mvp_test.domain.mvptest.repository.MvpTestRepository
+import com.team1.mvp_test.domain.report.repository.ReportRepository
 import com.team1.mvp_test.domain.step.dto.CreateStepRequest
 import com.team1.mvp_test.domain.step.dto.UpdateStepRequest
 import com.team1.mvp_test.domain.step.model.Step
@@ -27,11 +30,18 @@ class StepServiceTest : BehaviorSpec({
     val mvpTestRepository = mockk<MvpTestRepository>()
     val s3Service = mockk<S3Service>()
     val memberReportService = mockk<MemberReportService>()
+    val memberRepository = mockk<MemberRepository>()
+    val reportRepository = mockk<ReportRepository>()
+    val memberTestRepository = mockk<MemberTestRepository>()
+
     val stepService = StepService(
         stepRepository = stepRepository,
         mvpTestRepository = mvpTestRepository,
         s3Service = s3Service,
-        memberReportService = memberReportService
+        memberReportService = memberReportService,
+        memberRepository = memberRepository,
+        reportRepository = reportRepository,
+        memberTestRepository = memberTestRepository
     )
     Given("파일 형식이  pdf가 아니면") {
         every { mvpTestRepository.findByIdOrNull(any()) } returns mvpTest

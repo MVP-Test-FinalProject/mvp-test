@@ -28,6 +28,14 @@ class ReportService(
     private val reportMediaRepository: ReportMediaRepository,
     private val s3Service: S3Service
 ) {
+    @Transactional
+    fun getReport(memberId: Long, stepId: Long): ReportResponse? {
+        val step = stepRepository.findByIdOrNull(stepId) ?: throw ModelNotFoundException("step", stepId)
+        val memberTest = memberTestRepository.findByMemberIdAndTestId(memberId, step.mvpTest.id!!)
+            ?: throw NoPermissionException(ReportErrorMessage.NO_PERMISSION.message)
+        val report = reportRepository.findByStepIdAndMemberTestId(stepId, memberTest.id!!) ?: return null
+        return ReportResponse.from(report)
+    }
 
     @Transactional
     fun createReport(

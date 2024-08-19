@@ -44,7 +44,15 @@ class StepIntegrationTest @Autowired constructor(
 ) {
     private val memberReportService = MemberReportService(memberTestRepository, reportRepository)
     private val stepService =
-        StepService(stepRepository, mvpTestRepository, s3Service, memberReportService)
+        StepService(
+            stepRepository,
+            mvpTestRepository,
+            s3Service,
+            memberReportService,
+            memberRepository,
+            reportRepository,
+            memberTestRepository
+        )
 
     private val stepId = 1L
     private val testId = 1L
