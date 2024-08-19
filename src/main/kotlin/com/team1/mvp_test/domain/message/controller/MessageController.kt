@@ -1,5 +1,6 @@
 package com.team1.mvp_test.domain.message.controller
 
+import com.team1.mvp_test.domain.message.VerifyCodeResponse
 import com.team1.mvp_test.domain.message.service.MessageService
 import net.nurigo.sdk.message.response.SingleMessageSentResponse
 import org.springframework.http.HttpStatus
@@ -25,7 +26,7 @@ class MessageController(
     fun verifyCode(
         @RequestParam phoneNumber: String,
         @RequestParam code: String,
-    ): ResponseEntity<Boolean> {
+    ): ResponseEntity<VerifyCodeResponse> {
         return ResponseEntity.status(HttpStatus.OK).body(messageService.verifyCode(phoneNumber, code))
     }
 }

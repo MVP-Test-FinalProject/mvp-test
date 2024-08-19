@@ -1,5 +1,6 @@
 package com.team1.mvp_test.domain.message.service
 
+import com.team1.mvp_test.domain.message.VerifyCodeResponse
 import com.team1.mvp_test.infra.redis.RedisService
 import net.nurigo.sdk.NurigoApp.initialize
 import net.nurigo.sdk.message.model.Message
@@ -37,12 +38,12 @@ class MessageService(
         return (100000..999999).random().toString()
     }
 
-    fun verifyCode(phoneNumber: String, code: String): Boolean {
+    fun verifyCode(phoneNumber: String, code: String): VerifyCodeResponse {
         val savedCode = redisService.getVerificationCode(phoneNumber)
         if (savedCode == code) {
             redisService.saveVerifiedPhoneNumber(phoneNumber)
-            return true
+            return VerifyCodeResponse(state = true)
         }
-        return false
+        return VerifyCodeResponse(state = false)
     }
 }
