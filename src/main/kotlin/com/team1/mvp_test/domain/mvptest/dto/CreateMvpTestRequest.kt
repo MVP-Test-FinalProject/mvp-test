@@ -30,7 +30,7 @@ data class CreateMvpTestRequest(
 
     val requirementMinAge: Int?,
     val requirementMaxAge: Int?,
-    val requirementSex: Sex,
+    val requirementSex: Sex?,
     val recruitType: RecruitType,
 
     @field:Min(1)
