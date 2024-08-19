@@ -22,12 +22,12 @@ class ReportController(
     fun createReport(
         @PathVariable("step-id") stepId: Long,
         @Valid request: ReportRequest,
-        mediaFiles: MutableList<MultipartFile>,
+        mediaFile: MultipartFile,
         @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<ReportResponse> {
         return ResponseEntity
             .status(HttpStatus.CREATED)
-            .body(reportService.createReport(userPrincipal.id, stepId, request, mediaFiles))
+            .body(reportService.createReport(userPrincipal.id, stepId, request, mediaFile))
     }
 
     @PreAuthorize("hasRole('MEMBER')")
@@ -35,12 +35,12 @@ class ReportController(
     fun updateReport(
         @PathVariable("report-id") reportId: Long,
         @Valid request: ReportRequest,
-        mediaFiles: MutableList<MultipartFile>,
+        mediaFile: MultipartFile,
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
     ): ResponseEntity<ReportResponse> {
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(reportService.updateReport(userPrincipal.id, reportId, request, mediaFiles))
+            .body(reportService.updateReport(userPrincipal.id, reportId, request, mediaFile))
     }
 
     @PreAuthorize("hasRole('MEMBER')")

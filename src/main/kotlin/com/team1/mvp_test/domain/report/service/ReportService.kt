@@ -42,7 +42,7 @@ class ReportService(
         memberId: Long,
         stepId: Long,
         request: ReportRequest,
-        mediaFiles: MutableList<MultipartFile>
+        mediaFile: MultipartFile
     ): ReportResponse {
         val step = stepRepository.findByIdOrNull(stepId) ?: throw ModelNotFoundException("step", stepId)
         val memberTest = memberTestRepository.findByMemberIdAndTestId(memberId, step.mvpTest.id!!)
@@ -53,22 +53,20 @@ class ReportService(
                 memberTest
             )
         ) { ReportErrorMessage.ALREADY_REPORTED.message }
-        if (mediaFiles.isEmpty()) throw IllegalStateException(ReportErrorMessage.REPORT_MEDIA_URL_NOT_EXIST.message)
-        if (mediaFiles.size > 10) throw IllegalStateException(ReportErrorMessage.REPORT_MEDIA_URL_COUNT_NOT_VALID.message)
-        val fileUrl = mediaFiles.let { s3Service.uploadReportFile(it) }
+        if (mediaFile.isEmpty) throw IllegalStateException(ReportErrorMessage.REPORT_MEDIA_URL_NOT_EXIST.message)
+        val fileUrl = mediaFile.let { s3Service.uploadReportFile(it) }
+        val reportMedia = ReportMedia(mediaUrl = fileUrl)
+            .let { reportMediaRepository.save(it) }
         val report = Report(
             title = request.title,
             body = request.body,
             feedback = request.feedback,
             memberTest = memberTest,
-            step = step
+            step = step,
+            reportMedia = mutableListOf(reportMedia)
         ).let { reportRepository.save(it) }
 
-        fileUrl.map { fileUrls ->
-            ReportMedia(mediaUrl = fileUrls).apply { report.addReportMedia(this) }
-        }.let { reportMediaRepository.saveAll(it) }
-
-        return reportRepository.save(report).let { ReportResponse.from(it) }
+        return ReportResponse.from(report)
     }
 
     @Transactional
@@ -76,36 +74,33 @@ class ReportService(
         memberId: Long,
         reportId: Long,
         request: ReportRequest,
-        mediaFiles: MutableList<MultipartFile>
+        mediaFile: MultipartFile
     ): ReportResponse {
         val report = reportRepository.findByIdOrNull(reportId) ?: throw ModelNotFoundException("report", reportId)
+
         if (report.memberTest.member.id != memberId) throw NoPermissionException(ReportErrorMessage.NOT_AUTHORIZED.message)
+
         check(report.state != ReportState.APPROVED) { ReportErrorMessage.ALREADY_APPROVED.message }
+
         checkDateCondition(report.step.mvpTest)
+
         report.updateReport(
             title = request.title,
             body = request.body,
             feedback = request.feedback,
         )
-        if (mediaFiles.isEmpty()) throw IllegalStateException(ReportErrorMessage.REPORT_MEDIA_URL_NOT_EXIST.message)
-        if (mediaFiles.size > 10) throw IllegalStateException(ReportErrorMessage.REPORT_MEDIA_URL_COUNT_NOT_VALID.message)
+        if (mediaFile.isEmpty) throw IllegalStateException(ReportErrorMessage.REPORT_MEDIA_URL_NOT_EXIST.message)
 
-        val oldMediaUrls = report.reportMedia.map { it.mediaUrl }
+        report.reportMedia.firstOrNull()?.let {
+            s3Service.deleteFile(it.mediaUrl)
+            reportMediaRepository.delete(it)
+            report.clearReportMedia()
+        }
+        val fileUrl = s3Service.uploadReportFile(mediaFile)
+        val reportMedia = ReportMedia(mediaUrl = fileUrl).apply { report.addReportMedia(this) }
+        reportMediaRepository.save(reportMedia)
 
-        reportMediaRepository.deleteAll(report.reportMedia)
-
-        report.clearReportMedia()
-        s3Service.deleteReportFiles(oldMediaUrls)
-
-        val fileUrl = mediaFiles.let { s3Service.uploadReportFile(it) }
-
-        fileUrl.map { fileUrls ->
-            ReportMedia(mediaUrl = fileUrls).apply { report.addReportMedia(this) }
-        }.let { reportMediaRepository.saveAll(it) }
-
-
-        return reportRepository.save(report)
-            .let { ReportResponse.from(it) }
+        return reportRepository.save(report).let { ReportResponse.from(it) }
     }
 
     @Transactional
@@ -113,7 +108,10 @@ class ReportService(
         val report = reportRepository.findByIdOrNull(reportId) ?: throw ModelNotFoundException("report", reportId)
         if (report.memberTest.member.id != memberId) throw NoPermissionException(ReportErrorMessage.NOT_AUTHORIZED.message)
         check(report.state != ReportState.APPROVED) { ReportErrorMessage.ALREADY_APPROVED.message }
-        report.reportMedia.map { it.mediaUrl }.let { s3Service.deleteReportFiles(it) }
+        report.reportMedia.firstOrNull()?.let { media ->
+            s3Service.deleteFile(media.mediaUrl)
+            reportMediaRepository.delete(media)
+        }
         reportRepository.delete(report)
     }
 

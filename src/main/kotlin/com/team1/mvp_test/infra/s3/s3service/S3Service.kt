@@ -36,23 +36,15 @@ class S3Service(
         return upload(file, dir, allowedDocumentExtensions)
     }
 
-    fun uploadReportFile(files: MutableList<MultipartFile>): List<String> {
+    fun uploadReportFile(file: MultipartFile): String {
         val dir = "reportDocument/"
-        return files.map { file -> upload(file, dir, allowedImageExtensions) }
+        return upload(file, dir, allowedDocumentExtensions)
     }
 
     fun deleteFile(fileUrl: String) {
         val baseUrl = s3BaseUrl
         val filePath = URLDecoder.decode(fileUrl.removePrefix(baseUrl), StandardCharsets.UTF_8.name())
         amazonS3.deleteObject(DeleteObjectRequest(bucket, filePath))
-    }
-
-    fun deleteReportFiles(fileUrls: List<String>?) {
-        val baseUrl = s3BaseUrl
-        fileUrls?.forEach { fileUrl ->
-            val filePath = URLDecoder.decode(fileUrl.removePrefix(baseUrl), StandardCharsets.UTF_8.name())
-            amazonS3.deleteObject(DeleteObjectRequest(bucket, filePath))
-        }
     }
 
     private fun upload(file: MultipartFile, dir: String, allowedExtensions: Array<String>): String {
