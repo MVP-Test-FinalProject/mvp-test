@@ -1,10 +1,12 @@
 package com.team1.mvp_test.domain.member.controller
 
+import com.team1.mvp_test.admin.dto.adminauthority.MvpTestListResponse
 import com.team1.mvp_test.domain.member.dto.MemberResponse
 import com.team1.mvp_test.domain.member.dto.MemberUpdateRequest
 import com.team1.mvp_test.domain.member.dto.MemberUpdateResponse
 import com.team1.mvp_test.domain.member.dto.SignUpInfoRequest
 import com.team1.mvp_test.domain.member.service.MemberService
+import com.team1.mvp_test.domain.mvptest.service.MvpTestService
 import com.team1.mvp_test.infra.security.UserPrincipal
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
@@ -16,7 +18,8 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("api/v1/members")
 @RestController
 class MemberController(
-    val memberService: MemberService
+    private val memberService: MemberService,
+    private val mvpTestService: MvpTestService
 ) {
     @PutMapping("/info")
     @PreAuthorize("hasRole('MEMBER')")
@@ -47,5 +50,15 @@ class MemberController(
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(memberService.getMemberById(memberId))
+    }
+
+    @GetMapping("/mvp-tests")
+    @PreAuthorize("hasRole('MEMBER')")
+    fun getTests(
+        @AuthenticationPrincipal userPrincipal: UserPrincipal
+    ): ResponseEntity<List<MvpTestListResponse>> {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(mvpTestService.getMvpTestListByMember(userPrincipal.id))
     }
 }

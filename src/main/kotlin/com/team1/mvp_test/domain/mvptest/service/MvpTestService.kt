@@ -1,5 +1,6 @@
 package com.team1.mvp_test.domain.mvptest.service
 
+import com.team1.mvp_test.admin.dto.adminauthority.MvpTestListResponse
 import com.team1.mvp_test.common.error.CategoryErrorMessage
 import com.team1.mvp_test.common.error.MemberErrorMessage
 import com.team1.mvp_test.common.error.MvpTestErrorMessage
@@ -176,6 +177,14 @@ class MvpTestService(
                 test = test,
                 state = MemberTestState.PENDING
             ).let { memberTestRepository.save(it) }
+        }
+    }
+
+    @Transactional
+    fun getMvpTestListByMember(memberId: Long): List<MvpTestListResponse> {
+        val member = memberRepository.findByIdOrNull(memberId) ?: throw ModelNotFoundException("member", memberId)
+        return memberTestRepository.findAllByMemberId(memberId).map {
+            MvpTestListResponse.from(it)
         }
     }
 

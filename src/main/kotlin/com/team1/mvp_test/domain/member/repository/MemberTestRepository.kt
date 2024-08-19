@@ -11,7 +11,7 @@ interface MemberTestRepository : JpaRepository<MemberTest, Long> {
     fun findByMemberIdAndTestId(memberId: Long, testId: Long): MemberTest?
     fun countByTestIdAndState(testId: Long, state: MemberTestState): Long
     fun findAllByTestId(testId: Long): List<MemberTest>
-    fun findByMemberId(memberId: Long): List<MemberTest>?
+    fun findAllByMemberId(memberId: Long): List<MemberTest>
 
     @Query("SELECT mt FROM MemberTest mt JOIN FETCH mt.member WHERE mt.test.id = :testId")
     fun findAllAndMemberByTestId(testId: Long): List<MemberTest>

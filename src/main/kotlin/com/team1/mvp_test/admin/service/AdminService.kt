@@ -85,7 +85,7 @@ class AdminService(
     }
 
     fun getMemberMvpTest(memberId: Long): List<MvpTestListResponse> {
-        val memberTest = memberTestRepository.findByMemberId(memberId)
+        val memberTest = memberTestRepository.findAllByMemberId(memberId)
             ?: throw ModelNotFoundException("Member", memberId)
         return memberTest.map { MvpTestListResponse.from(it) }
     }
