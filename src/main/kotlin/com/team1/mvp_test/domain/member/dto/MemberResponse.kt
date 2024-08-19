@@ -9,6 +9,7 @@ data class MemberResponse(
     val age: Int?,
     val sex: String?,
     val info: String?,
+    val point: Int,
     val state: String,
 ) {
     companion object {
@@ -20,6 +21,7 @@ data class MemberResponse(
                 age = member.age,
                 sex = member.sex?.name,
                 info = member.info,
+                point = member.point,
                 state = member.state.name,
             )
         }

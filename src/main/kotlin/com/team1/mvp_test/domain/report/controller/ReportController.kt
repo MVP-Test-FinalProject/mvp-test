@@ -65,4 +65,25 @@ class ReportController(
             .body(reportService.approveReport(userPrincipal.id, reportId))
     }
 
+    @PreAuthorize("hasRole('MEMBER')")
+    @GetMapping("/steps/{step-id}/reports")
+    fun getReportByMember(
+        @PathVariable("step-id") stepId: Long,
+        @AuthenticationPrincipal userPrincipal: UserPrincipal
+    ): ResponseEntity<ReportResponse?> {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(reportService.getReport(userPrincipal.id, stepId))
+    }
+
+    @PreAuthorize("hasRole('ENTERPRISE')")
+    @GetMapping("/step/{step-id}/reports/{member-id}")
+    fun getReportByEnterprise(
+        @PathVariable("step-id") stepId: Long,
+        @PathVariable("member-id") memberId: Long,
+    ): ResponseEntity<ReportResponse?> {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(reportService.getReport(memberId, stepId))
+    }
 }
