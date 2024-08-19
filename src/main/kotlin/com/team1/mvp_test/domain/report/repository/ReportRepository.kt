@@ -12,4 +12,5 @@ interface ReportRepository : JpaRepository<Report, Long> {
     fun existsByStepAndMemberTest(step: Step, memberTest: MemberTest): Boolean
     fun findAllByMemberTestAndState(memberTest: MemberTest, state: ReportState): List<Report>
     fun findAllByStepId(stepId: Long): List<Report>
+    fun findByStepIdAndMemberTestId(stepId: Long, memberTestId: Long): Report?
 }

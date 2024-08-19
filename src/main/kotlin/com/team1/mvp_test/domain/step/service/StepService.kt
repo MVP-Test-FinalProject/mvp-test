@@ -4,9 +4,12 @@ import com.team1.mvp_test.common.error.MvpTestErrorMessage
 import com.team1.mvp_test.common.error.StepErrorMessage
 import com.team1.mvp_test.common.exception.ModelNotFoundException
 import com.team1.mvp_test.common.exception.NoPermissionException
+import com.team1.mvp_test.domain.member.repository.MemberRepository
+import com.team1.mvp_test.domain.member.repository.MemberTestRepository
 import com.team1.mvp_test.domain.mvptest.model.MvpTestState
 import com.team1.mvp_test.domain.mvptest.repository.MvpTestRepository
 import com.team1.mvp_test.domain.report.model.ReportState
+import com.team1.mvp_test.domain.report.repository.ReportRepository
 import com.team1.mvp_test.domain.step.dto.*
 import com.team1.mvp_test.domain.step.model.Step
 import com.team1.mvp_test.domain.step.repository.StepRepository
@@ -21,12 +24,29 @@ class StepService(
     private val stepRepository: StepRepository,
     private val mvpTestRepository: MvpTestRepository,
     private val s3Service: S3Service,
-    private val memberReportService: MemberReportService
+    private val memberReportService: MemberReportService,
+    private val memberRepository: MemberRepository,
+    private val reportRepository: ReportRepository,
+    private val memberTestRepository: MemberTestRepository,
 ) {
-    fun getStepList(testId: Long): List<StepListResponse> {
+
+
+    fun getStepList(memberId: Long?, testId: Long): List<StepListResponse> {
         val mvpTest = mvpTestRepository.findByIdOrNull(testId)
             ?: throw ModelNotFoundException("MvpTest", testId)
-        return stepRepository.findAllByMvpTestIdOrderByStepOrder(testId).map { StepListResponse.from(it) }
+        if (memberId == null) return stepRepository.findAllByMvpTestIdOrderByStepOrder(testId)
+            .map { StepListResponse.from(it) }
+        else {
+            val member = memberRepository.findByIdOrNull(memberId)
+                ?: throw ModelNotFoundException("Member", memberId)
+            val memberTest = memberTestRepository.findByMemberIdAndTestId(member.id!!, testId)
+                ?: throw ModelNotFoundException("MemberTest", "$memberId, $testId")
+            return stepRepository.findAllByMvpTestIdOrderByStepOrder(testId).map {
+                val report = reportRepository.findByStepIdAndMemberTestId(it.id!!, memberTest.id!!)
+                val state = report?.state ?: ReportState.MISSING
+                StepListResponse.from(it, state)
+            }
+        }
     }
 
     @Transactional
