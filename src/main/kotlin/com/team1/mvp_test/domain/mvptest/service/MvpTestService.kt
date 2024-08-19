@@ -256,7 +256,7 @@ class MvpTestService(
         if (member.state != MemberState.ACTIVE) {
             throw IllegalStateException(MvpTestErrorMessage.NOT_ACTIVE_USER.message)
         }
-        if (test.requirementSex != member.sex) {
+        if (test.requirementSex != null && test.requirementSex != member.sex) {
             throw IllegalStateException(MvpTestErrorMessage.SEX_RULE_INVALID.message)
         }
         if (test.requirementMinAge != null && test.requirementMinAge!! > member.age!!) {
