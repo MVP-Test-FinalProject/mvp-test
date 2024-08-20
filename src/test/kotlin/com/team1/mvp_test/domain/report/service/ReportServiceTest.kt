@@ -138,8 +138,8 @@ class ReportServiceTest : BehaviorSpec({
         every { s3Service.deleteFile(any()) } returns Unit
         every { s3Service.uploadReportFile(any()) } throws IllegalArgumentException()
         When("updateReport 실행 ") {
-            Then("IllegalArgumentException 예외 발생") {
-                shouldThrowExactly<IllegalArgumentException> {
+            Then("IllegalStateException 예외 발생") {
+                shouldThrowExactly<IllegalStateException> {
                     reportService.updateReport(MEMBER_ID, REPORT_ID, request, emptyFile)
                 }
             }
@@ -266,9 +266,9 @@ class ReportServiceTest : BehaviorSpec({
             id = TEST_ID,
             enterpriseId = ENTERPRISE_ID,
             mvpName = "test mvp name",
-            recruitStartDate = LocalDateTime.of(2025, 5, 1, 12, 0),
-            recruitEndDate = LocalDateTime.of(2025, 5, 5, 12, 0),
-            testStartDate = LocalDateTime.of(2025, 5, 10, 12, 0),
+            recruitStartDate = LocalDateTime.of(2023, 5, 1, 12, 0),
+            recruitEndDate = LocalDateTime.of(2024, 5, 5, 12, 0),
+            testStartDate = LocalDateTime.of(2024, 5, 10, 12, 0),
             testEndDate = LocalDateTime.of(2025, 5, 15, 12, 0),
             mainImageUrl = "test mvp main url",
             mvpInfo = "test mvp info",
