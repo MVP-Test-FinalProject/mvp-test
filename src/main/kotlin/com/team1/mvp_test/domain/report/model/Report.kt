@@ -52,6 +52,7 @@ class Report(
         this.title = title
         this.body = body
         this.feedback = feedback
+        this.state = ReportState.PENDING
     }
 
     fun approve() {
