@@ -160,7 +160,12 @@ class MvpTestService(
         val member = memberRepository.findByIdOrNull(memberId) ?: throw ModelNotFoundException("member", memberId)
         memberService.checkMemberActive(member)
         checkMemberCondition(member, test)
-
+        require(
+            !memberTestRepository.existsByMemberIdAndTestId(
+                memberId,
+                testId
+            )
+        ) { MvpTestErrorMessage.ALREADY_APPLIED }
         if (test.recruitType == RecruitType.FIRST_COME) {
             val lock = redissonService.getLock("applyToMvpTest:$testId", 2000, 6000)
             val recruitCount = memberTestRepository.countByTestIdAndState(testId, MemberTestState.APPROVED)
