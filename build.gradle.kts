@@ -33,8 +33,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("com.amazonaws:aws-java-sdk-s3:1.12.741")
     implementation("org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE")
+    implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("org.apache.tika:tika-core:2.7.0")
-
 
     //queryDsl
     implementation("com.querydsl:querydsl-jpa:$queryDslVersion:jakarta")
