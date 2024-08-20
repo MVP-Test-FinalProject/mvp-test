@@ -53,6 +53,7 @@ class ReportService(
                 memberTest
             )
         ) { ReportErrorMessage.ALREADY_REPORTED.message }
+        checkDateCondition(step.mvpTest)
         if (mediaFile.isEmpty) throw IllegalStateException(ReportErrorMessage.REPORT_MEDIA_URL_NOT_EXIST.message)
         val fileUrl = mediaFile.let { s3Service.uploadReportFile(it) }
         val reportMedia = ReportMedia(mediaUrl = fileUrl)
