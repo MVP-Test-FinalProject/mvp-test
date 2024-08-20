@@ -11,5 +11,6 @@ enum class MvpTestErrorMessage(val message: String) {
     NOT_ACTIVE_USER("승인된 유저가 아닙니다."),
     SEX_RULE_INVALID("테스트 참여 성별 제한이 유효하지 않습니다."),
     BLOCKED_STATE_ENTERPRISE("제재 당한 기업은 테스트를 생성하지 못합니다."),
-    BLOCKED_STATE_MEMBER("제제 당한 기업은 테스트 참가 신청 불가능합니다.")
+    BLOCKED_STATE_MEMBER("제제 당한 기업은 테스트 참가 신청 불가능합니다."),
+    ALREADY_APPLIED("이미 신청한 테스트입니다.")
 }
