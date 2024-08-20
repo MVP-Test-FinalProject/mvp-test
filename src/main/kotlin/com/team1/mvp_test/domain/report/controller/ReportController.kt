@@ -65,6 +65,19 @@ class ReportController(
             .body(reportService.approveReport(userPrincipal.id, reportId))
     }
 
+    @PreAuthorize("hasRole('ENTERPRISE')")
+    @PutMapping("/reports/{report-id}/reject")
+    fun rejectReport(
+        @PathVariable("report-id") reportId: Long,
+        @AuthenticationPrincipal userPrincipal: UserPrincipal,
+        reason: String,
+    ): ResponseEntity<ReportResponse> {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(reportService.rejectReport(userPrincipal.id, reportId, reason))
+    }
+
+
     @PreAuthorize("hasRole('MEMBER')")
     @GetMapping("/steps/{step-id}/reports")
     fun getReportByMember(

@@ -57,4 +57,9 @@ class Report(
     fun approve() {
         state = ReportState.APPROVED
     }
+
+    fun reject(reason: String) {
+        this.state = ReportState.REJECTED
+        this.reason = reason
+    }
 }

@@ -123,6 +123,14 @@ class ReportService(
         return ReportResponse.from(report)
     }
 
+    @Transactional
+    fun rejectReport(enterpriseId: Long, reportId: Long, reason: String): ReportResponse {
+        val report = reportRepository.findByIdOrNull(reportId) ?: throw ModelNotFoundException("report", reportId)
+        if (report.step.mvpTest.enterpriseId != enterpriseId) throw NoPermissionException(ReportErrorMessage.NO_PERMISSION.message)
+        report.reject(reason)
+        return ReportResponse.from(report)
+    }
+
     private fun checkDateCondition(test: MvpTest) {
         val currentDate = LocalDateTime.now()
         if (currentDate.isAfter(test.testEndDate) || currentDate.isBefore(test.testStartDate)) {
