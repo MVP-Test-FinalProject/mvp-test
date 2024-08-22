@@ -65,7 +65,8 @@
 
 
 <br>
-
+### API 명세서
+https://leather-antimony-86c.notion.site/MVPQuest-API-dc845bb76a4545889965a55837c2d49a?pvs=25
 
 <br>
 ## 4. 프로젝트 구조
