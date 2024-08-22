@@ -75,9 +75,9 @@
 - **사용자**
   - 테스트 참여 후 단계별 보고서 작성
     - 사용자(일반 회원)는 테스트에 참여 후, 어떤 단계(step)까지 진행했는지에 대한 결과를 보고서 형태로 작성합니다. 보고서는 글과 사진으로 테스트 진행 내용을 증명할 수 있습니다.
-   ![image](https://github.com/user-attachments/assets/0df74e17-f044-4611-8a4a-f4516a773250)
-  <br>본인이 참여중인 테스트를 확인할 수 있습니다.
-  ![참여테스트보고서작성](https://github.com/user-attachments/assets/e70dad66-844b-4103-b0bb-beab5bbec492)
+  ![내가참여중테스트](https://github.com/user-attachments/assets/72c3aae9-6569-4506-b991-d57de4a8c66d)
+    <br>본인이 참여중인 테스트를 확인할 수 있습니다.
+    ![참여테스트보고서작성](https://github.com/user-attachments/assets/e70dad66-844b-4103-b0bb-beab5bbec492)
   <br>참여한 테스트에 대해 보고서를 작성하여 테스트를 진행했음을 인증합니다.
       
 - **관리자**
