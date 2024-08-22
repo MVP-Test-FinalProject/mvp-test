@@ -83,7 +83,15 @@
 - **관리자**
   - 기업 회원/일반 회원의 가입 관리 및 제재
     - 관리자는 일반 회원과 기업 회원의 가입을 관리하며, 부정한 사용이 의심되는 사용자/기업회원에게 제재를 가할 수 있습니다.
+  - 테스트 모집글을 업로드 할 수 있습니다.
+    ![Bubble _ No-code apps 외 페이지 5개 - 개인 - Microsoft Edge 2024-08-22 오후 3_04_52](https://github.com/user-attachments/assets/a3b7e22c-b3e6-4edc-b56e-2e0b0cb4f122)
+  - 등록한 모집글의 각 STEP 별 사용자 보고서 현황을 확인할 수 있습니다.
+    ![Bubble _ No-code apps 외 페이지 5개 - 개인 - Microsoft Edge 2024-08-22 오후 3_03_10](https://github.com/user-attachments/assets/3d06e442-cb0d-4b37-a004-5b9d2990d531)
+  - 개별 보고서 내용을 확인할 수 있습니다.
+    ![Bubble _ No-code apps 외 페이지 5개 - 개인 - Microsoft Edge 2024-08-22 오후 3_02_55](https://github.com/user-attachments/assets/aa90dcfd-cb3b-427c-93a5-0051c7418de0)
 
+  
+    
 
 <br>
 
